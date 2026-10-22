@@ -1,5 +1,5 @@
-const CACHE_NAME = 'moya-site-report-cache-v8-uxpro';
-const ASSETS = ['./index.html', './styles.css?v=6', './app.js?v=6', './manifest.json'];
+const CACHE_NAME = 'moya-site-report-cache-v9-uxpro';
+const ASSETS = ['./index.html', './styles.css?v=9', './app.js?v=9', './manifest.json'];
 
 self.addEventListener('install', event => {
   event.waitUntil(

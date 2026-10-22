@@ -1,3 +1,351 @@
+
+/* ==============================================================
+ * 📐 BAUHAUS (包豪斯) 專屬 UI/UX PRO MAX 設計系統 (V9)
+ * - 產品與產業類別：Plant Care Tracker ＆ 營建工程
+ * - 視覺風格：Bauhaus (幾何構成、3px 黑邊、4px 4px 實心硬影、機械觸控按壓、0ms 瞬態、點陣網格)
+ * - 色彩配置：Primary #15803D | Secondary #059669 | CTA #D97706 | Background #F0FDF4 | Card #FFFFFF | Text #0F172A
+ * - 字型：Inter (Google Fonts)
+ * - 間距密度：1.3x，卡片圓角：0px
+ * ============================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root, [data-ui-theme="bauhaus"] {
+  --vvh: 100dvh;
+  --vvw: 100vw;
+
+  /* 包豪斯色彩 */
+  --bg-outer: #E2E8F0;
+  --bg-shell: #F0FDF4;
+  --card-bg: #FFFFFF;
+  --white: #FFFFFF;
+  --matcha-primary: #15803D;
+  --matcha-dark: #0F172A;
+  --matcha-light: #DCFCE7;
+  --matcha-muted-bg: #E8F5E9;
+  --cta-amber: #D97706;
+  --secondary-emerald: #059669;
+  --text-main: #0F172A;
+  --text-sub: #1E293B;
+  --text-muted: #475569;
+  --border-color: #0F172A;
+  --border-focus: #15803D;
+  --focus-ring: rgba(21, 128, 61, 0.45);
+  --danger-text: #B91C1C;
+  --danger-bg: #FEE2E2;
+  --danger-border: #0F172A;
+  --ok-text: #15803D;
+  --ok-bg: #DCFCE7;
+  --mach-primary: #059669;
+  --mach-light: #CCFBF1;
+  --radius-card: 0px !important;
+  --radius-control: 0px !important;
+  --shadow-card: 4px 4px 0px #0F172A !important;
+  --hard-shadow: 4px 4px 0px #0F172A !important;
+  --hard-shadow-sm: 2px 2px 0px #0F172A !important;
+}
+
+/* 全域字型採用 Inter，背景點陣網格 (Dot Grid Pattern) */
+html, body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Noto Sans TC", sans-serif !important;
+  background-color: #E2E8F0 !important;
+  background-image: radial-gradient(#CBD5E1 1.5px, transparent 1.5px) !important;
+  background-size: 16px 16px !important;
+  color: #0F172A !important;
+}
+
+.app-shell {
+  background-color: #F0FDF4 !important;
+  border-left: 3px solid #0F172A;
+  border-right: 3px solid #0F172A;
+}
+
+/* 包豪斯核心幾何：所有卡片圓角 0px、3px 粗實黑線、4px 4px 實心硬影 (Hard Offset Shadow) */
+.main-card, .proj-clean-card, .chart-card, .date-mini-card, .date-section-box,
+.report-preview-paper, .plant-card, .plant-hero-box, .social-proof-card {
+  border-radius: 0px !important;
+  border: 3px solid #0F172A !important;
+  box-shadow: 4px 4px 0px #0F172A !important;
+  background: #FFFFFF !important;
+}
+
+/* 包豪斯按鈕：圓角 0px、3px 邊框、3px 硬影、機械觸控按壓 (translate 2px, 2px) 與 0ms 瞬態 */
+button, .btn-top-item, .btn-proj-action, .phrase-chip, .btn-cat-tab,
+.step-pill-btn, .preset-btn, .btn-create-proj-hero, .btn-full-green, .btn-full-gray,
+.floating-jump-btn, .plant-tab-btn, .btn-care-action {
+  border-radius: 0px !important;
+  border: 3px solid #0F172A !important;
+  box-shadow: 3px 3px 0px #0F172A !important;
+  transition: none !important; /* instant 0ms transitions */
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 800 !important;
+}
+
+button:active, .btn-top-item:active, .btn-proj-action:active, .phrase-chip:active,
+.btn-cat-tab:active, .btn-full-green:active, .floating-jump-btn:active, .btn-care-action:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 1px 1px 0px #0F172A !important;
+}
+
+/* 頂部標題列 Bauhaus 化 */
+.app-topbar {
+  background-color: #F0FDF4 !important;
+  border-bottom: 3px solid #0F172A !important;
+}
+
+.topbar-step-pill {
+  border-radius: 0px !important;
+  border: 2px solid #0F172A !important;
+  background: #DCFCE7 !important;
+  color: #15803D !important;
+  font-weight: 900 !important;
+}
+
+.btn-top-item {
+  background: #15803D !important;
+  color: #FFFFFF !important;
+}
+
+.btn-top-item.btn-settings-highlight {
+  background: #D97706 !important;
+  color: #FFFFFF !important;
+  border: 3px solid #0F172A !important;
+}
+
+/* 醒目的 CTA 琥珀黃按鈕 */
+.btn-cta-amber {
+  background: #D97706 !important;
+  color: #FFFFFF !important;
+  border: 3px solid #0F172A !important;
+  box-shadow: 3px 3px 0px #0F172A !important;
+}
+
+/* 浮動下一欄按鈕 */
+.floating-jump-btn {
+  background: #D97706 !important;
+  color: #FFFFFF !important;
+  border: 3px solid #0F172A !important;
+  box-shadow: 4px 4px 0px #0F172A !important;
+  border-radius: 0px !important;
+}
+
+/* 輸入框包豪斯化 */
+input, textarea, select {
+  border-radius: 0px !important;
+  border: 3px solid #0F172A !important;
+  box-shadow: 2px 2px 0px #0F172A !important;
+  font-family: 'Inter', sans-serif !important;
+  background-color: #FFFFFF !important;
+}
+input:focus, textarea:focus {
+  border-color: #15803D !important;
+  box-shadow: 3px 3px 0px #15803D !important;
+}
+
+/* ==============================================================
+ * 🌿 PLANT CARE TRACKER (植物養護追蹤) 專屬 UI 組件樣式
+ * ============================================================== */
+.plant-mode-toggle-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  background: #FFFFFF;
+  border: 3px solid #0F172A;
+  box-shadow: 3px 3px 0px #0F172A;
+  padding: 4px;
+}
+
+.plant-tab-btn {
+  flex: 1;
+  height: 38px;
+  background: #F0FDF4;
+  color: #0F172A;
+  border: 2px solid transparent !important;
+  box-shadow: none !important;
+  font-size: 13.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.plant-tab-btn.active {
+  background: #15803D !important;
+  color: #FFFFFF !important;
+  border: 2px solid #0F172A !important;
+  box-shadow: 2px 2px 0px #0F172A !important;
+}
+
+/* Storytelling Hero 卡片 */
+.plant-hero-box {
+  background: #DCFCE7 !important;
+  padding: 18px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.plant-hero-tag {
+  display: inline-block;
+  background: #D97706;
+  color: #FFFFFF;
+  font-size: 11.5px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border: 2px solid #0F172A;
+  box-shadow: 2px 2px 0px #0F172A;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.plant-hero-title {
+  font-size: 19px;
+  font-weight: 900;
+  color: #0F172A;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.plant-hero-story {
+  font-size: 13px;
+  color: #1E293B;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.plant-stats-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.plant-stat-block {
+  background: #FFFFFF;
+  border: 2px solid #0F172A;
+  box-shadow: 2px 2px 0px #0F172A;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.plant-stat-val {
+  font-size: 16px;
+  font-weight: 900;
+  color: #15803D;
+}
+
+.plant-stat-lbl {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #475569;
+}
+
+/* 植物卡片 */
+.plant-card-item {
+  background: #FFFFFF;
+  border: 3px solid #0F172A;
+  box-shadow: 4px 4px 0px #0F172A;
+  padding: 14px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plant-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px dashed #0F172A;
+  padding-bottom: 8px;
+}
+
+.plant-name {
+  font-size: 16.5px;
+  font-weight: 900;
+  color: #0F172A;
+}
+
+.plant-latin {
+  font-size: 11.5px;
+  font-style: italic;
+  color: #475569;
+}
+
+.plant-badge-status {
+  background: #DCFCE7;
+  color: #15803D;
+  border: 2px solid #0F172A;
+  box-shadow: 2px 2px 0px #0F172A;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.plant-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.plant-metric-pill {
+  background: #F0FDF4;
+  border: 2px solid #0F172A;
+  padding: 6px;
+  text-align: center;
+}
+
+.plant-metric-val {
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #0F172A;
+}
+
+.plant-metric-lbl {
+  font-size: 10px;
+  color: #475569;
+  font-weight: 700;
+}
+
+/* Social Proof 社群推薦與實證背書區塊 */
+.social-proof-card {
+  background: #FEF3C7 !important;
+  border: 3px solid #0F172A !important;
+  box-shadow: 4px 4px 0px #0F172A !important;
+  padding: 16px;
+  margin-top: 14px;
+}
+
+.social-proof-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.social-stars {
+  color: #D97706;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.social-proof-quote {
+  font-size: 12.5px;
+  color: #1E293B;
+  line-height: 1.6;
+  font-style: italic;
+  margin-bottom: 8px;
+  border-left: 3px solid #0F172A;
+  padding-left: 10px;
+}
+
+.social-author {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0F172A;
+  text-align: right;
+}
+
 /**
  * 營建工程管理日報表 App - UI/UX Pro Max 旗艦版樣式表 (V6)
  * 1. 支援 4 種專業主題切換 (MOYA 抹茶大地 / Swiss 戶外強光 / Blueprint 工程科技藍 / Dark OLED 護眼深色)

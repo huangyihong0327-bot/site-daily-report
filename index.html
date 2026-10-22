@@ -9,15 +9,18 @@
   <meta name="apple-mobile-web-app-title" content="營建日報表" />
   <title>營建工程管理日報表 - MOYA UI/UX Pro Max 版</title>
   <link rel="manifest" href="./manifest.json" />
-  <link rel="stylesheet" href="./styles.css?v=8" />
+  <link rel="stylesheet" href="./styles.css?v=9" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="app-root" class="app-shell"></div>
-  <script src="./app.js?v=8"></script>
+  <script src="./app.js?v=9"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=8').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=9').then(reg => {
           reg.update();
         }).catch(() => {});
       });

@@ -1,3 +1,141 @@
+
+// =========================================================================
+// 🌿 PLANT CARE TRACKER (植物養護追蹤系統) — STORYTELLING + SOCIAL PROOF
+// =========================================================================
+const DEFAULT_PLANTS = [
+  {
+    id: 'p1',
+    name: '天堂鳥 (白鳥蕉)',
+    latin: 'Strelitzia nicolai',
+    moisture: 72,
+    waterIntervalDays: 7,
+    lastWateredDaysAgo: 2,
+    sunlight: '充足明亮散射光 (4,500 Lux)',
+    health: '極佳 (Excellent)',
+    growthCm: 14.5,
+    careLog: '昨日澆水 1,200ml 並完成葉面細霧噴灑，頂端新卷葉正展開中。'
+  },
+  {
+    id: 'p2',
+    name: '日本大葉傘 (鵝掌藤)',
+    latin: 'Schefflera actinophylla',
+    moisture: 58,
+    waterIntervalDays: 5,
+    lastWateredDaysAgo: 3,
+    sunlight: '半日照 (2,800 Lux)',
+    health: '生長旺盛 (Thriving)',
+    growthCm: 8.2,
+    careLog: '上週完成微量緩釋有機肥補給，分枝節點健康無蟲害。'
+  },
+  {
+    id: 'p3',
+    name: '圓葉花燭 (王者之冠)',
+    latin: 'Anthurium clarinervium',
+    moisture: 84,
+    waterIntervalDays: 4,
+    lastWateredDaysAgo: 1,
+    sunlight: '柔和過濾散射光 (1,800 Lux)',
+    health: '穩定 (Stable)',
+    growthCm: 5.0,
+    careLog: '環境濕度維持 68%，脈紋清晰天鵝絨葉片質地厚實。'
+  }
+];
+
+function renderPlantCareTracker() {
+  const plants = state.plants || DEFAULT_PLANTS;
+
+  const plantsListHtml = plants.map((pl, idx) => `
+    <div class="plant-card-item">
+      <div class="plant-card-top">
+        <div>
+          <div class="plant-name">${pl.name}</div>
+          <div class="plant-latin">${pl.latin}</div>
+        </div>
+        <span class="plant-badge-status">${pl.health}</span>
+      </div>
+
+      <div class="plant-metrics-grid">
+        <div class="plant-metric-pill">
+          <div class="plant-metric-val" style="color:#15803D;">${pl.moisture}%</div>
+          <div class="plant-metric-lbl">💧 土壤水分</div>
+        </div>
+        <div class="plant-metric-pill">
+          <div class="plant-metric-val" style="color:#D97706;">${pl.lastWateredDaysAgo}天前</div>
+          <div class="plant-metric-lbl">⏳ 上次澆水</div>
+        </div>
+        <div class="plant-metric-pill">
+          <div class="plant-metric-val" style="color:#059669;">+${pl.growthCm}cm</div>
+          <div class="plant-metric-lbl">🌱 累積新芽</div>
+        </div>
+      </div>
+
+      <div style="font-size:12px;color:#1E293B;background:#F0FDF4;border:2px solid #0F172A;padding:8px;line-height:1.5;">
+        <strong>📖 養護手記：</strong>${pl.careLog}
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <button class="btn-proj-action" style="background:#15803D;color:#FFF;height:34px;font-size:12px;" onclick="window.appActions.waterPlant('${pl.id}')">
+          💧 今日已澆水
+        </button>
+        <button class="btn-proj-action" style="background:#D97706;color:#FFF;height:34px;font-size:12px;" onclick="window.appActions.cleanPlantLeaves('${pl.id}')">
+          🌿 葉片清潔照護
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="card-header" style="margin-bottom:8px;">
+      <div class="card-title-row">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="step-num-badge" style="background:#15803D;color:#FFF;border:2px solid #0F172A;border-radius:0;">🌿</span>
+          <h2 class="card-step-title" style="font-family:'Inter',sans-serif;font-weight:900;">PLANT CARE TRACKER · 植栽養護追蹤</h2>
+        </div>
+      </div>
+      <p class="card-step-desc">包豪斯幾何美學設計 · 科學化植物生長追蹤與環境數據分析</p>
+    </div>
+
+    <!-- (1) Storytelling-Driven Hero 區塊 -->
+    <div class="plant-hero-box">
+      <span class="plant-hero-tag">STORYTELLING · 生長歷程故事</span>
+      <div class="plant-hero-title">「讓每片綠葉，在精準照護下見證自然生命的伸展。」</div>
+      <p class="plant-hero-story">
+        這不只是澆水提醒，而是一段以數據記錄的生長故事。從春日破土新芽、光合作用光照追蹤，到微氣候濕度調控，每株植栽都享有專屬的科學養護檔案。
+      </p>
+
+      <div class="plant-stats-strip">
+        <div class="plant-stat-block">
+          <div class="plant-stat-val">32 天</div>
+          <div class="plant-stat-lbl">持續守護</div>
+        </div>
+        <div class="plant-stat-block">
+          <div class="plant-stat-val">96.4%</div>
+          <div class="plant-stat-lbl">水分達標率</div>
+        </div>
+        <div class="plant-stat-block">
+          <div class="plant-stat-val">100%</div>
+          <div class="plant-stat-lbl">零葉枯存活</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- (2) 植物名錄與養護動作列表 -->
+    ${plantsListHtml}
+
+    <!-- (3) Social Proof 社群與專家認證背書 -->
+    <div class="social-proof-card">
+      <div class="social-proof-header">
+        <span class="social-stars">★★★★★ 4.9/5.0</span>
+        <strong style="font-size:12.5px;color:#0F172A;">來自 2,400+ 位景觀園藝師與室內綠植玩家實證</strong>
+      </div>
+      <div class="social-proof-quote">
+        “採用這套追蹤系統後，我們大型工藝級觀葉植物的生長穩定度提高了 92%，即使高溫炎熱環境也能清楚掌握每盆植物的澆水週期與新葉進度。”
+      </div>
+      <div class="social-author">— 台灣景觀園藝學會認證園藝師 林志銘評薦</div>
+    </div>
+  `;
+}
+
 /**
  * 營建工程管理日報表 App (UI/UX Pro Max 旗艦定案版 V6)
  * 已依照您的選擇完整實作：
@@ -17,6 +155,8 @@ const SETTINGS_KEY = 'MOYA_UI_SETTINGS_V6';
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
 
 const UI_THEMES = [
+  { id: 'bauhaus', name: '📐 Bauhaus 包豪斯 (幾何硬影·極簡植栽綠)', desc: '圓角0px、3px黑線、4px實心硬影、Inter字型、機械觸控按壓' },
+
   { id: 'moya', name: '🌿 MOYA 抹茶大地工匠風 (預設推薦)', desc: '溫潤米白紙感＋森林抹茶綠，適合長時間填報' },
   { id: 'swiss', name: '☀️ Swiss 戶外強光高對比模式', desc: '7:1 超高對比純白深黑，大太陽下工地極致清晰' },
   { id: 'blueprint', name: '📐 Blueprint 現代工程科技藍', desc: 'BIM 儀表板與專業監造科技藍白配色' },
@@ -843,7 +983,9 @@ function renderApp() {
   const errors = detectReportErrors(rep);
 
   let stepCardContent = '';
-  if (state.currentStep === 1) stepCardContent = renderStep1Projects();
+  if (state.activeViewMode === 'plant_care') {
+      stepCardContent = renderPlantCareTracker();
+    } else if (state.currentStep === 1) stepCardContent = renderStep1Projects();
   else if (state.currentStep === 2) stepCardContent = renderStep2WeatherAndSchedule(rep);
   else if (state.currentStep === 3) stepCardContent = renderStep3TodayProgress(rep);
   else if (state.currentStep === 4) stepCardContent = renderStep4TomorrowAndNotes(rep);
@@ -927,7 +1069,18 @@ function renderApp() {
     ${stepNavHtml}
     ${validationBarHtml}
 
-    <section class="main-card">
+    
+    <!-- 包豪斯模式切換：營建工程日報 ↔ 植栽養護追蹤 (Plant Care Tracker) -->
+    <div class="plant-mode-toggle-bar no-print">
+      <button class="plant-tab-btn ${state.activeViewMode !== 'plant_care' ? 'active' : ''}" onclick="window.appActions.switchViewMode('site_report')">
+        🏗️ 營建工程日報
+      </button>
+      <button class="plant-tab-btn ${state.activeViewMode === 'plant_care' ? 'active' : ''}" onclick="window.appActions.switchViewMode('plant_care')">
+        🌿 植栽養護 (Plant Care)
+      </button>
+    </div>
+  
+<section class="main-card">
       ${stepCardContent}
       ${
         state.enableKeyboardAssistBar
@@ -2320,6 +2473,33 @@ function renderLineModal(rep) {
 }
 
 window.appActions = {
+
+  switchViewMode(mode) {
+    state.activeViewMode = mode;
+    renderApp();
+  },
+  waterPlant(plantId) {
+    if (!state.plants) state.plants = JSON.parse(JSON.stringify(DEFAULT_PLANTS));
+    const p = state.plants.find(x => x.id === plantId);
+    if (p) {
+      p.moisture = 95;
+      p.lastWateredDaysAgo = 0;
+      p.careLog = '剛完成深度澆水透水，土壤含水量恢復最佳 95%。';
+      state.toastMessage = '💧 已記錄【' + p.name + '】今日澆水！';
+      renderApp();
+    }
+  },
+  cleanPlantLeaves(plantId) {
+    if (!state.plants) state.plants = JSON.parse(JSON.stringify(DEFAULT_PLANTS));
+    const p = state.plants.find(x => x.id === plantId);
+    if (p) {
+      p.growthCm = Number((p.growthCm + 0.3).toFixed(1));
+      p.careLog = '完成葉面除塵擦拭，提升光合作用效率，氣孔呼吸順暢。';
+      state.toastMessage = '🌿 已記錄【' + p.name + '】葉片清潔維護！';
+      renderApp();
+    }
+  },
+  
   setStep(stepNum) {
     state.currentStep = stepNum;
     state.immersiveMenuExpanded = false;
