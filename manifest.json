@@ -1,0 +1,10 @@
+{
+  "name": "營建工程管理日報表 (MOYA 工匠版)",
+  "short_name": "營建日報表",
+  "description": "工地日報機器人 App - 支援人機料累計、A4 向量 PDF 輸出與 LINE 公文文字稿一鍵上傳",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F5F2EB",
+  "theme_color": "#2D3A2F",
+  "orientation": "portrait"
+}
