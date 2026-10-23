@@ -122,7 +122,8 @@ function generateSampleReportsForProject(proj, count = 20) {
 }
 
 let state = {
-  activeBottomTab: 'home', // 'home' | 'report' | 'stats' | 'model' | 'settings'
+  activeBottomTab: 'home', // 'home' | 'report' | 'stats' | 'model' | 'settings' | 'checkout'
+  statsFilterRange: 'all', // 'all' | 'week' | 'month' | 'quarter' | 'last30'
   currentStep: 1, // 1~7
   activeProjId: 'proj_shiguang',
   activeReportId: null,
@@ -223,6 +224,106 @@ function getActiveReport() {
 // =========================================================================
 // 核心頁面渲染
 // =========================================================================
+
+// =========================================================================
+// 📱 第 3 頁【03_新畫面頁】(393×852px 確認訂單與安全結帳)
+// =========================================================================
+function renderPage03CheckoutView() {
+  return `
+    <div class="checkout-view-box">
+      <!-- 1. [navbar] "← 確認訂單與安全結帳" -->
+      <div class="checkout-header-navbar">
+        <button class="checkout-back-btn" onclick="window.appActions.navigateTab('settings')">
+          ←
+        </button>
+        <span class="checkout-nav-title">確認訂單與安全結帳</span>
+      </div>
+
+      <!-- 2. [product] 方案產品卡 -->
+      <div class="checkout-product-card">
+        <div class="checkout-prod-icon">💎</div>
+        <div class="checkout-prod-details">
+          <div class="checkout-prod-name">營建日報專業通用版 (年繳方案)</div>
+          <div class="checkout-prod-desc">365天全功能無限制 · A4/Excel自動導出 · 5組工程專案同步備份</div>
+          <div class="checkout-prod-price">NT$ 6,800 / 年</div>
+        </div>
+      </div>
+
+      <!-- 3. [banner] "🎟️ 已套用 VIP 折抵券 (-NT$ 500)" -->
+      <div class="checkout-vip-banner">
+        <span>🎟️ 已套用 VIP 折抵券</span>
+        <span style="color:#B45309;font-weight:900;">-NT$ 500</span>
+      </div>
+
+      <!-- 4. [form] "收件人與付款設定" -->
+      <div class="checkout-form-card">
+        <div class="checkout-form-title">💳 收件人與付款設定</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div>
+            <label style="font-size:11.5px;color:var(--text-muted);font-weight:700;">訂購人姓名 / 公司抬頭</label>
+            <input type="text" class="native-input-box" value="陳建銘工程師 / 拾光營造" style="height:38px;font-size:13.5px;" />
+          </div>
+          <div>
+            <label style="font-size:11.5px;color:var(--text-muted);font-weight:700;">信用卡卡號 (SSL 256-bit 加密)</label>
+            <input type="text" class="native-input-box" value="4532 •••• •••• 8892" style="height:38px;font-size:13.5px;" />
+          </div>
+          <div style="display:flex;gap:8px;">
+            <div style="flex:1;">
+              <label style="font-size:11.5px;color:var(--text-muted);font-weight:700;">有效月年</label>
+              <input type="text" class="native-input-box" value="08/28" style="height:38px;font-size:13.5px;text-align:center;" />
+            </div>
+            <div style="flex:1;">
+              <label style="font-size:11.5px;color:var(--text-muted);font-weight:700;">安全碼 (CVV)</label>
+              <input type="password" class="native-input-box" value="888" style="height:38px;font-size:13.5px;text-align:center;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. [listitem] "🧾 電子發票・手機條碼載具" -->
+      <div class="checkout-invoice-item">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:18px;">🧾</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:var(--text-main);">電子發票・手機條碼載具</div>
+            <div style="font-size:11px;color:var(--text-muted);">/AB89-721 (已完成財政部驗證)</div>
+          </div>
+        </div>
+        <span style="color:#059669;font-weight:900;font-size:13px;">已綁定 ✓</span>
+      </div>
+
+      <!-- 6. [button] "🔒 確認授權付款 NT$ 6,300 →" -->
+      <button class="checkout-pay-btn" onclick="window.appActions.completePayment()">
+        <span>🔒 確認授權付款 NT$ 6,300 →</span>
+      </button>
+
+      <!-- 7. [tabbar] "🏠 首頁|🔍 探索|📊 數據|🛒 購物|👤 我的" -->
+      <div class="checkout-bottom-tabbar">
+        <button class="checkout-tab-btn" onclick="window.appActions.navigateTab('home')">
+          <span style="font-size:16px;">🏠</span>
+          <span>首頁</span>
+        </button>
+        <button class="checkout-tab-btn" onclick="window.appActions.navigateTab('report')">
+          <span style="font-size:16px;">🔍</span>
+          <span>探索</span>
+        </button>
+        <button class="checkout-tab-btn" onclick="window.appActions.navigateTab('stats')">
+          <span style="font-size:16px;">📊</span>
+          <span>數據</span>
+        </button>
+        <button class="checkout-tab-btn active" onclick="window.appActions.navigateTab('checkout')">
+          <span style="font-size:16px;">🛒</span>
+          <span>購物</span>
+        </button>
+        <button class="checkout-tab-btn" onclick="window.appActions.navigateTab('settings')">
+          <span style="font-size:16px;">👤</span>
+          <span>我的</span>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
 function renderApp() {
   const root = document.getElementById('app-root');
   if (!root) return;
@@ -240,6 +341,8 @@ function renderApp() {
     bodyContent = renderPageBimModelView();
   } else if (state.activeBottomTab === 'settings') {
     bodyContent = renderPageSettingsView();
+  } else if (state.activeBottomTab === 'checkout') {
+    bodyContent = renderPage03CheckoutView();
   } else {
     if (state.currentStep === 2) {
       bodyContent = renderPage02DateWeatherSchedule(proj, rep);
@@ -276,11 +379,18 @@ function renderHeaderNav() {
     <header class="app-header-nav no-print">
       <div class="header-brand-title" onclick="window.appActions.navigateTab('home')">
         <span>🏗️</span>
-        <h1 style="font-size:18px;font-weight:900;">${isHome ? '營建管理系統' : '營建日報'}</h1>
+        <h1 style="font-size:17px;font-weight:900;">${isHome ? '營建管理系統' : '營建日報'}</h1>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        ${!isHome ? `<span style="font-size:11.5px;font-weight:700;color:var(--text-sub);background:#E0F2FE;border:1.5px solid var(--border-color);border-radius:4px;padding:2px 8px;white-space:nowrap;">${proj.name.slice(0, 4)}...</span>` : ''}
-        <button class="header-login-btn" onclick="window.appActions.navigateTab('settings')">
+      <div class="header-actions-row">
+        ${!isHome ? `
+          <button class="header-action-btn" onclick="window.appActions.exportToPdf()" title="匯出 PDF 報表">
+            <span>📄</span> PDF
+          </button>
+          <button class="header-action-btn" onclick="window.appActions.exportToExcel()" title="匯出 Excel 報表">
+            <span>📊</span> EXCEL
+          </button>
+        ` : ''}
+        <button class="header-action-btn" style="background:#0EA5E9;color:#fff;border-color:#0284C7;" onclick="window.appActions.navigateTab('settings')">
           <span>👤</span> 登入
         </button>
       </div>
@@ -441,21 +551,43 @@ function renderPage02DateWeatherSchedule(proj, rep) {
 
     <div class="field-input-card">
       <div class="field-label-small">
-        <span>⏱️ 契約工期天數設定 (主動計算剩餘天數)</span>
-        <span style="color:var(--accent-cta);font-weight:800;">尚餘 ${remainDays} 天</span>
+        <span>⏱️ 契約工期天數</span>
+        <span style="color:var(--accent-cta);font-weight:800;font-size:13px;">尚餘 ${remainDays} 天</span>
       </div>
-      <div class="field-interactive-row">
-        <div style="flex:1;">
-          <input type="number" class="native-input-box" value="${contractDays}"
-                 onchange="window.appActions.updateProjectDays('contractDays', this.value)" />
-          <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;text-align:center;">契約總工期 (天)</div>
+      <div class="duration-vertical-grid">
+        <div class="duration-vertical-item">
+          <div class="duration-item-info">
+            <span class="duration-item-title">契約總工期</span>
+            <span class="duration-item-sub">工程契約核定總日曆天</span>
+          </div>
+          <div class="duration-item-input-wrap">
+            <input type="number" class="native-input-box" value="${contractDays}"
+                   onchange="window.appActions.updateProjectDays('contractDays', this.value)" style="text-align:right;font-weight:800;height:38px;" />
+          </div>
         </div>
-        <span style="font-weight:900;color:var(--text-muted);">·</span>
-        <div style="flex:1;">
-          <input type="number" class="native-input-box" value="${usedDays}"
-                 onchange="window.appActions.updateProjectDays('usedDays', this.value)" />
-          <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;text-align:center;">已施工天數 (天)</div>
+        <div class="duration-vertical-item">
+          <div class="duration-item-info">
+            <span class="duration-item-title">已施工天數</span>
+            <span class="duration-item-sub">累計至本日之日曆施工天</span>
+          </div>
+          <div class="duration-item-input-wrap">
+            <input type="number" class="native-input-box" value="${usedDays}"
+                   onchange="window.appActions.updateProjectDays('usedDays', this.value)" style="text-align:right;font-weight:800;height:38px;" />
+          </div>
         </div>
+      </div>
+    </div>
+
+    <div class="field-input-card">
+      <div class="field-label-small">
+        <span>📅 本日施工日期</span>
+        <span style="color:var(--primary-dark);font-weight:800;">${formatDateWestern(rep.reportDateISO, 'slash_weekday')}</span>
+      </div>
+      <div class="date-clean-row">
+        <input type="date" class="native-input-box date-clean-input" value="${rep.reportDateISO}"
+               onchange="window.appActions.setReportDate(this.value)" />
+        <button class="date-shift-btn" onclick="window.appActions.shiftReportDate(-1)" title="前一天">◀ -1天</button>
+        <button class="date-shift-btn" onclick="window.appActions.shiftReportDate(1)" title="後一天">+1天 ▶</button>
       </div>
     </div>
 
@@ -968,7 +1100,41 @@ function renderPage07DailyReportAndA4(proj, rep) {
 // =========================================================================
 function renderPageStatsView() {
   const proj = getActiveProject();
-  const reports = [...(proj.reports || [])].sort((a, b) => a.reportDateISO.localeCompare(b.reportDateISO));
+  const allReports = [...(proj.reports || [])].sort((a, b) => a.reportDateISO.localeCompare(b.reportDateISO));
+  
+  // 依選擇的區間篩選日報
+  const range = state.statsFilterRange || 'all';
+  const now = new Date();
+  
+  const filteredReports = allReports.filter(rep => {
+    if (range === 'all') return true;
+    const repDate = new Date(rep.reportDateISO);
+    if (range === 'last30') {
+      const diffDays = (now - repDate) / (1000 * 60 * 60 * 24);
+      return diffDays >= 0 && diffDays <= 30;
+    }
+    if (range === 'month') {
+      return repDate.getFullYear() === now.getFullYear() && repDate.getMonth() === now.getMonth();
+    }
+    if (range === 'quarter') {
+      const currentQuarter = Math.floor(now.getMonth() / 3);
+      const repQuarter = Math.floor(repDate.getMonth() / 3);
+      return repDate.getFullYear() === now.getFullYear() && repQuarter === currentQuarter;
+    }
+    if (range === 'week') {
+      const dayOfWeek = (now.getDay() + 6) % 7; // 0 is Monday
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - dayOfWeek);
+      monday.setHours(0,0,0,0);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      sunday.setHours(23,59,59,999);
+      return repDate >= monday && repDate <= sunday;
+    }
+    return true;
+  });
+
+  const reports = filteredReports.length > 0 ? filteredReports : allReports;
 
   const totalWorkers = reports.reduce((acc, rep) => {
     return acc + rep.tradeRecords.filter(r => r.category === 'workers').reduce((s, r) => s + getTodayQty(r), 0);
@@ -981,8 +1147,16 @@ function renderPageStatsView() {
   const mountainChartSvg = buildMountainSvg(reports);
 
   return `
-    <div class="section-title-box">
-      <span class="section-title-text">專案總報表與區間山積圖</span>
+    <div class="section-title-box" style="display:flex;justify-content:space-between;align-items:center;">
+      <span class="section-title-text">專案總報表與區間統計</span>
+      <div style="display:flex;gap:6px;">
+        <button class="header-action-btn" onclick="window.appActions.exportToPdf()" title="匯出總報表 PDF">
+          <span>📄</span> 匯出 PDF
+        </button>
+        <button class="header-action-btn" onclick="window.appActions.exportToExcel()" title="匯出總報表 EXCEL">
+          <span>📊</span> 匯出 EXCEL
+        </button>
+      </div>
     </div>
 
     <!-- 頂部快速切換專案 -->
@@ -996,10 +1170,19 @@ function renderPageStatsView() {
       </select>
     </div>
 
+    <!-- 區間篩選晶片 (全部、本週、本月、本季、近30日) -->
+    <div class="stats-filter-chips-row">
+      <button class="stats-filter-chip ${range === 'all' ? 'active' : ''}" onclick="window.appActions.setStatsRange('all')">全工期 (${allReports.length}日)</button>
+      <button class="stats-filter-chip ${range === 'week' ? 'active' : ''}" onclick="window.appActions.setStatsRange('week')">本週報表</button>
+      <button class="stats-filter-chip ${range === 'month' ? 'active' : ''}" onclick="window.appActions.setStatsRange('month')">本月報表</button>
+      <button class="stats-filter-chip ${range === 'quarter' ? 'active' : ''}" onclick="window.appActions.setStatsRange('quarter')">本季報表</button>
+      <button class="stats-filter-chip ${range === 'last30' ? 'active' : ''}" onclick="window.appActions.setStatsRange('last30')">近 30 天</button>
+    </div>
+
     <!-- 指標卡片 -->
     <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:6px;margin-bottom:10px;">
       <div class="motion-card" style="padding:8px 4px;text-align:center;margin-bottom:0;">
-        <div style="font-size:10px;color:var(--text-muted);">總日報數</div>
+        <div style="font-size:10px;color:var(--text-muted);">區間天數</div>
         <div style="font-size:16px;font-weight:900;color:var(--primary);font-family:var(--font-heading);">${reports.length}日</div>
       </div>
       <div class="motion-card" style="padding:8px 4px;text-align:center;margin-bottom:0;">
@@ -1016,14 +1199,14 @@ function renderPageStatsView() {
       </div>
     </div>
 
-    <!-- 1. 括號文字拿掉：標題只保留「👷 區間每日出工人數山積圖」，提示文字為「(左右滑動檢視)」單行不換行 -->
+    <!-- 山積圖卡片 (括號內容已移除) -->
     <div class="motion-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:6px;">
         <div style="font-size:14px;font-weight:900;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
           👷 區間每日出工人數山積圖
         </div>
         <span style="font-size:11px;color:var(--primary-dark);background:#E0F2FE;padding:2px 8px;border-radius:4px;font-weight:800;white-space:nowrap;flex-shrink:0;">
-          (左右滑動檢視)
+          左右滑動檢視
         </span>
       </div>
 
@@ -1032,7 +1215,7 @@ function renderPageStatsView() {
       </div>
     </div>
 
-    <!-- 3. 分類改為「工班」與「機具」 -->
+    <!-- 全量項目統計表 (括號內容已移除) -->
     <div class="motion-card">
       <div style="font-size:13.5px;font-weight:900;color:var(--text-main);margin-bottom:6px;">
         📋 區間已填寫項目全量統計總表
@@ -1044,7 +1227,7 @@ function renderPageStatsView() {
               <th style="width:64px;white-space:nowrap;">分類</th>
               <th style="white-space:nowrap;">項目</th>
               <th style="white-space:nowrap;text-align:right;">區間總計</th>
-              <th style="white-space:nowrap;text-align:right;">月均 (30日)</th>
+              <th style="white-space:nowrap;text-align:right;">月均 30日</th>
               <th style="white-space:nowrap;text-align:right;">單日峰值</th>
               <th style="white-space:nowrap;text-align:center;">天數</th>
             </tr>
@@ -1335,7 +1518,17 @@ function renderPageSettingsView() {
         </div>
       </div>
 
-      <button class="btn-create-proj-locked" style="background:#059669;height:44px;font-size:14px;"
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button class="btn-create-proj-locked" style="flex:1;background:#0EA5E9;height:44px;font-size:13.5px;margin-bottom:0;"
+                onclick="window.appActions.navigateTab('checkout')">
+          <span>💳</span> 線上刷卡升級訂閱
+        </button>
+        <button class="btn-create-proj-locked" style="flex:1;background:#059669;height:44px;font-size:13.5px;margin-bottom:0;"
+                onclick="window.appActions.openLineSupport()">
+          <span>💬</span> LINE 客服諮詢
+        </button>
+      </div>
+      <button class="btn-create-proj-locked" style="display:none;background:#059669;height:44px;font-size:14px;"
               onclick="window.appActions.openLineSupport()">
         <span>💬</span> 聯繫專屬 LINE 線上客服
       </button>
@@ -1417,6 +1610,51 @@ window.appActions = {
     state.currentStep = stepNumber;
     renderApp();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  
+  setStatsRange(rangeKey) {
+    state.statsFilterRange = rangeKey;
+    renderApp();
+  },
+
+  exportToPdf() {
+    window.print();
+  },
+
+  exportToExcel() {
+    const proj = getActiveProject();
+    const reports = proj.reports || [];
+    
+    // 生成 CSV 格式內容 (可直接在 Excel 開啟並支援 UTF-8 BOM)
+    let csv = '\uFEFF"工程名稱","' + proj.name.replace(/"/g, '""') + '"\n';
+    csv += '"契約總工期","' + proj.contractDays + ' 天","已施工天數","' + proj.usedDays + ' 天"\n\n';
+    csv += '"日報日期","上午天氣","下午天氣","本日進度摘要","預定進度(%)","實際進度(%)","出工人數","機具台數"\n';
+    
+    reports.forEach(r => {
+      const workers = r.tradeRecords.filter(t => t.category === 'workers').reduce((sum, w) => sum + getTodayQty(w), 0);
+      const machines = r.tradeRecords.filter(t => t.category === 'machinery').reduce((sum, m) => sum + getTodayQty(m), 0);
+      csv += `"${r.reportDateISO}","${r.weatherAM}","${r.weatherPM}","${(r.todayProgressSummary||'').replace(/"/g, '""')}","${r.plannedProgressCumulative}%","${r.actualProgressCumulative}%","${workers}","${machines}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${proj.name}_工程總報表_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    state.toastMessage = '📊 成功匯出 Excel (CSV) 專案報表！';
+    renderApp();
+  },
+
+  completePayment() {
+    alert('🎉 恭喜！您已成功授權付款 NT$ 6,300！\n專業通用版年費方案已正式開通！');
+    state.account.planType = 'annual_pro';
+    state.account.renewDate = '2027/10/23';
+    state.activeBottomTab = 'settings';
+    renderApp();
   },
 
   switchStatsProject(projId) {
