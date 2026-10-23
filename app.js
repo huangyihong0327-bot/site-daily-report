@@ -1546,67 +1546,7 @@ function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
       }).join('')}
     </svg>
   `;
-} {
-  if (!reports || reports.length === 0) {
-    return '<div style="padding:18px;text-align:center;color:#64748B;">尚無日報數據</div>';
-  }
-
-  const n = reports.length;
-  const colW = 44;
-  const padL = 36;
-  const padR = 38;
-  const padT = 24;
-  const padB = 46;
-  const svgW = Math.max(380, padL + padR + n * colW);
-  const svgH = 210;
-  const plotW = svgW - padL - padR;
-  const plotH = svgH - padT - padB;
-
-  let cum = 0;
-  const daysData = reports.map(r => {
-    const workers = r.tradeRecords.filter(t => t.category === 'workers');
-    const dayTotal = workers.reduce((sum, w) => sum + getTodayQty(w), 0);
-    cum += dayTotal;
-    return {
-      date: r.reportDateISO.slice(5),
-      total: dayTotal,
-      cum: cum
-    };
-  });
-
-  const maxDay = Math.max(10, ...daysData.map(d => d.total));
-  const maxCum = Math.max(20, cum);
-
-  const barSvgParts = [];
-  const linePoints = [];
-
-  daysData.forEach((d, i) => {
-    const cx = padL + i * colW + colW / 2;
-    const barH = (d.total / maxDay) * plotH;
-    const yTop = padT + (plotH - barH);
-
-    barSvgParts.push(`
-      <rect x="${cx - 14}" y="${yTop}" width="28" height="${barH}" fill="#0EA5E9" rx="2" />
-      <text x="${cx}" y="${yTop - 5}" font-size="10" font-weight="bold" fill="#0C4A6E" text-anchor="middle">${d.total}人</text>
-      <text x="${cx}" y="${svgH - padB + 14}" font-size="9" fill="#0C4A6E" text-anchor="middle">${d.date}</text>
-      <text x="${cx}" y="${svgH - padB + 26}" font-size="8" fill="#64748B" text-anchor="middle">累${d.cum}</text>
-    `);
-
-    const cy = padT + plotH - (d.cum / maxCum) * plotH;
-    linePoints.push(`${cx},${cy}`);
-    barSvgParts.push(`<circle cx="${cx}" cy="${cy}" r="3" fill="#D97706" stroke="#FFFFFF" stroke-width="1.5" />`);
-  });
-
-  return `
-    <svg width="${svgW}" height="${svgH}" style="display:block;">
-      <line x1="${padL}" y1="${padT + plotH}" x2="${svgW - padR}" y2="${padT + plotH}" stroke="#CBD5E1" stroke-width="1" />
-      <line x1="${padL}" y1="${padT + plotH * 0.5}" x2="${svgW - padR}" y2="${padT + plotH * 0.5}" stroke="#E2E8F0" stroke-dasharray="3,3" />
-      ${barSvgParts.join('')}
-      <polyline points="${linePoints.join(' ')}" fill="none" stroke="#D97706" stroke-width="2.5" />
-    </svg>
-  `;
 }
-
 // 單日出工山積圖 (Step 7)
 function buildSingleDayMountainSvg(records, mode = 'workers') {
   if (!records || records.length === 0) {
