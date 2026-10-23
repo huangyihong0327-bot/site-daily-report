@@ -1870,6 +1870,36 @@ function renderPageSettingsView() {
                onchange="window.appActions.toggleAdvancedFeature('enableSubcontractorNotes', this.checked)" />
       </label>
     </div>
+
+    <!-- 專案管理與刪除建錯專案 (安全移至設定區) -->
+    <div class="motion-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div>
+          <div style="font-size:14.5px;font-weight:900;color:var(--text-main);">📁 工程專案管理與清理</div>
+          <div style="font-size:11px;color:var(--text-muted);">若有建錯或測試專案，可在此處安全刪除</div>
+        </div>
+        <button class="phrase-chip-item" style="padding:4px 10px;font-size:11.5px;font-weight:800;" onclick="window.appActions.openCreateProjectModal()">
+          ＋ 新增專案
+        </button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        ${state.projects.map(p => {
+          const repCount = (p.reports || []).length;
+          return `
+            <div class="project-manage-item-row">
+              <div class="project-manage-info">
+                <div class="project-manage-name">${p.name}</div>
+                <div class="project-manage-meta">工期：${p.usedDays}/${p.contractDays} 天 · ${repCount} 份日報</div>
+              </div>
+              <button class="btn-delete-project" onclick="window.appActions.deleteProject('${p.id}')">
+                <span>🗑️</span> 刪除專案
+              </button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
   `;
 }
 
@@ -2339,6 +2369,33 @@ window.appActions = {
       state.toastMessage = '✅ 已複製 LINE 施工日報摘要文字！';
       renderApp();
     });
+  },
+
+  deleteProject(projId) {
+    const targetProj = state.projects.find(p => p.id === projId);
+    if (!targetProj) return;
+
+    if (state.projects.length <= 1) {
+      alert('⚠️ 系統中至少需保留一個工程專案，無法刪除最後一個專案！');
+      return;
+    }
+
+    const confirmMsg = '確定要刪除「' + targetProj.name + '」嗎？\n\n⚠️ 注意：此操作將會清除該工程的所有日報紀錄且無法復原！';
+    if (!confirm(confirmMsg)) return;
+
+    // 執行刪除
+    state.projects = state.projects.filter(p => p.id !== projId);
+
+    // 如果刪除的是當前正選取的專案，自動切換至第一個現有專案
+    if (state.activeProjId === projId) {
+      state.activeProjId = state.projects[0].id;
+      const reps = state.projects[0].reports || [];
+      state.activeReportId = reps.length > 0 ? reps[reps.length - 1].id : null;
+    }
+
+    saveState();
+    state.toastMessage = '🗑️ 已成功刪除專案：' + targetProj.name;
+    renderApp();
   },
 
   openCreateProjectModal() {

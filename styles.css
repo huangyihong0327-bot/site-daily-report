@@ -1843,3 +1843,59 @@ table.rep-table-grid th {
 .stats-export-btn-pdf:active, .stats-export-btn-excel:active {
   transform: scale(0.97) !important;
 }
+
+
+/* ================= 設定頁 - 專案管理與刪除專案樣式 ================= */
+.project-manage-item-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 10px 12px !important;
+  background: #F8FAFC !important;
+  border: 1.5px solid var(--border-light) !important;
+  border-radius: 8px !important;
+  margin-bottom: 8px !important;
+  gap: 10px !important;
+}
+
+.project-manage-info {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.project-manage-name {
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  color: var(--text-main) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.project-manage-meta {
+  font-size: 11px !important;
+  color: var(--text-muted) !important;
+  margin-top: 2px !important;
+}
+
+.btn-delete-project {
+  height: 34px !important;
+  padding: 0 10px !important;
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+  border: 1.5px solid #FCA5A5 !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  flex-shrink: 0 !important;
+  transition: all 0.12s ease !important;
+}
+
+.btn-delete-project:active {
+  background: #FEE2E2 !important;
+  transform: scale(0.96) !important;
+}
