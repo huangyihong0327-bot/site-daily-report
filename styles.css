@@ -1,467 +1,63 @@
-
-/* ==============================================================
- * 📐 BAUHAUS (包豪斯) 專屬 UI/UX PRO MAX 設計系統 (V9)
- * - 產品與產業類別：Plant Care Tracker ＆ 營建工程
- * - 視覺風格：Bauhaus (幾何構成、3px 黑邊、4px 4px 實心硬影、機械觸控按壓、0ms 瞬態、點陣網格)
- * - 色彩配置：Primary #15803D | Secondary #059669 | CTA #D97706 | Background #F0FDF4 | Card #FFFFFF | Text #0F172A
- * - 字型：Inter (Google Fonts)
- * - 間距密度：1.3x，卡片圓角：0px
- * ============================================================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
-:root, [data-ui-theme="bauhaus"] {
-  --vvh: 100dvh;
-  --vvw: 100vw;
-
-  /* 包豪斯色彩 */
-  --bg-outer: #E2E8F0;
-  --bg-shell: #F0FDF4;
-  --card-bg: #FFFFFF;
-  --white: #FFFFFF;
-  --matcha-primary: #15803D;
-  --matcha-dark: #0F172A;
-  --matcha-light: #DCFCE7;
-  --matcha-muted-bg: #E8F5E9;
-  --cta-amber: #D97706;
-  --secondary-emerald: #059669;
-  --text-main: #0F172A;
-  --text-sub: #1E293B;
-  --text-muted: #475569;
-  --border-color: #0F172A;
-  --border-focus: #15803D;
-  --focus-ring: rgba(21, 128, 61, 0.45);
-  --danger-text: #B91C1C;
-  --danger-bg: #FEE2E2;
-  --danger-border: #0F172A;
-  --ok-text: #15803D;
-  --ok-bg: #DCFCE7;
-  --mach-primary: #059669;
-  --mach-light: #CCFBF1;
-  --radius-card: 0px !important;
-  --radius-control: 0px !important;
-  --shadow-card: 4px 4px 0px #0F172A !important;
-  --hard-shadow: 4px 4px 0px #0F172A !important;
-  --hard-shadow-sm: 2px 2px 0px #0F172A !important;
-}
-
-/* 全域字型採用 Inter，背景點陣網格 (Dot Grid Pattern) */
-html, body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Noto Sans TC", sans-serif !important;
-  background-color: #E2E8F0 !important;
-  background-image: radial-gradient(#CBD5E1 1.5px, transparent 1.5px) !important;
-  background-size: 16px 16px !important;
-  color: #0F172A !important;
-}
-
-.app-shell {
-  background-color: #F0FDF4 !important;
-  border-left: 3px solid #0F172A;
-  border-right: 3px solid #0F172A;
-}
-
-/* 包豪斯核心幾何：所有卡片圓角 0px、3px 粗實黑線、4px 4px 實心硬影 (Hard Offset Shadow) */
-.main-card, .proj-clean-card, .chart-card, .date-mini-card, .date-section-box,
-.report-preview-paper, .plant-card, .plant-hero-box, .social-proof-card {
-  border-radius: 0px !important;
-  border: 3px solid #0F172A !important;
-  box-shadow: 4px 4px 0px #0F172A !important;
-  background: #FFFFFF !important;
-}
-
-/* 包豪斯按鈕：圓角 0px、3px 邊框、3px 硬影、機械觸控按壓 (translate 2px, 2px) 與 0ms 瞬態 */
-button, .btn-top-item, .btn-proj-action, .phrase-chip, .btn-cat-tab,
-.step-pill-btn, .preset-btn, .btn-create-proj-hero, .btn-full-green, .btn-full-gray,
-.floating-jump-btn, .plant-tab-btn, .btn-care-action {
-  border-radius: 0px !important;
-  border: 3px solid #0F172A !important;
-  box-shadow: 3px 3px 0px #0F172A !important;
-  transition: none !important; /* instant 0ms transitions */
-  font-family: 'Inter', sans-serif !important;
-  font-weight: 800 !important;
-}
-
-button:active, .btn-top-item:active, .btn-proj-action:active, .phrase-chip:active,
-.btn-cat-tab:active, .btn-full-green:active, .floating-jump-btn:active, .btn-care-action:active {
-  transform: translate(2px, 2px) !important;
-  box-shadow: 1px 1px 0px #0F172A !important;
-}
-
-/* 頂部標題列 Bauhaus 化 */
-.app-topbar {
-  background-color: #F0FDF4 !important;
-  border-bottom: 3px solid #0F172A !important;
-}
-
-.topbar-step-pill {
-  border-radius: 0px !important;
-  border: 2px solid #0F172A !important;
-  background: #DCFCE7 !important;
-  color: #15803D !important;
-  font-weight: 900 !important;
-}
-
-.btn-top-item {
-  background: #15803D !important;
-  color: #FFFFFF !important;
-}
-
-.btn-top-item.btn-settings-highlight {
-  background: #D97706 !important;
-  color: #FFFFFF !important;
-  border: 3px solid #0F172A !important;
-}
-
-/* 醒目的 CTA 琥珀黃按鈕 */
-.btn-cta-amber {
-  background: #D97706 !important;
-  color: #FFFFFF !important;
-  border: 3px solid #0F172A !important;
-  box-shadow: 3px 3px 0px #0F172A !important;
-}
-
-/* 浮動下一欄按鈕 */
-.floating-jump-btn {
-  background: #D97706 !important;
-  color: #FFFFFF !important;
-  border: 3px solid #0F172A !important;
-  box-shadow: 4px 4px 0px #0F172A !important;
-  border-radius: 0px !important;
-}
-
-/* 輸入框包豪斯化 */
-input, textarea, select {
-  border-radius: 0px !important;
-  border: 3px solid #0F172A !important;
-  box-shadow: 2px 2px 0px #0F172A !important;
-  font-family: 'Inter', sans-serif !important;
-  background-color: #FFFFFF !important;
-}
-input:focus, textarea:focus {
-  border-color: #15803D !important;
-  box-shadow: 3px 3px 0px #15803D !important;
-}
-
-/* ==============================================================
- * 🌿 PLANT CARE TRACKER (植物養護追蹤) 專屬 UI 組件樣式
- * ============================================================== */
-.plant-mode-toggle-bar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  background: #FFFFFF;
-  border: 3px solid #0F172A;
-  box-shadow: 3px 3px 0px #0F172A;
-  padding: 4px;
-}
-
-.plant-tab-btn {
-  flex: 1;
-  height: 38px;
-  background: #F0FDF4;
-  color: #0F172A;
-  border: 2px solid transparent !important;
-  box-shadow: none !important;
-  font-size: 13.5px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.plant-tab-btn.active {
-  background: #15803D !important;
-  color: #FFFFFF !important;
-  border: 2px solid #0F172A !important;
-  box-shadow: 2px 2px 0px #0F172A !important;
-}
-
-/* Storytelling Hero 卡片 */
-.plant-hero-box {
-  background: #DCFCE7 !important;
-  padding: 18px;
-  margin-bottom: 14px;
-  position: relative;
-  overflow: hidden;
-}
-
-.plant-hero-tag {
-  display: inline-block;
-  background: #D97706;
-  color: #FFFFFF;
-  font-size: 11.5px;
-  font-weight: 900;
-  padding: 2px 8px;
-  border: 2px solid #0F172A;
-  box-shadow: 2px 2px 0px #0F172A;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-
-.plant-hero-title {
-  font-size: 19px;
-  font-weight: 900;
-  color: #0F172A;
-  line-height: 1.35;
-  margin-bottom: 6px;
-}
-
-.plant-hero-story {
-  font-size: 13px;
-  color: #1E293B;
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-
-.plant-stats-strip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.plant-stat-block {
-  background: #FFFFFF;
-  border: 2px solid #0F172A;
-  box-shadow: 2px 2px 0px #0F172A;
-  padding: 8px 6px;
-  text-align: center;
-}
-
-.plant-stat-val {
-  font-size: 16px;
-  font-weight: 900;
-  color: #15803D;
-}
-
-.plant-stat-lbl {
-  font-size: 10.5px;
-  font-weight: 800;
-  color: #475569;
-}
-
-/* 植物卡片 */
-.plant-card-item {
-  background: #FFFFFF;
-  border: 3px solid #0F172A;
-  box-shadow: 4px 4px 0px #0F172A;
-  padding: 14px;
-  margin-bottom: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.plant-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 2px dashed #0F172A;
-  padding-bottom: 8px;
-}
-
-.plant-name {
-  font-size: 16.5px;
-  font-weight: 900;
-  color: #0F172A;
-}
-
-.plant-latin {
-  font-size: 11.5px;
-  font-style: italic;
-  color: #475569;
-}
-
-.plant-badge-status {
-  background: #DCFCE7;
-  color: #15803D;
-  border: 2px solid #0F172A;
-  box-shadow: 2px 2px 0px #0F172A;
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.plant-metrics-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 6px;
-}
-
-.plant-metric-pill {
-  background: #F0FDF4;
-  border: 2px solid #0F172A;
-  padding: 6px;
-  text-align: center;
-}
-
-.plant-metric-val {
-  font-size: 13.5px;
-  font-weight: 900;
-  color: #0F172A;
-}
-
-.plant-metric-lbl {
-  font-size: 10px;
-  color: #475569;
-  font-weight: 700;
-}
-
-/* Social Proof 社群推薦與實證背書區塊 */
-.social-proof-card {
-  background: #FEF3C7 !important;
-  border: 3px solid #0F172A !important;
-  box-shadow: 4px 4px 0px #0F172A !important;
-  padding: 16px;
-  margin-top: 14px;
-}
-
-.social-proof-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.social-stars {
-  color: #D97706;
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.social-proof-quote {
-  font-size: 12.5px;
-  color: #1E293B;
-  line-height: 1.6;
-  font-style: italic;
-  margin-bottom: 8px;
-  border-left: 3px solid #0F172A;
-  padding-left: 10px;
-}
-
-.social-author {
-  font-size: 11px;
-  font-weight: 800;
-  color: #0F172A;
-  text-align: right;
-}
-
 /**
- * 營建工程管理日報表 App - UI/UX Pro Max 旗艦版樣式表 (V6)
- * 1. 支援 4 種專業主題切換 (MOYA 抹茶大地 / Swiss 戶外強光 / Blueprint 工程科技藍 / Dark OLED 護眼深色)
- * 2. 支援 3 種導覽列佈局切換 (雙軌橫向膠囊列 dual_pill / 極簡沉浸單屏 immersive / 底部常駐分頁列 bottom_tab)
- * 3. 側邊放不下之按鈕列、分類列、常用詞庫、表格全面支援「完整顯示不裁切 ＋ 左右滑動瀏覽」
- * 4. 智慧鍵盤防遮擋與光標置中引擎 (body.keyboard-open + visualViewport)：確保輸入文字時永遠看得到光標，絕不被鍵盤擋住
+ * 營建管理系統 - Motion-Driven (動態敘事驅動) UI/UX Pro Max 規範樣式表 (V10)
+ * 
+ * 【設計系統】
+ * - 手機尺寸：393×852px (Shell 自適應置中)
+ * - 視覺風格：動態敘事驅動 (Motion-Driven)
+ * - 配色(light)：主色 #0EA5E9 | 次色 #0284C7 | 強調 #059669 | 背景 #F0F9FF | 卡片 #FFFFFF | 文字 #0C4A6E
+ * - 字型：標題 Space Grotesk | 內文 DM Sans
+ * - 圓角：8px | 邊框：3px
  */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&display=swap');
 
 :root {
   --vvh: 100dvh;
   --vvw: 100vw;
 
-  /* 預設主題：🌿 MOYA 抹茶大地工匠風 */
-  --bg-outer: #E4E0D6;
-  --bg-shell: #EAEDE6;
-  --card-bg: #FAF9F5;
-  --white: #FFFFFF;
-  --matcha-primary: #2F5D46;
-  --matcha-dark: #214432;
-  --matcha-light: #E4ECE7;
-  --matcha-muted-bg: #EFECE6;
-  --text-main: #1C2520;
-  --text-sub: #4A554E;
-  --text-muted: #6E7872;
-  --border-color: #D5D1C7;
-  --border-focus: #2F5D46;
-  --focus-ring: rgba(47, 93, 70, 0.28);
-  --danger-text: #B9382C;
-  --danger-bg: #FCECE9;
-  --danger-border: #F2B8B2;
-  --ok-text: #25633E;
-  --ok-bg: #E3F3E9;
-  --mach-primary: #2B5B6C;
-  --mach-light: #E3EFF3;
-  --radius-card: 14px;
-  --radius-control: 8px;
-  --shadow-card: 0 2px 10px rgba(28, 37, 32, 0.05);
-}
+  /* 配色系統 (Light Mode) */
+  --primary: #0EA5E9;       /* 主色：天藍 */
+  --primary-dark: #0284C7;  /* 次色：深天藍 */
+  --accent-cta: #059669;    /* 強調色 / CTA：翡翠綠 */
+  --bg-main: #F0F9FF;       /* 背景色：清新天藍底 */
+  --card-bg: #FFFFFF;       /* 卡片表面：純白 */
+  --text-main: #0C4A6E;     /* 文字：深板岩海軍藍 */
+  --text-sub: #0369A1;      /* 次要文字 */
+  --text-muted: #64748B;    /* 輔助標籤文字 */
+  --border-color: #0EA5E9;  /* 核心邊框：3px 主色 */
+  --border-dark: #0C4A6E;   /* 深色強調邊框 */
+  --border-light: #BAE6FD;  /* 淺色分割線 */
+  --danger-text: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
 
-/* 主題 B：☀️ Swiss 戶外強光高對比模式 */
-[data-ui-theme="swiss"] {
-  --bg-outer: #E2E8F0;
-  --bg-shell: #F1F5F9;
-  --card-bg: #FFFFFF;
-  --white: #FFFFFF;
-  --matcha-primary: #0F172A;
-  --matcha-dark: #020617;
-  --matcha-light: #E2E8F0;
-  --matcha-muted-bg: #F1F5F9;
-  --text-main: #090D16;
-  --text-sub: #334155;
-  --text-muted: #64748B;
-  --border-color: #94A3B8;
-  --border-focus: #0F172A;
-  --focus-ring: rgba(15, 23, 42, 0.28);
-  --radius-card: 6px;
-  --radius-control: 4px;
-}
+  /* 幾何與尺寸 */
+  --radius-base: 8px;
+  --border-width: 3px;
+  --shadow-base: 0 4px 14px rgba(14, 165, 233, 0.16), 0 2px 4px rgba(12, 74, 110, 0.06);
+  --shadow-hover: 0 8px 24px rgba(14, 165, 233, 0.24), 0 3px 6px rgba(12, 74, 110, 0.1);
+  --shadow-press: 0 1px 3px rgba(12, 74, 110, 0.15);
 
-/* 主題 C：📐 Blueprint 現代工程科技藍 */
-[data-ui-theme="blueprint"] {
-  --bg-outer: #DCE6F2;
-  --bg-shell: #EBF1F8;
-  --card-bg: #F8FAFC;
-  --white: #FFFFFF;
-  --matcha-primary: #1D4ED8;
-  --matcha-dark: #1E3A8A;
-  --matcha-light: #DBEAFE;
-  --matcha-muted-bg: #EFF6FF;
-  --text-main: #0F172A;
-  --text-sub: #334155;
-  --text-muted: #64748B;
-  --border-color: #CBD5E1;
-  --border-focus: #1D4ED8;
-  --focus-ring: rgba(29, 78, 216, 0.28);
-  --radius-card: 12px;
-  --radius-control: 8px;
-}
-
-/* 主題 D：🌙 Dark OLED 夜間與地下室護眼模式 */
-[data-ui-theme="dark"] {
-  --bg-outer: #090D0B;
-  --bg-shell: #111714;
-  --card-bg: #18211C;
-  --white: #202B25;
-  --matcha-primary: #3E8E63;
-  --matcha-dark: #2F704D;
-  --matcha-light: #24352C;
-  --matcha-muted-bg: #25302A;
-  --text-main: #F1F5F2;
-  --text-sub: #C2CEC6;
-  --text-muted: #8FA196;
-  --border-color: #34463C;
-  --border-focus: #52B788;
-  --focus-ring: rgba(82, 183, 136, 0.35);
-  --danger-text: #FCA5A5;
-  --danger-bg: #3B1A1A;
-  --danger-border: #7F1D1D;
-  --ok-text: #86EFAC;
-  --ok-bg: #163824;
-  --mach-primary: #67B7D1;
-  --mach-light: #1B333B;
+  /* 字型設定 */
+  --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
 }
 
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+  margin: 0;
+  padding: 0;
 }
 
 html, body {
-  margin: 0;
-  padding: 0;
   width: 100%;
   min-height: 100%;
-  background-color: var(--bg-outer);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  background-color: #E0F2FE;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(5, 150, 105, 0.06) 0%, transparent 40%);
+  font-family: var(--font-body);
   color: var(--text-main);
   -webkit-text-size-adjust: 100%;
 }
@@ -469,1208 +65,762 @@ html, body {
 body {
   display: flex;
   justify-content: center;
-  align-items: stretch;
+  align-items: flex-start;
+  overflow-x: hidden;
 }
 
+/* 核心 App 容器 (依 393×852px 基準自適應置中) */
 .app-shell {
   width: 100%;
-  max-width: 100%;
+  max-width: 430px;
   min-height: 100vh;
   min-height: var(--vvh, 100dvh);
-  background-color: var(--bg-shell);
+  background-color: var(--bg-main);
+  border-left: var(--border-width) solid var(--border-color);
+  border-right: var(--border-width) solid var(--border-color);
   display: flex;
   flex-direction: column;
-  padding: 6px 10px 80px;
+  padding: 12px 14px 115px; /* 預留底部 88px TabBar 空間 */
   position: relative;
+  box-shadow: 0 12px 48px rgba(12, 74, 110, 0.15);
 }
 
-@media (min-width: 640px) {
-  .app-shell {
-    max-width: min(95vw, 900px);
-    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.14);
-  }
+/* ================= 標題與字型層級 ================= */
+h1, h2, h3, .heading-font {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
 }
 
-/* ================= 通用橫向滑動容器 (完整顯示功能、絕不裁切文字，側邊放不下時可左右滑動) ================= */
-.h-scroll-strip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  padding-bottom: 3px;
-  flex-shrink: 0;
-}
-
-.h-scroll-strip::-webkit-scrollbar {
-  height: 4px;
-}
-
-.h-scroll-strip::-webkit-scrollbar-thumb {
-  background: rgba(47, 93, 70, 0.3);
-  border-radius: 4px;
-}
-
-.h-scroll-strip > * {
-  flex-shrink: 0 !important;
-  white-space: nowrap !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
-}
-
-
-/* 頂部標題列：按鈕完整顯示於畫面，絕不左右滑動 */
-.app-topbar {
+/* 頂部頁頭 Navbar */
+.app-header-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 4px 8px;
-  flex-shrink: 0;
-  gap: 6px;
+  padding: 4px 0 10px;
+  border-bottom: 2px solid var(--border-light);
+  margin-bottom: 12px;
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: var(--bg-shell);
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 6px;
+  background: var(--bg-main);
 }
 
-.topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  min-width: 0;
-}
-
-.app-main-title {
-  margin: 0;
-  font-size: clamp(15px, 4vw, 18px);
-  font-weight: 900;
+.header-brand-title {
+  font-size: 20px;
+  font-weight: 800;
   color: var(--text-main);
-  white-space: nowrap;
-  letter-spacing: -0.3px;
-}
-
-.topbar-step-pill {
-  font-size: 11px;
-  font-weight: 800;
-  background: var(--matcha-light);
-  color: var(--matcha-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 999px;
-  padding: 1px 7px;
-  white-space: nowrap;
-}
-
-.topbar-right {
   display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-shrink: 0;
-}
-
-.btn-top-item {
-  height: 33px;
-  padding: 0 9px;
-  border-radius: 8px;
-  background: var(--matcha-primary);
-  color: #FFFFFF;
-  border: none;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.btn-top-item.btn-settings-highlight {
-  background: #3B4B3E !important;
-  border: 1.5px solid #6E8773 !important;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-}
-
-.btn-top-item:active {
-  transform: scale(0.96);
-}
-
-
-/* 導覽模式 1 & 2：頂部步驟橫向滑動膠囊導覽列 */
-.step-pill-nav {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  margin-bottom: 5px;
-  padding-bottom: 3px;
-  flex-shrink: 0;
-}
-
-.step-pill-nav::-webkit-scrollbar {
-  height: 3px;
-}
-
-.step-pill-nav::-webkit-scrollbar-thumb {
-  background: rgba(47, 93, 70, 0.28);
-  border-radius: 3px;
-}
-
-.step-pill-btn {
-  height: 29px;
-  padding: 0 11px;
-  border-radius: 999px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-sub);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.step-pill-btn.active {
-  background: var(--matcha-primary);
-  border-color: var(--matcha-dark);
-  color: #FFFFFF;
-}
-
-/* 導覽模式 3：底部常駐分頁列 (Bottom Tab Bar，支援左右滑動完整顯示所有分頁) */
-.bottom-tab-bar {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 5px 6px;
-  margin-top: 6px;
-  flex-shrink: 0;
-}
-
-.bottom-tab-item {
-  flex: 1;
-  min-width: 68px;
-  height: 44px;
-  border-radius: 8px;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-sub);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  padding: 0 6px;
-}
-
-.bottom-tab-item.active {
-  background: var(--matcha-primary);
-  color: #FFFFFF;
-  font-weight: 800;
-}
-
-/* 自動偵測報錯檢核橫幅 */
-.validation-bar {
-  flex-shrink: 0;
-  margin-bottom: 5px;
-  padding: 5px 10px;
-  border-radius: var(--radius-control);
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  overflow-x: auto;
-  white-space: nowrap;
 }
 
-.validation-bar.ok {
-  background: var(--ok-bg);
-  color: var(--ok-text);
-  border: 1px solid #B7E1C6;
-}
-
-.validation-bar.err {
-  background: var(--danger-bg);
-  color: var(--danger-text);
-  border: 1px solid var(--danger-border);
-}
-
-/* 主步驟大卡片 */
-.main-card {
-  flex: 1;
-  min-height: 0;
+.header-login-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-base);
+  border: var(--border-width) solid var(--border-color);
   background: var(--card-bg);
-  border-radius: var(--radius-card);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-card);
-  padding: clamp(10px, 2.5vw, 16px);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  color: var(--primary-dark);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.15);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-login-btn:active {
+  transform: scale(0.96);
+  background: #E0F2FE;
+}
+
+/* ================= 第 1 頁【01_專案管理】(首頁) ================= */
+
+/* 填寫步驟教學海報 (Poster Card - Motion Driven) */
+.poster-tutorial-card {
+  background: linear-gradient(135deg, #0284C7 0%, #0EA5E9 100%);
+  color: #FFFFFF;
+  border-radius: var(--radius-base);
+  border: var(--border-width) solid var(--border-dark);
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.28);
+  position: relative;
   overflow: hidden;
 }
 
-.card-header {
-  flex-shrink: 0;
-  margin-bottom: 6px;
-}
-
-.card-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none;
-}
-
-.card-title-row::-webkit-scrollbar {
-  display: none;
-}
-
-.step-num-badge {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--matcha-primary);
+.poster-tag {
+  display: inline-block;
+  background: #059669;
   color: #FFFFFF;
-  font-size: 12.5px;
+  font-size: 11px;
   font-weight: 800;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1.5px solid #FFFFFF;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
 }
 
-.card-step-title {
-  margin: 0;
-  font-size: clamp(15px, 4vw, 17.5px);
+.poster-title {
+  font-size: 18px;
   font-weight: 800;
-  color: var(--text-main);
-  white-space: nowrap;
-}
-
-.card-step-desc {
-  margin: 2px 0 0;
-  font-size: 11.5px;
-  color: var(--text-muted);
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none;
-}
-
-.card-step-desc::-webkit-scrollbar {
-  display: none;
-}
-
-.card-body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-padding-top: 16px;
-  scroll-padding-bottom: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-right: 2px;
-}
-
-/* ================= 智慧鍵盤防遮擋模式 (body.keyboard-open) =================
- * 當使用者點擊輸入框彈出鍵盤時：
- * 1. 自動收折頂部檢核條、步驟列、描述列與底部換頁列，釋放最大可視空間
- * 2. 限制 textarea 最大高度不超過鍵盤上方可視區，確保文字光標 (caret) 永遠保持在視線正中央
- * 3. 在鍵盤正上方顯示「⌨️ 鍵盤上方浮動輔助列（▲上一欄 / ▼下一欄 / ✓收起鍵盤）」
- */
-/* 鍵盤開啟時保持佈局穩定，不任意隱藏位移 */
-body.keyboard-open .card-step-desc {
-  display: none !important;
-}
-
-body.keyboard-open .app-topbar {
-  padding-bottom: 2px;
-}
-
-body.keyboard-open .card-header {
   margin-bottom: 4px;
 }
 
-body.keyboard-open .card-body {
-  padding-bottom: 36px !important;
-}
-
-body.keyboard-open .adaptive-textarea:focus {
-  max-height: calc(var(--vvh, 100dvh) - 185px) !important;
-  min-height: 84px !important;
-}
-
-.keyboard-assist-bar {
-  display: none;
-  flex-shrink: 0;
-  background: var(--matcha-light);
-  border-top: 2px solid var(--matcha-primary);
-  padding: 6px 10px;
-  margin: 6px -12px -12px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-body.keyboard-open .keyboard-assist-bar {
-  display: flex;
-}
-
-.card-footer {
-  flex-shrink: 0;
-  padding-top: 8px;
-  margin-top: 6px;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* 按鈕與輸入框 */
-button {
-  font-family: inherit;
-  touch-action: manipulation;
-  transition: transform 0.08s ease, background-color 0.15s ease;
-}
-
-button:active {
-  transform: scale(0.98);
-}
-
-.btn-full-green {
-  width: 100%;
-  height: clamp(38px, 5.8vh, 44px);
-  border-radius: var(--radius-control);
-  background: var(--matcha-primary);
-  color: #FFFFFF;
-  border: none;
-  font-size: 14.5px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  white-space: nowrap;
-}
-
-.btn-full-gray {
-  width: 100%;
-  height: clamp(36px, 5.4vh, 42px);
-  border-radius: var(--radius-control);
-  background: var(--matcha-muted-bg);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  font-size: 13.5px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  white-space: nowrap;
-}
-
-.btn-row-2 {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 8px;
-  width: 100%;
-}
-
-/* 輸入框與光標強顯設計 */
-.adaptive-input, .adaptive-textarea {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  background: var(--white);
-  border: 1.5px solid var(--border-color);
-  border-radius: var(--radius-control);
-  padding: 7px 10px;
-  font-size: 16px;
-  color: var(--text-main);
-  caret-color: var(--matcha-primary);
-  font-family: inherit;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.adaptive-input:focus, .adaptive-textarea:focus {
-  outline: none;
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px var(--focus-ring);
-  background: var(--white);
-}
-
-.adaptive-input.input-error, .adaptive-textarea.input-error {
-  border-color: var(--danger-text);
-  background: var(--danger-bg);
-}
-
-.adaptive-textarea {
-  resize: none;
+.poster-desc {
+  font-size: 12.5px;
+  opacity: 0.95;
   line-height: 1.5;
-  overflow-y: auto;
-  scroll-padding-bottom: 36px;
+  margin-bottom: 10px;
 }
 
-/* ================= 日期選擇欄位專屬元件 (.date-section-box) ================= */
-.date-section-box {
-  background: var(--matcha-light);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-control);
-  padding: 8px 10px;
-  display: flex;
-  flex-direction: column;
+.poster-steps-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
-  flex-shrink: 0;
+  margin-top: 4px;
 }
 
-.date-main-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  flex-wrap: wrap;
+.poster-step-pill {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  padding: 6px 4px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
 }
 
-.date-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: var(--white);
-  border: 1.5px solid var(--matcha-primary);
-  border-radius: var(--radius-control);
-  padding: 2px 8px;
-  min-width: 148px;
-  flex: 1;
-  cursor: pointer;
-}
-
-.date-picker-input {
+/* 建立新專案按鈕 */
+.btn-create-proj-locked {
   width: 100%;
-  min-width: 132px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: var(--text-main);
+  height: 46px;
+  border-radius: var(--radius-base);
+  border: var(--border-width) solid var(--border-dark);
+  background: var(--accent-cta);
+  color: #FFFFFF;
   font-size: 15px;
   font-weight: 800;
-  font-family: inherit;
-  outline: none;
   cursor: pointer;
-}
-
-.date-sub-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(140px, 1fr));
-  gap: 6px;
-  overflow-x: auto;
-}
-
-@media (max-width: 350px) {
-  .date-sub-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.date-mini-card {
-  background: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 5px 8px;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  margin-bottom: 10px;
+  transition: transform 0.1s ease, filter 0.15s ease;
 }
 
-.date-mini-label {
-  font-size: 10.5px;
+.btn-create-proj-locked:active {
+  transform: scale(0.98);
+  filter: brightness(0.92);
+}
+
+/* 備份按鈕列 */
+.backup-btn-row-locked {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.btn-backup-item {
+  height: 42px;
+  border-radius: var(--radius-base);
+  border: 2px solid var(--border-color);
+  background: #E0F2FE;
+  color: var(--text-main);
+  font-size: 12.5px;
   font-weight: 700;
-  color: var(--text-sub);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.12s ease;
+}
+
+.btn-backup-item:active {
+  background: #BAE6FD;
+}
+
+/* 分隔線 */
+.section-divider {
+  width: 100%;
+  height: 2px;
+  background: var(--border-light);
+  margin: 8px 0 14px;
+}
+
+/* 專案卡片 (Project Card - Motion-Driven) */
+.project-card-item {
+  background: var(--card-bg);
+  border-radius: var(--radius-base);
+  border: var(--border-width) solid var(--border-color);
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-base);
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, border-color 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.15s ease;
+}
+
+.project-card-item:hover, .project-card-item:active {
+  transform: translateY(-2px);
+  border-color: var(--border-dark);
+  box-shadow: var(--shadow-hover);
+}
+
+.project-card-item:active::before {
+  width: 8px;
+}
+
+.proj-title-row {
   display: flex;
   justify-content: space-between;
-  gap: 4px;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.proj-name-heading {
+  font-size: 16.5px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+
+.proj-badge-active {
+  background: #DCFCE7;
+  color: #059669;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #86EFAC;
   white-space: nowrap;
 }
 
-/* Step 1: 專案卡片 */
-.proj-box {
-  background: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 10px 12px;
+.proj-meta-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.proj-action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed var(--border-light);
+  padding-top: 8px;
+}
+
+.proj-enter-link {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary-dark);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ================= 第 2 頁【02_日期天氣工期】================= */
+
+/* 步驟膠囊列 (Step Tabstrip) */
+.tabstrip-steps-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  scrollbar-width: none;
+}
+
+.tabstrip-steps-row::-webkit-scrollbar {
+  display: none;
+}
+
+.tabstrip-pill {
+  flex-shrink: 0;
+  white-space: nowrap;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-base);
+  border: 2px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-sub);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.12s ease;
+}
+
+.tabstrip-pill.active {
+  background: var(--primary);
+  color: #FFFFFF;
+  border-color: var(--border-dark);
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+}
+
+/* 區塊標題 */
+.section-title-box {
+  background: #E0F2FE;
+  border-left: 4px solid var(--primary);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-.proj-name {
-  font-size: clamp(15px, 4vw, 17px);
+.section-title-text {
+  font-size: 16px;
   font-weight: 800;
   color: var(--text-main);
-  margin-bottom: 5px;
-  overflow-x: auto;
+}
+
+/* 工期進度條卡片 */
+.progress-schedule-card {
+  background: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius-base);
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-base);
+}
+
+.progress-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.progress-pct-badge {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--accent-cta);
+  font-family: var(--font-heading);
+}
+
+.progress-track {
+  width: 100%;
+  height: 12px;
+  background: #E0F2FE;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1.5px solid var(--border-light);
+  margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0EA5E9, #059669);
+  border-radius: 6px;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 契約工期與施工日期輸入框卡片 */
+.field-input-card {
+  background: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius-base);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-base);
+}
+
+.field-label-small {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.field-interactive-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.native-input-box {
+  width: 100%;
+  height: 42px;
+  border-radius: 6px;
+  border: 2px solid var(--border-light);
+  padding: 0 10px;
+  font-size: 14.5px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--text-main);
+  background: #F8FAFC;
+  outline: none;
+  transition: border-color 0.12s ease;
+}
+
+.native-input-box:focus {
+  border-color: var(--primary);
+  background: #FFFFFF;
+}
+
+/* 天氣選擇 Chips 列 */
+.weather-heading {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 8px 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.weather-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.chip-weather-btn {
+  height: 44px;
+  border-radius: var(--radius-base);
+  border: 2px solid var(--border-light);
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: 0 1px 3px rgba(12, 74, 110, 0.05);
+  transition: all 0.1s ease;
+}
+
+.chip-weather-btn:active {
+  transform: scale(0.95);
+}
+
+.chip-weather-btn.active {
+  border-color: var(--border-dark);
+  background: #E0F2FE;
+  color: var(--primary-dark);
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
+}
+
+/* 下一步大按鈕 */
+.btn-next-action-locked {
+  width: 100%;
+  height: 52px;
+  border-radius: var(--radius-base);
+  border: var(--border-width) solid var(--border-dark);
+  background: var(--primary);
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.35);
+  margin-top: 14px;
+  margin-bottom: 10px;
+  transition: transform 0.1s ease, filter 0.12s ease;
+}
+
+.btn-next-action-locked:active {
+  transform: scale(0.98);
+  filter: brightness(0.92);
+}
+
+/* ================= 底部常駐導覽列 (404×99px / 420×88px 規格) ================= */
+.bottom-quick-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  height: 82px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  border-top: var(--border-width) solid var(--border-color);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 6px 4px 12px;
+  z-index: 999;
+  box-shadow: 0 -4px 20px rgba(12, 74, 110, 0.12);
+}
+
+.quick-tab-item {
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.12s ease, transform 0.1s ease;
+}
+
+.quick-tab-item:active {
+  transform: scale(0.94);
+}
+
+.quick-tab-icon {
+  font-size: 19px;
+  line-height: 1;
+}
+
+.quick-tab-label {
+  font-size: 11px;
+  font-weight: 700;
   white-space: nowrap;
 }
 
-.proj-year-bar {
-  border: 1px solid var(--border-color);
+.quick-tab-item.active {
+  color: var(--primary);
+}
+
+.quick-tab-item.active .quick-tab-label {
+  font-weight: 900;
+  color: var(--primary-dark);
+}
+
+/* ================= 第三頁之後的通用卡片與輸入組件 ================= */
+.motion-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-base);
+  border: var(--border-width) solid var(--border-color);
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-base);
+}
+
+/* 多排工項標籤雲 (Multi-row Tag Wrap) */
+.phrase-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+
+.phrase-chip-item {
+  background: #E0F2FE;
+  border: 1.5px solid var(--border-light);
   border-radius: 6px;
   padding: 6px 10px;
   font-size: 12.5px;
   font-weight: 700;
-  background: var(--card-bg);
+  color: var(--text-main);
   cursor: pointer;
-  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.12s ease;
 }
 
-.proj-actions-col {
-  display: flex;
-  flex-direction: column;
+.phrase-chip-item:active {
+  background: var(--primary);
+  color: #FFFFFF;
+  transform: scale(0.96);
+}
+
+.chip-del-x {
+  color: var(--danger-text);
+  font-weight: 900;
+  margin-left: 4px;
+}
+
+/* 自適應文字輸入框 (Textarea) */
+.motion-textarea {
+  width: 100%;
+  border-radius: var(--radius-base);
+  border: 2px solid var(--border-light);
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  font-family: var(--font-body);
+  color: var(--text-main);
+  background: #F8FAFC;
+  outline: none;
+  resize: vertical;
+  min-height: 96px;
+  transition: border-color 0.12s ease;
+}
+
+.motion-textarea:focus {
+  border-color: var(--primary);
+  background: #FFFFFF;
+}
+
+/* 出工與機具單列卡片 (Step 5) */
+.trade-row-card {
+  background: var(--card-bg);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-base);
+  padding: 10px;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: 1fr 48px 84px 96px;
+  align-items: center;
   gap: 6px;
 }
 
-.btn-proj-add {
-  height: 36px;
-  padding: 0 12px;
-  border-radius: 6px;
-  background: var(--matcha-primary);
-  color: #FFFFFF;
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.btn-proj-del {
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 6px;
-  background: var(--danger-bg);
-  color: var(--danger-text);
-  border: 1px solid var(--danger-border);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-/* Step 2: 天氣與工期 (支援窄螢幕橫向滑動完整檢視) */
-.weather-sec-label {
-  font-size: 12px;
+.trade-row-name {
+  font-size: 14px;
   font-weight: 800;
   color: var(--text-main);
-  margin-bottom: 3px;
 }
 
-.weather-strip {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 2px;
-}
-
-.btn-weather {
-  flex: 1;
-  min-width: 58px;
-  height: 36px;
-  border-radius: var(--radius-control);
-  background: var(--white);
-  border: 1px solid var(--border-color);
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--text-main);
-  cursor: pointer;
-  white-space: nowrap;
-  padding: 0 8px;
-  flex-shrink: 0;
-}
-
-.btn-weather.active {
-  background: var(--matcha-primary);
-  border-color: var(--matcha-dark);
-  color: #FFFFFF;
-}
-
-.compact-metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(88px, 1fr));
-  gap: 6px;
-  background: var(--matcha-light);
-  padding: 8px;
-  border-radius: var(--radius-control);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.metric-cell label {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-sub);
-  margin-bottom: 2px;
-  white-space: nowrap;
-}
-
-.metric-cell input {
-  padding: 4px 6px;
-  height: 34px;
-  font-size: 16px;
-  font-weight: 700;
+.trade-row-unit {
+  font-size: 12px;
+  color: var(--text-muted);
   text-align: center;
 }
 
-/* Step 3 & Step 4: 常用工項新增列與橫向滑動快選標籤 */
-.phrase-add-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.phrase-bar, .phrase-chips-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  align-items: center;
-  padding: 4px 0 8px;
-  flex-shrink: 0;
-}
-
-.phrase-chip {
-  display: inline-flex;
-  align-items: center;
-  background: var(--matcha-light);
-  border: 1px solid var(--border-color);
-  border-radius: 999px;
-  padding: 5px 10px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--matcha-primary);
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.phrase-chip-del {
-  margin-left: 6px;
-  color: var(--danger-text);
-  font-weight: 900;
-  padding: 0 2px;
-}
-
-/* Step 5: 分類標籤與項目列 */
-.cat-tabs-strip, .cat-tabs-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 2px 0 8px;
-  flex-shrink: 0;
-}
-
-.btn-cat-tab {
-  height: 36px;
-  padding: 0 12px;
-  border-radius: var(--radius-control);
-  background: var(--matcha-muted-bg);
-  border: 1px solid var(--border-color);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-main);
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.btn-cat-tab.active {
-  background: var(--matcha-primary);
-  border-color: var(--matcha-dark);
-  color: #FFFFFF;
-}
-
-.trade-row-card {
-  background: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-control);
-  padding: 8px 10px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.trade-single-grid {
-  display: grid;
-  grid-template-columns: minmax(110px, 1.4fr) 38px 86px minmax(84px, 0.9fr);
-  gap: 6px;
-  align-items: center;
-  min-width: 320px;
-}
-
-/* Step 6: 現場照片 */
-.photo-action-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.dashed-photo-btn {
-  height: 76px;
-  border: 1.5px dashed var(--border-color);
-  border-radius: 10px;
-  background: var(--white);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  gap: 4px;
-}
-
-.green-circle-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--matcha-primary);
-  color: #FFFFFF;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
+.trade-row-qty-input {
+  height: 38px;
+  border-radius: 6px;
+  border: 2px solid var(--border-light);
+  text-align: center;
+  font-size: 14px;
   font-weight: 800;
+  color: var(--text-main);
+  font-family: var(--font-heading);
 }
 
-/* Step 7 & Step 8: 股票 K 棒式左右滑動山積圖容器 */
-.kbar-chart-wrapper {
+.trade-row-qty-input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.trade-row-cum-badge {
+  background: #E0F2FE;
+  color: var(--primary-dark);
+  border-radius: 6px;
+  padding: 6px 4px;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 橫向滑動山積圖容器 (對應使用者圖片中的山積圖) */
+.mountain-chart-scroll-box {
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid var(--border-color);
+  background: #FAF8F5;
+  border: 2px solid #CBD5E1;
   border-radius: 6px;
-  background: #FFFFFF;
-  padding-bottom: 4px;
+  padding: 8px 4px;
+  margin: 8px 0;
 }
 
-.kbar-chart-wrapper::-webkit-scrollbar {
+.mountain-chart-scroll-box::-webkit-scrollbar {
   height: 6px;
 }
 
-.kbar-chart-wrapper::-webkit-scrollbar-thumb {
-  background: #B8C7BE;
+.mountain-chart-scroll-box::-webkit-scrollbar-thumb {
+  background: #94A3B8;
   border-radius: 3px;
 }
 
-.kbar-hint-tag {
-  font-size: 10px;
-  color: var(--matcha-primary);
-  background: var(--matcha-light);
-  padding: 2px 7px;
-  border-radius: 999px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-/* 正式報表與表格 */
-.report-preview-paper {
-  background: #FFFFFF;
-  color: #1C2520;
-  border: 1px solid #C8D0CA;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 11.5px;
-}
-
-.table-scroll-box {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin-bottom: 10px;
-}
-
-table.rep-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-table.rep-table th, table.rep-table td {
-  border: 1px solid #C4CCC6;
-  padding: 5px 6px;
-  vertical-align: middle;
-}
-
-table.rep-table th {
-  background: #EEF3F0;
-  color: #2F5D46;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.nowrap-cell {
-  white-space: nowrap !important;
-}
-
-.chart-card {
-  border: 1px solid #C4CCC6;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
-  background: #FCFDFB;
-  color: #1C2520;
-  page-break-inside: avoid;
-}
-
-.chart-card-title {
-  font-size: 12.5px;
-  font-weight: 800;
-  color: #2F5D46;
-  border-bottom: 1.5px solid #E4ECE7;
-  padding-bottom: 4px;
-  margin-bottom: 6px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 6px;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-/* Modal */
-.modal-mask {
-  position: fixed;
-  inset: 0;
-  background: rgba(24, 32, 25, 0.58);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 200;
-  padding: 12px;
-}
-
-.modal-box {
-  width: 100%;
-  max-width: 520px;
-  max-height: 90dvh;
-  background: var(--card-bg);
-  border-radius: 14px;
-  border: 2px solid var(--matcha-primary);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* ================= 正式 A4 PDF 列印輸出專用排版 (@media print) ================= */
+/* ================= A4 列印與 PDF 輸出規範 (@media print) ================= */
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm;
+    margin: 8mm;
   }
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  html, body, .app-shell, .main-card, .card-body {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    overflow: visible !important;
+
+  body, html {
     background: #FFFFFF !important;
-    color: #1C2520 !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    background-image: none !important;
+    color: #000000 !important;
+    width: 100% !important;
+  }
+
+  .app-shell {
+    max-width: 100% !important;
+    width: 100% !important;
     border: none !important;
     box-shadow: none !important;
-    display: block !important;
+    padding: 0 !important;
   }
-  .no-print, .step-pill-nav, .bottom-tab-bar, .keyboard-assist-bar {
+
+  /* 列印時隱藏手機導覽列、按鈕、教學海報 */
+  .app-header-nav,
+  .bottom-quick-tabbar,
+  .tabstrip-steps-row,
+  .btn-next-action-locked,
+  .floating-jump-btn,
+  .no-print {
     display: none !important;
   }
-  .report-preview-paper {
-    border: none !important;
-    padding: 0 !important;
-    font-size: 10.5pt !important;
-  }
-  .kbar-chart-wrapper, .table-scroll-box {
-    overflow: visible !important;
-    border: none !important;
-  }
-  .kbar-chart-wrapper svg {
+
+  /* 輸出 A4 日報標準表格格式 */
+  .a4-print-sheet {
+    display: block !important;
     width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    height: auto !important;
+    page-break-after: avoid;
+    font-family: "Noto Sans TC", sans-serif !important;
+    font-size: 10.5pt;
+    line-height: 1.4;
   }
-  table.rep-table {
-    page-break-inside: auto;
-    font-size: 9.5pt !important;
+
+  table.a4-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 6px;
   }
-  table.rep-table tr {
-    page-break-inside: avoid;
-    page-break-after: auto;
+
+  table.a4-report-table th, table.a4-report-table td {
+    border: 1px solid #000000 !important;
+    padding: 4px 6px;
+    font-size: 9pt;
   }
-  .chart-card {
-    page-break-inside: avoid;
-    border: 1px solid #999 !important;
-    margin-bottom: 12px !important;
+
+  table.a4-report-table th {
+    background: #F1F5F9 !important;
+    font-weight: bold;
+    text-align: center;
   }
-}
-
-
-/* 第一頁專案簡潔卡片 */
-.proj-clean-card {
-  background: var(--card-bg);
-  border: 1.5px solid var(--border-color);
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow-card);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.proj-clean-header {
-  border-bottom: 1px dashed var(--border-color);
-  padding-bottom: 8px;
-}
-
-.proj-clean-title {
-  font-size: 17px;
-  font-weight: 900;
-  color: var(--text-main);
-  line-height: 1.35;
-  margin-bottom: 3px;
-}
-
-.proj-clean-sub {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-/* 名稱下方為三個獨立按鈕：新增日報 / 總統計 / 刪除專案 */
-.proj-clean-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-}
-
-.btn-proj-action {
-  height: 38px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 800;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  white-space: nowrap;
-  transition: transform 0.1s ease;
-}
-
-.btn-proj-action:active {
-  transform: scale(0.96);
-}
-
-.btn-proj-action.btn-add-report {
-  background: var(--matcha-primary);
-  color: #FFFFFF;
-}
-
-.btn-proj-action.btn-stats {
-  background: #3B6E75;
-  color: #FFFFFF;
-}
-
-.btn-proj-action.btn-del-proj {
-  background: var(--danger-bg);
-  color: var(--danger-text);
-  border: 1px solid var(--danger-border);
-}
-
-.proj-reports-stream {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 4px;
-  max-height: 220px;
-  overflow-y: auto;
-}
-
-.proj-report-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.proj-report-row:active {
-  background: var(--matcha-light);
-}
-
-.report-row-date {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.report-row-action {
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--matcha-primary);
-}
-
-.btn-create-proj-hero {
-  width: 100%;
-  height: 44px;
-  border-radius: 10px;
-  background: var(--white);
-  border: 2px dashed var(--matcha-primary);
-  color: var(--matcha-primary);
-  font-size: 14px;
-  font-weight: 800;
-  cursor: pointer;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.new-proj-form-box {
-  background: var(--white);
-  border: 2px solid var(--matcha-primary);
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.backup-actions-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-color);
-}
-
-.btn-subtle-link {
-  background: transparent;
-  border: none;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px 6px;
-}
-
-
-/* 浮動下一欄跳轉按鈕 (填寫資料時隨時可點擊跳下一個欄位) */
-.floating-jump-btn {
-  position: fixed;
-  right: 14px;
-  bottom: 70px;
-  z-index: 999;
-  background: var(--matcha-primary);
-  color: #FFFFFF;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-radius: 999px;
-  padding: 8px 16px;
-  font-size: 13.5px;
-  font-weight: 800;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  transition: transform 0.1s ease;
-}
-
-.floating-jump-btn:active {
-  transform: scale(0.94);
-}
-
-/* 預社區間快速切換按鈕列 (日/週/月/季/全期) */
-.preset-range-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-  margin: 6px 0 10px;
-}
-
-.preset-btn {
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: var(--white);
-  border: 1px solid var(--border-color);
-  color: var(--text-sub);
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.preset-btn.active {
-  background: var(--matcha-primary);
-  color: #FFFFFF;
-  border-color: var(--matcha-dark);
-}
-
-/* 直流瀏覽：Step 8 總統計全量瀑布流排版 */
-.stats-stream-flow {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
