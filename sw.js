@@ -1,5 +1,5 @@
-const CACHE_NAME = 'site-daily-report-v10-motion';
-const ASSETS = ['./index.html', './styles.css?v=10', './app.js?v=10', './manifest.json'];
+const CACHE_NAME = 'site-daily-report-v13-motion';
+const ASSETS = ['./index.html', './styles.css?v=13', './app.js?v=13', './manifest.json'];
 
 self.addEventListener('install', event => {
   event.waitUntil(

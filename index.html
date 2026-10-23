@@ -12,15 +12,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
   <link rel="manifest" href="./manifest.json" />
-  <link rel="stylesheet" href="./styles.css?v=10" />
+  <link rel="stylesheet" href="./styles.css?v=13" />
 </head>
 <body data-ui-theme="motion-driven">
   <div id="app-root" class="app-shell"></div>
-  <script src="./app.js?v=10"></script>
+  <script src="./app.js?v=13"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=10').then(reg => {
+        navigator.serviceWorker.register('./sw.js?v=13').then(reg => {
           reg.update();
         }).catch(() => {});
       });
