@@ -124,6 +124,9 @@ function generateSampleReportsForProject(proj, count = 20) {
 let state = {
   activeBottomTab: 'home', // 'home' | 'report' | 'stats' | 'model' | 'settings' | 'checkout'
   statsFilterRange: 'all', // 'all' | 'week' | 'month' | 'quarter' | 'last30'
+  mountainChartMode: 'workers', // 'workers' (出工人力) | 'machinery' (進場機具) | 'combined' (綜合負載)
+  showExportActionSheet: false,
+  selectedDayDetail: null,
   currentStep: 1, // 1~7
   activeProjId: 'proj_shiguang',
   activeReportId: null,
@@ -324,6 +327,96 @@ function renderPage03CheckoutView() {
   `;
 }
 
+
+// =========================================================================
+// 浮動 Action Sheet (匯出 PDF / EXCEL / LINE 備份收納)
+// =========================================================================
+function renderExportActionSheetModal() {
+  if (!state.showExportActionSheet) return '';
+  return `
+    <div class="bottom-sheet-backdrop" onclick="window.appActions.closeExportActionSheet(event)">
+      <div class="bottom-sheet-content" onclick="event.stopPropagation()">
+        <div class="bottom-sheet-grabber"></div>
+        <div style="font-size:16px;font-weight:900;color:var(--text-main);margin-bottom:12px;font-family:var(--font-heading);">
+          📤 工程報表與匯出功能
+        </div>
+        <button class="action-sheet-item-btn" onclick="window.appActions.exportToPdf();window.appActions.closeExportActionSheet();">
+          <span style="font-size:20px;">📄</span>
+          <div style="text-align:left;">
+            <div>輸出正式 A4 日報表 (PDF)</div>
+            <div style="font-size:11px;color:var(--text-muted);font-weight:normal;">瀏覽器列印為 PDF 格式</div>
+          </div>
+        </button>
+        <button class="action-sheet-item-btn" onclick="window.appActions.exportToExcel();window.appActions.closeExportActionSheet();">
+          <span style="font-size:20px;">📊</span>
+          <div style="text-align:left;">
+            <div>匯出全工程總統計表 (EXCEL)</div>
+            <div style="font-size:11px;color:var(--text-muted);font-weight:normal;">下載 UTF-8 CSV 完整資料表</div>
+          </div>
+        </button>
+        <button class="action-sheet-item-btn" onclick="window.appActions.openLineShareModal();window.appActions.closeExportActionSheet();">
+          <span style="font-size:20px;">💬</span>
+          <div style="text-align:left;">
+            <div>產生 LINE 工地通報摘要</div>
+            <div style="font-size:11px;color:var(--text-muted);font-weight:normal;">一鍵複製文字並分享至群組</div>
+          </div>
+        </button>
+        <button class="action-sheet-item-btn" style="background:#F1F5F9;justify-content:center;color:var(--text-muted);margin-top:8px;" onclick="window.appActions.closeExportActionSheet()">
+          取消
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// =========================================================================
+// 點選單日柱體滑出之 Bottom Sheet (單日工種人力與機具細項抽屜)
+// =========================================================================
+function renderDayDetailBottomSheet() {
+  if (!state.selectedDayDetail) return '';
+  const proj = getActiveProject();
+  const rep = (proj.reports || []).find(r => r.reportDateISO === state.selectedDayDetail);
+  if (!rep) return '';
+
+  const workers = rep.tradeRecords.filter(t => t.category === 'workers');
+  const machines = rep.tradeRecords.filter(t => t.category === 'machinery');
+
+  return `
+    <div class="bottom-sheet-backdrop" onclick="window.appActions.closeDayDetailSheet(event)">
+      <div class="bottom-sheet-content" onclick="event.stopPropagation()">
+        <div class="bottom-sheet-grabber"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid var(--border-light);padding-bottom:8px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:16px;font-weight:900;color:var(--text-main);">📅 ${formatDateWestern(rep.reportDateISO, 'slash_weekday')} 現場明細</div>
+            <div style="font-size:11.5px;color:var(--text-muted);">天氣：上午 ${rep.weatherAM} / 下午 ${rep.weatherPM}</div>
+          </div>
+          <button class="phrase-chip-item" style="padding:4px 10px;" onclick="window.appActions.closeDayDetailSheet()">關閉 ✕</button>
+        </div>
+
+        <div style="font-size:13px;font-weight:900;color:var(--text-main);margin-bottom:6px;">👷 當日出工明細：</div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;">
+          ${workers.map(w => `
+            <div style="display:flex;justify-content:space-between;padding:6px 8px;background:#F8FAFC;border-radius:4px;font-size:12px;">
+              <span>${w.name}</span>
+              <strong style="color:var(--primary-dark);">${getTodayQty(w)} 人</strong>
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="font-size:13px;font-weight:900;color:var(--text-main);margin-bottom:6px;">🚜 當日機具明細：</div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;">
+          ${machines.map(m => `
+            <div style="display:flex;justify-content:space-between;padding:6px 8px;background:#F0FDF4;border-radius:4px;font-size:12px;">
+              <span>${m.name}</span>
+              <strong style="color:#059669;">${getTodayQty(m)} 台</strong>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderApp() {
   const root = document.getElementById('app-root');
   if (!root) return;
@@ -367,6 +460,8 @@ function renderApp() {
       ${bodyContent}
     </main>
     ${renderBottomQuickTabBar()}
+    ${renderExportActionSheetModal()}
+    ${renderDayDetailBottomSheet()}
     ${renderToastNotice()}
   `;
 }
@@ -376,22 +471,20 @@ function renderHeaderNav() {
   const proj = getActiveProject();
 
   return `
-    <header class="app-header-nav no-print">
-      <div class="header-brand-title" onclick="window.appActions.navigateTab('home')">
-        <span>🏗️</span>
-        <h1 style="font-size:17px;font-weight:900;">${isHome ? '營建管理系統' : '營建日報'}</h1>
+    <header class="minimal-header-nav no-print">
+      <div class="minimal-brand-wrap" onclick="window.appActions.navigateTab('home')">
+        <span style="font-size:20px;">🏗️</span>
+        <span class="minimal-brand-title">${isHome ? '營建管理系統' : '營建日報'}</span>
+        ${!isHome ? `<span class="minimal-proj-pill">${proj.name}</span>` : ''}
       </div>
-      <div class="header-actions-row">
+      <div class="minimal-header-actions">
         ${!isHome ? `
-          <button class="header-action-btn" onclick="window.appActions.exportToPdf()" title="匯出 PDF 報表">
-            <span>📄</span> PDF
-          </button>
-          <button class="header-action-btn" onclick="window.appActions.exportToExcel()" title="匯出 Excel 報表">
-            <span>📊</span> EXCEL
+          <button class="action-sheet-trigger-btn" onclick="window.appActions.openExportActionSheet()" title="更多匯出與報表操作">
+            <span>⋯</span>
           </button>
         ` : ''}
-        <button class="header-action-btn" style="background:#0EA5E9;color:#fff;border-color:#0284C7;" onclick="window.appActions.navigateTab('settings')">
-          <span>👤</span> 登入
+        <button class="action-sheet-trigger-btn" style="background:#0EA5E9;color:#fff;border-color:#0284C7;" onclick="window.appActions.navigateTab('settings')" title="帳號與設定">
+          <span>👤</span>
         </button>
       </div>
     </header>
@@ -1122,7 +1215,7 @@ function renderPageStatsView() {
       return repDate.getFullYear() === now.getFullYear() && repQuarter === currentQuarter;
     }
     if (range === 'week') {
-      const dayOfWeek = (now.getDay() + 6) % 7; // 0 is Monday
+      const dayOfWeek = (now.getDay() + 6) % 7;
       const monday = new Date(now);
       monday.setDate(now.getDate() - dayOfWeek);
       monday.setHours(0,0,0,0);
@@ -1144,18 +1237,32 @@ function renderPageStatsView() {
     return acc + rep.tradeRecords.filter(r => r.category === 'machinery').reduce((s, r) => s + getTodayQty(r), 0);
   }, 0);
 
-  const mountainChartSvg = buildMountainSvg(reports);
+  const rangeLabelMap = {
+    all: '全工期 (' + allReports.length + '日)',
+    week: '本週報表',
+    month: '本月報表',
+    quarter: '本季報表',
+    last30: '近 30 天'
+  };
+
+  const plannedPct = Number(proj.plannedProgress || 43.5);
+  const actualPct = Number(proj.actualProgress || 41.3);
+  const diffPct = Number((actualPct - plannedPct).toFixed(1));
+  const isAhead = diffPct >= 0;
+  const contractDays = Number(proj.contractDays) || 480;
+  const usedDays = Number(proj.usedDays) || 198;
+  const remainDays = Math.max(0, contractDays - usedDays);
+
+  const chartMode = state.mountainChartMode || 'workers';
+  const mountainChartSvg = buildDoubleAxisMountainSvg(reports, chartMode);
 
   return `
-    <div class="section-title-box" style="display:flex;justify-content:space-between;align-items:center;">
-      <span class="section-title-text">專案總報表與區間統計</span>
-      <div style="display:flex;gap:6px;">
-        <button class="header-action-btn" onclick="window.appActions.exportToPdf()" title="匯出總報表 PDF">
-          <span>📄</span> 匯出 PDF
-        </button>
-        <button class="header-action-btn" onclick="window.appActions.exportToExcel()" title="匯出總報表 EXCEL">
-          <span>📊</span> 匯出 EXCEL
-        </button>
+    <!-- 1. 垂直主次分明標題列 (移除頂部擠壓的雙按鈕) -->
+    <div class="vertical-hierarchy-header">
+      <div class="vh-primary-title">專案總報表與區間統計</div>
+      <div class="vh-secondary-meta">
+        <span class="vh-badge-tag">${proj.name}</span>
+        <span>統計區間：<strong>${rangeLabelMap[range]}</strong></span>
       </div>
     </div>
 
@@ -1170,7 +1277,7 @@ function renderPageStatsView() {
       </select>
     </div>
 
-    <!-- 區間篩選晶片 (全部、本週、本月、本季、近30日) -->
+    <!-- 區間篩選晶片 -->
     <div class="stats-filter-chips-row">
       <button class="stats-filter-chip ${range === 'all' ? 'active' : ''}" onclick="window.appActions.setStatsRange('all')">全工期 (${allReports.length}日)</button>
       <button class="stats-filter-chip ${range === 'week' ? 'active' : ''}" onclick="window.appActions.setStatsRange('week')">本週報表</button>
@@ -1179,43 +1286,76 @@ function renderPageStatsView() {
       <button class="stats-filter-chip ${range === 'last30' ? 'active' : ''}" onclick="window.appActions.setStatsRange('last30')">近 30 天</button>
     </div>
 
-    <!-- 指標卡片 -->
-    <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:6px;margin-bottom:10px;">
-      <div class="motion-card" style="padding:8px 4px;text-align:center;margin-bottom:0;">
-        <div style="font-size:10px;color:var(--text-muted);">區間天數</div>
-        <div style="font-size:16px;font-weight:900;color:var(--primary);font-family:var(--font-heading);">${reports.length}日</div>
+    <!-- 2. 採用 2×2 網格卡片：放大核心數值，次列顯示輔助標籤 -->
+    <div class="kpi-matrix-2x2">
+      <div class="kpi-matrix-card">
+        <span class="kpi-matrix-label">總出工總結</span>
+        <span class="kpi-matrix-val" style="color:var(--accent-cta);">${totalWorkers} <span style="font-size:13px;color:var(--text-muted);">人·日</span></span>
+        <span class="kpi-matrix-sub">日均出工：${Math.round(totalWorkers / Math.max(1, reports.length))} 人</span>
       </div>
-      <div class="motion-card" style="padding:8px 4px;text-align:center;margin-bottom:0;">
-        <div style="font-size:10px;color:var(--text-muted);">累計出工</div>
-        <div style="font-size:16px;font-weight:900;color:var(--accent-cta);font-family:var(--font-heading);">${totalWorkers}人</div>
+      <div class="kpi-matrix-card">
+        <span class="kpi-matrix-label">進場機具總計</span>
+        <span class="kpi-matrix-val" style="color:var(--primary-dark);">${totalMachines} <span style="font-size:13px;color:var(--text-muted);">台·班</span></span>
+        <span class="kpi-matrix-sub">運轉稼動率：${reports.length > 0 ? '88%' : '0%'}</span>
       </div>
-      <div class="motion-card" style="padding:8px 4px;text-align:center;margin-bottom:0;">
-        <div style="font-size:10px;color:var(--text-muted);">累計機具</div>
-        <div style="font-size:16px;font-weight:900;color:var(--primary-dark);font-family:var(--font-heading);">${totalMachines}台</div>
+      <div class="kpi-matrix-card">
+        <span class="kpi-matrix-label">統計區間天數</span>
+        <span class="kpi-matrix-val" style="color:var(--primary);">${reports.length} <span style="font-size:13px;color:var(--text-muted);">日</span></span>
+        <span class="kpi-matrix-sub">累積日報填報完整</span>
       </div>
-      <div class="motion-card" style="padding:8px 4px;text-align:center;margin-bottom:0;">
-        <div style="font-size:10px;color:var(--text-muted);">工期進度</div>
-        <div style="font-size:16px;font-weight:900;color:var(--text-main);font-family:var(--font-heading);">${Math.round((proj.usedDays/proj.contractDays)*100)}%</div>
+      <div class="kpi-matrix-card">
+        <span class="kpi-matrix-label">契約工期進度</span>
+        <span class="kpi-matrix-val" style="color:var(--text-main);">${Math.round((usedDays/contractDays)*100)}%</span>
+        <span class="kpi-matrix-sub">已用 ${usedDays}天 / 餘 ${remainDays}天</span>
       </div>
     </div>
 
-    <!-- 山積圖卡片 (括號內容已移除) -->
+    <!-- 落後警示全寬標註列 -->
+    <div class="variance-fullwidth-alert ${isAhead ? 'variance-ahead-alert' : ''}">
+      <div class="variance-alert-text ${isAhead ? 'variance-ahead-text' : ''}">
+        <span>${isAhead ? '⚡ 施工進度超前穩定' : '⚠️ 進度落後警示分析'}</span>
+        <span style="font-size:11px;font-weight:normal;">(預定 ${plannedPct}% ｜ 實際 ${actualPct}%)</span>
+      </div>
+      <span class="variance-alert-badge ${isAhead ? 'variance-ahead-badge' : ''}">
+        ${isAhead ? '超前 +' + diffPct + '%' : '落後 ' + Math.abs(diffPct) + '%'}
+      </span>
+    </div>
+
+    <!-- 3. 雙維度工務山積圖 (人力負荷 ＋ 施工重機具) -->
     <div class="motion-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:6px;">
-        <div style="font-size:14px;font-weight:900;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-          👷 區間每日出工人數山積圖
-        </div>
-        <span style="font-size:11px;color:var(--primary-dark);background:#E0F2FE;padding:2px 8px;border-radius:4px;font-weight:800;white-space:nowrap;flex-shrink:0;">
-          左右滑動檢視
+      <div style="font-size:14.5px;font-weight:900;color:var(--text-main);margin-bottom:8px;">
+        資源配置山積圖 (每日投入與累積曲線)
+      </div>
+
+      <!-- Segmented Control 切換 [出工人力] / [進場機具] / [綜合負載] -->
+      <div class="chart-segmented-control">
+        <button class="chart-seg-btn ${chartMode === 'workers' ? 'active' : ''}" onclick="window.appActions.setChartMode('workers')">
+          👷 出工人力
+        </button>
+        <button class="chart-seg-btn ${chartMode === 'machinery' ? 'active' : ''}" onclick="window.appActions.setChartMode('machinery')">
+          🚜 進場機具
+        </button>
+        <button class="chart-seg-btn ${chartMode === 'combined' ? 'active' : ''}" onclick="window.appActions.setChartMode('combined')">
+          📈 綜合負載
+        </button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:11px;color:var(--text-muted);">
+          點選柱體可滑出當日工種/機具細項
+        </span>
+        <span style="font-size:11px;color:var(--primary-dark);font-weight:800;">
+          左右平滑滾動檢視 ${reports.length} 日區間 ➔
         </span>
       </div>
 
-      <div class="mountain-chart-scroll-box">
+      <!-- 優化滑動容器：overflow-x: auto & scroll-snap-type -->
+      <div class="mountain-chart-scroll-box-smooth">
         ${mountainChartSvg}
       </div>
     </div>
 
-    <!-- 全量項目統計表 (括號內容已移除) -->
+    <!-- 全量項目統計總表 -->
     <div class="motion-card">
       <div style="font-size:13.5px;font-weight:900;color:var(--text-main);margin-bottom:6px;">
         📋 區間已填寫項目全量統計總表
@@ -1224,8 +1364,8 @@ function renderPageStatsView() {
         <table class="rep-table-grid" style="font-size:11px;margin-bottom:0;">
           <thead>
             <tr>
-              <th style="width:64px;white-space:nowrap;">分類</th>
-              <th style="white-space:nowrap;">項目</th>
+              <th style="width:58px;white-space:nowrap;">分類</th>
+              <th style="white-space:nowrap;">項目名稱</th>
               <th style="white-space:nowrap;text-align:right;">區間總計</th>
               <th style="white-space:nowrap;text-align:right;">月均 30日</th>
               <th style="white-space:nowrap;text-align:right;">單日峰值</th>
@@ -1241,8 +1381,172 @@ function renderPageStatsView() {
   `;
 }
 
-// 繪製山積圖
-function buildMountainSvg(reports) {
+// 繪製雙軸山積圖 (支援出工人力、進場機具、雙柱綜合負載 + S-Curve 累計折線)
+function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
+  if (!reports || reports.length === 0) {
+    return '<div style="padding:18px;text-align:center;color:#64748B;">尚無日報數據</div>';
+  }
+
+  const n = reports.length;
+  const colW = mode === 'combined' ? 56 : 46;
+  const padL = 40;
+  const padR = 40;
+  const padT = 24;
+  const padB = 46;
+  const svgW = Math.max(380, padL + padR + n * colW);
+  const svgH = 220;
+  const plotW = svgW - padL - padR;
+  const plotH = svgH - padT - padB;
+
+  let cumWorkers = 0;
+  let cumMachines = 0;
+
+  const daysData = reports.map(r => {
+    const workers = r.tradeRecords.filter(t => t.category === 'workers');
+    const machines = r.tradeRecords.filter(t => t.category === 'machinery');
+
+    // 人力堆疊細項
+    const mainWorkers = workers.filter(w => !w.name.includes('點工') && !w.name.includes('特約')).reduce((sum, w) => sum + getTodayQty(w), 0);
+    const subWorkers = workers.filter(w => w.name.includes('點工') || w.name.includes('特約')).reduce((sum, w) => sum + getTodayQty(w), 0);
+    const totalW = mainWorkers + subWorkers;
+    const totalM = machines.reduce((sum, m) => sum + getTodayQty(m), 0);
+
+    cumWorkers += totalW;
+    cumMachines += totalM;
+
+    return {
+      reportId: r.id,
+      dateISO: r.reportDateISO,
+      dateShort: r.reportDateISO.slice(5),
+      mainWorkers,
+      subWorkers,
+      totalW,
+      totalM,
+      cumW: cumWorkers,
+      cumM: cumMachines,
+      records: r.tradeRecords
+    };
+  });
+
+  const maxVal = mode === 'machinery'
+    ? Math.max(8, ...daysData.map(d => d.totalM))
+    : Math.max(12, ...daysData.map(d => d.totalW));
+
+  const maxCum = mode === 'machinery' ? Math.max(15, cumMachines) : Math.max(25, cumWorkers);
+
+  const barSvgParts = [];
+  const linePoints = [];
+
+  daysData.forEach((d, i) => {
+    const cx = padL + i * colW + colW / 2;
+
+    if (mode === 'workers') {
+      // 堆疊長條柱：主體包商 (藍 #0EA5E9) + 點工協力 (橘 #D97706)
+      const hMain = (d.mainWorkers / maxVal) * plotH;
+      const hSub = (d.subWorkers / maxVal) * plotH;
+      const yBase = padT + plotH;
+      const yMain = yBase - hMain;
+      const ySub = yMain - hSub;
+
+      barSvgParts.push(`
+        <g style="cursor:pointer;" onclick="window.appActions.openDayDetailSheet('${d.dateISO}')">
+          <rect x="${cx - 12}" y="${yMain}" width="24" height="${hMain}" fill="#0EA5E9" rx="2" />
+          ${hSub > 0 ? `<rect x="${cx - 12}" y="${ySub}" width="24" height="${hSub}" fill="#D97706" rx="2" />` : ''}
+          <text x="${cx}" y="${ySub - 5}" font-size="9.5" font-weight="900" fill="#0C4A6E" text-anchor="middle">${d.totalW}</text>
+          <text x="${cx}" y="${svgH - padB + 16}" font-size="9" fill="#0C4A6E" text-anchor="middle" font-weight="700">${d.dateShort}</text>
+        </g>
+      `);
+
+      const yCum = (padT + plotH) - (d.cumW / maxCum) * plotH;
+      linePoints.push(`${cx},${yCum}`);
+
+    } else if (mode === 'machinery') {
+      // 機具柱體 (翠綠 #059669)
+      const barH = (d.totalM / maxVal) * plotH;
+      const yTop = (padT + plotH) - barH;
+
+      barSvgParts.push(`
+        <g style="cursor:pointer;" onclick="window.appActions.openDayDetailSheet('${d.dateISO}')">
+          <rect x="${cx - 12}" y="${yTop}" width="24" height="${barH}" fill="#059669" rx="2" />
+          <text x="${cx}" y="${yTop - 5}" font-size="9.5" font-weight="900" fill="#065F46" text-anchor="middle">${d.totalM}台</text>
+          <text x="${cx}" y="${svgH - padB + 16}" font-size="9" fill="#0C4A6E" text-anchor="middle" font-weight="700">${d.dateShort}</text>
+        </g>
+      `);
+
+      const yCum = (padT + plotH) - (d.cumM / maxCum) * plotH;
+      linePoints.push(`${cx},${yCum}`);
+
+    } else {
+      // 綜合負載：並排雙柱 (左藍工人 + 右綠機具)
+      const hW = (d.totalW / maxVal) * plotH;
+      const hM = (d.totalM / maxVal) * plotH;
+      const yBase = padT + plotH;
+
+      barSvgParts.push(`
+        <g style="cursor:pointer;" onclick="window.appActions.openDayDetailSheet('${d.dateISO}')">
+          <rect x="${cx - 14}" y="${yBase - hW}" width="12" height="${hW}" fill="#0EA5E9" rx="2" />
+          <rect x="${cx}" y="${yBase - hM}" width="12" height="${hM}" fill="#059669" rx="2" />
+          <text x="${cx - 8}" y="${yBase - hW - 4}" font-size="8.5" font-weight="800" fill="#0EA5E9" text-anchor="middle">${d.totalW}</text>
+          <text x="${cx + 6}" y="${yBase - hM - 4}" font-size="8.5" font-weight="800" fill="#059669" text-anchor="middle">${d.totalM}</text>
+          <text x="${cx}" y="${svgH - padB + 16}" font-size="9" fill="#0C4A6E" text-anchor="middle" font-weight="700">${d.dateShort}</text>
+        </g>
+      `);
+
+      const yCum = (padT + plotH) - (d.cumW / maxCum) * plotH;
+      linePoints.push(`${cx},${yCum}`);
+    }
+  });
+
+  const linePointsStr = linePoints.join(' ');
+  const yBase = padT + plotH;
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:10px;margin-bottom:6px;padding:0 4px;">
+      <div style="display:flex;gap:10px;">
+        ${mode === 'workers' ? `
+          <span><strong style="color:#0EA5E9;">■</strong> 主體出工</span>
+          <span><strong style="color:#D97706;">■</strong> 點工協力</span>
+        ` : mode === 'machinery' ? `
+          <span><strong style="color:#059669;">■</strong> 進場機具(台)</span>
+        ` : `
+          <span><strong style="color:#0EA5E9;">■</strong> 人力</span>
+          <span><strong style="color:#059669;">■</strong> 機具</span>
+        `}
+      </div>
+      <div>
+        <span><strong style="color:#EF4444;">●—</strong> 累計工數折線 (右軸 ${maxCum})</span>
+      </div>
+    </div>
+
+    <svg width="${svgW}" height="${svgH}" style="display:block;min-width:${svgW}px;">
+      <!-- 水平參考線 -->
+      <line x1="${padL}" y1="${yBase}" x2="${svgW - padR}" y2="${yBase}" stroke="#CBD5E1" stroke-width="1.5" />
+      <line x1="${padL}" y1="${yBase - plotH / 2}" x2="${svgW - padR}" y2="${yBase - plotH / 2}" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="3 3" />
+      <line x1="${padL}" y1="${padT}" x2="${svgW - padR}" y2="${padT}" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="3 3" />
+
+      <!-- 左軸刻度 (日用量) -->
+      <text x="${padL - 6}" y="${padT + 4}" font-size="9" fill="#64748B" text-anchor="end">${maxVal}</text>
+      <text x="${padL - 6}" y="${yBase - plotH / 2 + 3}" font-size="9" fill="#64748B" text-anchor="end">${Math.round(maxVal / 2)}</text>
+      <text x="${padL - 6}" y="${yBase}" font-size="9" fill="#64748B" text-anchor="end">0</text>
+
+      <!-- 右軸刻度 (累積 S-Curve) -->
+      <text x="${svgW - padR + 6}" y="${padT + 4}" font-size="9" fill="#EF4444" font-weight="bold">${maxCum}</text>
+      <text x="${svgW - padR + 6}" y="${yBase}" font-size="9" fill="#EF4444" font-weight="bold">0</text>
+
+      <!-- 長條柱群 -->
+      ${barSvgParts.join('')}
+
+      <!-- 累計 S-Curve 實體折線 -->
+      <polyline fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${linePointsStr}" />
+      
+      <!-- 節點圓點 -->
+      ${linePoints.map(pt => {
+        const [px, py] = pt.split(',');
+        return `<circle cx="${px}" cy="${py}" r="3" fill="#EF4444" stroke="#FFFFFF" stroke-width="1.5" />`;
+      }).join('')}
+    </svg>
+  `;
+} {
   if (!reports || reports.length === 0) {
     return '<div style="padding:18px;text-align:center;color:#64748B;">尚無日報數據</div>';
   }
@@ -1466,15 +1770,27 @@ function buildSixColTableRows(reports) {
 function renderPageBimModelView() {
   const proj = getActiveProject();
   return `
-    <div class="section-title-box">
-      <span class="section-title-text">🏠 工地 BIM 輕量化 3D 模型檢視</span>
-      <span style="font-size:12px;color:var(--primary-dark);">${proj.name.slice(0, 5)}</span>
+    <!-- 主次上下垂直排版：主標在第一行，專案名稱作為次級文字於下方 -->
+    <div class="vertical-hierarchy-header">
+      <div class="vh-primary-title">工地 BIM 輕量化 3D 模型檢視</div>
+      <div class="vh-secondary-meta">
+        <span class="vh-badge-tag">${proj.name}</span>
+        <span>當前施工進度層：5F 樑板鋼筋綁紮中</span>
+      </div>
     </div>
+
     <div class="motion-card" style="text-align:center;padding:16px;">
-      <div style="width:100%;height:240px;background:linear-gradient(180deg,#E0F2FE 0%,#BAE6FD 100%);border:2px solid var(--border-color);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;">
-        <div style="font-size:48px;margin-bottom:8px;">🏢</div>
-        <div style="font-size:15px;font-weight:900;color:var(--text-main);">${proj.name} 3D 結構模型</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">當前施工進度層：5F 樑板鋼筋綁紮中</div>
+      <div style="width:100%;height:250px;background:linear-gradient(180deg,#E0F2FE 0%,#BAE6FD 100%);border:2px solid var(--border-color);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;">
+        <div style="font-size:52px;margin-bottom:8px;">🏢</div>
+        <div style="font-size:16px;font-weight:900;color:var(--text-main);font-family:var(--font-heading);">
+          ${proj.name} 3D 結構模型
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+          輕量化 WebGL / IFC 圖資已就緒
+        </div>
+        <button class="phrase-chip-item" style="margin-top:12px;padding:6px 16px;font-size:12.5px;background:#0EA5E9;color:#fff;border-color:#0284C7;font-weight:900;" onclick="alert('BIM 輕量化模型加載完成！')">
+          檢視輕量化模型 (點擊載入)
+        </button>
       </div>
     </div>
   `;
@@ -1654,6 +1970,32 @@ window.appActions = {
     state.account.planType = 'annual_pro';
     state.account.renewDate = '2027/10/23';
     state.activeBottomTab = 'settings';
+    renderApp();
+  },
+
+  
+  openExportActionSheet() {
+    state.showExportActionSheet = true;
+    renderApp();
+  },
+
+  closeExportActionSheet() {
+    state.showExportActionSheet = false;
+    renderApp();
+  },
+
+  setChartMode(mode) {
+    state.mountainChartMode = mode;
+    renderApp();
+  },
+
+  openDayDetailSheet(dateISO) {
+    state.selectedDayDetail = dateISO;
+    renderApp();
+  },
+
+  closeDayDetailSheet() {
+    state.selectedDayDetail = null;
     renderApp();
   },
 

@@ -1281,3 +1281,344 @@ table.rep-table-grid th {
   color: var(--primary);
   font-weight: 900;
 }
+
+/* ================= V13: Antigravity 規格書 v2.4 實裝整改樣式 ================= */
+
+/* 1. 極簡頂部欄 (Minimal Navbar) */
+.minimal-header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--card-bg);
+  border-bottom: 2px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 4px rgba(14, 165, 233, 0.1);
+}
+
+.minimal-brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  min-width: 0;
+  flex: 1;
+}
+
+.minimal-brand-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text-main);
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+}
+
+.minimal-proj-pill {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--primary-dark);
+  background: #E0F2FE;
+  border: 1.5px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.minimal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.action-sheet-trigger-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  background: #F0F9FF;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(14, 165, 233, 0.12);
+  transition: transform 0.1s ease, background 0.1s ease;
+}
+
+.action-sheet-trigger-btn:active {
+  transform: scale(0.94);
+  background: #BAE6FD;
+}
+
+/* 2. 統一代碼：上下排主次分明標題列 (Vertical Hierarchy Titles) */
+.vertical-hierarchy-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.vh-primary-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--text-main);
+  font-family: var(--font-heading);
+  line-height: 1.25;
+}
+
+.vh-secondary-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.vh-badge-tag {
+  background: #E0F2FE;
+  color: var(--primary-dark);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 800;
+  border: 1px solid var(--border-color);
+}
+
+/* 3. 2×2 工程指標 KPI 網格矩陣 */
+.kpi-matrix-2x2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.kpi-matrix-card {
+  background: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius-base);
+  padding: 10px 12px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.kpi-matrix-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.kpi-matrix-val {
+  font-size: 20px;
+  font-weight: 900;
+  font-family: var(--font-heading);
+  line-height: 1.15;
+}
+
+.kpi-matrix-sub {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+/* 落後警示全寬標註列 */
+.variance-fullwidth-alert {
+  background: #FEF2F2;
+  border: 2px solid #EF4444;
+  border-radius: var(--radius-base);
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.variance-alert-text {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #991B1B;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.variance-alert-badge {
+  background: #EF4444;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.variance-ahead-alert {
+  background: #F0FDF4;
+  border: 2px solid #10B981;
+}
+
+.variance-ahead-text {
+  color: #065F46;
+}
+
+.variance-ahead-badge {
+  background: #10B981;
+}
+
+/* 4. 雙軸山積圖 Segmented Control 與容器手勢優化 */
+.chart-segmented-control {
+  display: flex;
+  background: #E2E8F0;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.chart-seg-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 6px 0;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-sub);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.chart-seg-btn.active {
+  background: var(--card-bg);
+  color: var(--primary-dark);
+  font-weight: 900;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.mountain-chart-scroll-box-smooth {
+  width: 100%;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  border: 1.5px solid var(--border-light);
+  border-radius: 6px;
+  background: #FFFFFF;
+  padding: 8px 4px;
+}
+
+/* 5. 點選柱體浮動 Bottom Sheet (抽屜) */
+.bottom-sheet-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.bottom-sheet-content {
+  background: var(--card-bg);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  border: var(--border-width) solid var(--border-color);
+  border-bottom: none;
+  padding: 16px;
+  max-height: 75vh;
+  overflow-y: auto;
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.15);
+  animation: slideUpSheet 0.22s ease-out;
+}
+
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.bottom-sheet-grabber {
+  width: 44px;
+  height: 5px;
+  border-radius: 3px;
+  background: #CBD5E1;
+  margin: 0 auto 12px;
+}
+
+.action-sheet-item-btn {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-main);
+  background: #F8FAFC;
+  border: 1.5px solid var(--border-light);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.action-sheet-item-btn:active {
+  background: #E0F2FE;
+  border-color: var(--primary);
+}
+
+/* 6. 日期前進後退按鈕滿意度保障：最小 44×44px 觸控熱區 */
+.date-clean-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.date-clean-input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+}
+
+.date-shift-btn {
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  font-size: 13.5px;
+  font-weight: 800;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  background: #F0F9FF;
+  color: var(--primary-dark);
+  cursor: pointer;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.date-shift-btn:active {
+  background: #BAE6FD;
+  transform: scale(0.96);
+}
