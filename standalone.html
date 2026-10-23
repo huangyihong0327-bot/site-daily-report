@@ -1634,6 +1634,181 @@ table.rep-table-grid th {
   transform: scale(0.96);
 }
 
+/* ================= V14: 6 大手機版 RWD UI/UX 修正樣式 ================= */
+
+/* 1. 步驟導航列：支援換行 (一排2~3個) 或水平滑動不破版 */
+.tabstrip-steps-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  padding-bottom: 4px !important;
+  margin-bottom: 12px !important;
+  overflow: visible !important;
+}
+
+.tabstrip-pill {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 11.5px;
+  height: 32px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+/* 2. 輸出操作按鈕列：平分寬度 grid 1fr 1fr，確保兩按鈕絕對在螢幕內不被裁切 */
+.action-buttons-grid-2col {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin-bottom: 12px !important;
+  box-sizing: border-box !important;
+}
+
+.action-buttons-grid-2col button {
+  width: 100% !important;
+  height: 44px !important;
+  margin-bottom: 0 !important;
+  padding: 0 8px !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  box-sizing: border-box !important;
+}
+
+/* 3. 圓餅圖：改為上下垂直排列 (flex-direction: column) */
+.pie-chart-vertical-box {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 12px !important;
+  background: #F8FAFC !important;
+  padding: 12px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid var(--border-light) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.pie-chart-svg-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.pie-chart-legend-full {
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pie-chart-legend-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 11.5px !important;
+  padding: 5px 0 !important;
+  border-bottom: 1px dashed #E2E8F0 !important;
+  width: 100% !important;
+}
+
+/* 4. 施工日報表預覽：手機友善垂直表格 + 橫向滑動包覆 */
+.report-table-scroll-container {
+  width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  margin-bottom: 10px !important;
+}
+
+.mobile-info-vertical-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 11.5px !important;
+}
+
+.mobile-info-vertical-table th {
+  background: #E0F2FE !important;
+  color: #0C4A6E !important;
+  padding: 6px 8px !important;
+  border: 1px solid #CBD5E1 !important;
+  font-weight: 800 !important;
+  text-align: left !important;
+  width: 25% !important;
+}
+
+.mobile-info-vertical-table td {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  padding: 6px 8px !important;
+  border: 1px solid #CBD5E1 !important;
+}
+
+/* 5. 報表最底部「完成填報並複製貼上 LINE」行動總結按鈕區 */
+.report-bottom-submit-section {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin-top: 18px !important;
+  margin-bottom: 85px !important; /* 充足預留空間，避免被底部導覽列遮擋 */
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.btn-complete-and-line {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  color: #FFFFFF !important;
+  border: 2px solid #064E3B !important;
+  border-radius: 8px !important;
+  height: 52px !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35) !important;
+  width: 100% !important;
+  transition: transform 0.1s ease, filter 0.1s ease !important;
+}
+
+.btn-complete-and-line:active {
+  transform: scale(0.98) !important;
+  filter: brightness(0.92) !important;
+}
+
+.btn-bottom-sub-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.btn-bottom-sub-item {
+  height: 42px !important;
+  border-radius: 6px !important;
+  border: 1.5px solid var(--border-color) !important;
+  background: var(--card-bg) !important;
+  color: var(--primary-dark) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+}
+
+.btn-bottom-sub-item:active {
+  background: #E0F2FE !important;
+}
+
   </style>
 </head>
 <body data-ui-theme="motion-driven">
@@ -2317,11 +2492,9 @@ function renderPage02DateWeatherSchedule(proj, rep) {
         <span>📅 本日施工日期</span>
         <span style="color:var(--primary-dark);font-weight:800;">${formatDateWestern(rep.reportDateISO, 'slash_weekday')}</span>
       </div>
-      <div class="date-clean-row">
-        <input type="date" class="native-input-box date-clean-input" value="${rep.reportDateISO}"
-               onchange="window.appActions.setReportDate(this.value)" />
-        <button class="date-shift-btn" onclick="window.appActions.shiftReportDate(-1)" title="前一天">◀ -1天</button>
-        <button class="date-shift-btn" onclick="window.appActions.shiftReportDate(1)" title="後一天">+1天 ▶</button>
+      <div style="width:100%;">
+        <input type="date" class="native-input-box" value="${rep.reportDateISO}"
+               onchange="window.appActions.setReportDate(this.value)" style="width:100%;height:44px;font-size:15px;font-weight:800;" />
       </div>
     </div>
 
@@ -2651,7 +2824,7 @@ function renderPage07DailyReportAndA4(proj, rep) {
 
   // 圖表 1：單日工種出工山積圖
   const workerMountainSvg = buildSingleDayMountainSvg(workers, 'workers');
-  // 圖表 2：工種出工佔比圓餅/環形圖 (Donut Chart)
+  // 圖表 2：工種出工佔比圓餅圖 (上下垂直排版)
   const workerDonutHtml = buildDonutChartHtml(workers);
   // 圖表 3：機具使用直方圖
   const machSvg = buildSingleDayMountainSvg(machines, 'machinery');
@@ -2659,30 +2832,30 @@ function renderPage07DailyReportAndA4(proj, rep) {
   return `
     <div class="tabstrip-steps-row no-print">
       <button class="tabstrip-pill" onclick="window.appActions.navigateTab('home')">1.專案管理</button>
-      <button class="tabstrip-pill" onclick="window.appActions.goToStep(2)">2.日期天氣工期</button>
+      <button class="tabstrip-pill" onclick="window.appActions.goToStep(2)">2.工期氣候</button>
       <button class="tabstrip-pill" onclick="window.appActions.goToStep(3)">3.今日進度</button>
       <button class="tabstrip-pill" onclick="window.appActions.goToStep(4)">4.明日進度</button>
       <button class="tabstrip-pill" onclick="window.appActions.goToStep(5)">5.出工機具</button>
       <button class="tabstrip-pill" onclick="window.appActions.goToStep(6)">6.現場照片</button>
-      <button class="tabstrip-pill active">7.日報預覽PDF</button>
+      <button class="tabstrip-pill active">7.日報預覽</button>
     </div>
 
-    <!-- 頂部操作按鈕 (輸出 A4 PDF ＆ LINE 稿) -->
-    <div class="no-print" style="display:flex;gap:8px;margin-bottom:12px;">
-      <button class="btn-create-proj-locked" style="flex:1;height:46px;margin-bottom:0;" onclick="window.print()">
-        <span>🖨️</span> 輸出正式 A4 日報表 (PDF)
+    <!-- 頂部操作按鈕 (文案精簡，grid 1fr 1fr 防裁切) -->
+    <div class="action-buttons-grid-2col no-print">
+      <button class="btn-create-proj-locked" onclick="window.print()">
+        <span>🖨️</span> 輸出 PDF
       </button>
-      <button class="btn-backup-item" style="height:46px;padding:0 14px;" onclick="window.appActions.openLineShareModal()">
-        <span>💬</span> 複製 LINE
+      <button class="btn-backup-item" onclick="window.appActions.openLineShareModal()">
+        <span>💬</span> 複製 LINE 文字
       </button>
     </div>
 
-    <!-- 進度差異比較功能 (仿上兩版) -->
+    <!-- 進度差異比較功能 -->
     <div class="motion-card no-print" style="padding:12px;">
       <div style="font-size:13.5px;font-weight:900;color:var(--text-main);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
         <span>📈 工期與累計進度差異比較分析</span>
         <span class="${isAhead ? 'variance-badge-ahead' : 'variance-badge-behind'}">
-          ${isAhead ? '超前 +' + diffPct + '%' : '落後 ' + diffPct + '%'}
+          ${isAhead ? '超前 +' + diffPct + '%' : '落後 ' + Math.abs(diffPct) + '%'}
         </span>
       </div>
 
@@ -2719,112 +2892,141 @@ function renderPage07DailyReportAndA4(proj, rep) {
         ${workerMountainSvg}
       </div>
 
-      <div style="font-size:13px;font-weight:900;color:var(--text-main);margin:10px 0 6px;">
+      <div style="font-size:13px;font-weight:900;color:var(--text-main);margin:12px 0 6px;">
         🍩 本日各工種出工佔比分析 (圓餅圖)
       </div>
       ${workerDonutHtml}
     </div>
 
-    <!-- 正式日報表主體 (手機一條式展示，列印時為標準 A4 格線格式) -->
+    <!-- 正式日報表主體 (手機垂直排版 ＋ 支援左右滑動與標準 A4 列印) -->
     <div class="motion-card a4-print-sheet" style="padding:14px;">
       <div style="text-align:center;border-bottom:2.5px solid #0C4A6E;padding-bottom:6px;margin-bottom:10px;">
-        <h2 style="font-size:18px;font-weight:900;color:#0C4A6E;">${proj.contractorCompany || '營造工程股份有限公司'}</h2>
-        <h3 style="font-size:16px;font-weight:800;color:#0C4A6E;letter-spacing:1px;">營 建 工 程 施 工 日 報 表</h3>
+        <h2 style="font-size:17px;font-weight:900;color:#0C4A6E;">${proj.contractorCompany || '營造工程股份有限公司'}</h2>
+        <h3 style="font-size:15px;font-weight:800;color:#0C4A6E;letter-spacing:1px;margin-top:2px;">營 建 工 程 施 工 日 報 表</h3>
       </div>
 
-      <!-- 格線表格 1：基本工程資訊 -->
-      <table class="rep-table-grid">
-        <tr>
-          <th style="width:16%;">工程名稱</th>
-          <td colspan="3"><strong>${proj.name}</strong></td>
-          <th style="width:16%;">施工日期</th>
-          <td style="width:22%;">${formatDateWestern(rep.reportDateISO, 'slash_weekday')}</td>
-        </tr>
-        <tr>
-          <th>契約工期</th>
-          <td>${contractDays} 天</td>
-          <th>已施工天數</th>
-          <td>${usedDays} 天 (餘 ${remainDays} 天)</td>
-          <th>天候狀況</th>
-          <td>上午：${rep.weatherAM} / 下午：${rep.weatherPM}</td>
-        </tr>
-        <tr>
-          <th>預定進度</th>
-          <td>${plannedPct}%</td>
-          <th>實際進度</th>
-          <td>${actualPct}%</td>
-          <th>進度差值</th>
-          <td><strong style="color:${isAhead ? '#059669' : '#DC2626'};">${isAhead ? '超前 +' : '落後 '}${diffPct}%</strong></td>
-        </tr>
-      </table>
+      <!-- 格線表格 1：手機友善垂直表格 (解決右側被切掉問題) -->
+      <div class="report-table-scroll-container">
+        <table class="rep-table-grid mobile-info-vertical-table">
+          <tr>
+            <th>工程名稱</th>
+            <td colspan="3"><strong>${proj.name}</strong></td>
+          </tr>
+          <tr>
+            <th>施工日期</th>
+            <td>${formatDateWestern(rep.reportDateISO, 'slash_weekday')}</td>
+            <th>天候狀況</th>
+            <td>上午：${rep.weatherAM} / 下午：${rep.weatherPM}</td>
+          </tr>
+          <tr>
+            <th>契約工期</th>
+            <td>${contractDays} 天</td>
+            <th>已施工天數</th>
+            <td>${usedDays} 天 (餘 ${remainDays} 天)</td>
+          </tr>
+          <tr>
+            <th>預定進度</th>
+            <td>${plannedPct}%</td>
+            <th>實際進度</th>
+            <td>${actualPct}% (差值 <strong style="color:${isAhead ? '#059669' : '#DC2626'};">${isAhead ? '+' : ''}${diffPct}%</strong>)</td>
+          </tr>
+        </table>
+      </div>
 
       <!-- 格線表格 2：施工進度內容 -->
       <table class="rep-table-grid" style="margin-top:6px;">
         <tr>
-          <th style="width:16%;height:68px;">本日施作進度</th>
-          <td colspan="5" style="vertical-align:top;line-height:1.5;">${rep.todayProgressSummary || '按既定工序順利施作。'}</td>
+          <th style="width:24%;height:64px;">本日施作進度</th>
+          <td style="vertical-align:top;line-height:1.5;">${rep.todayProgressSummary || '按既定工序順利施作。'}</td>
         </tr>
         <tr>
-          <th style="width:16%;height:56px;">明日預定進度</th>
-          <td colspan="5" style="vertical-align:top;line-height:1.5;">${rep.tomorrowPlanSummary || '明日按排程賡續施作。'}</td>
+          <th style="width:24%;height:56px;">明日預定進度</th>
+          <td style="vertical-align:top;line-height:1.5;">${rep.tomorrowPlanSummary || '明日按排程賡續施作。'}</td>
         </tr>
         <tr>
-          <th style="width:16%;height:44px;">工區重要記事</th>
-          <td colspan="5" style="vertical-align:top;line-height:1.4;">${rep.importantNotes || '本日無特殊異常或公安狀況。'}</td>
+          <th style="width:24%;height:44px;">工區重要記事</th>
+          <td style="vertical-align:top;line-height:1.4;">${rep.importantNotes || '本日無特殊異常或公安狀況。'}</td>
         </tr>
       </table>
 
       <!-- 格線表格 3：出工統計 -->
-      <div style="font-size:12.5px;font-weight:900;color:#0C4A6E;margin:8px 0 4px;">一、工班出工統計 (本日合計：${totalWorkers} 人)</div>
-      <table class="rep-table-grid">
-        <tr>
-          <th style="width:38%;">工種項目</th>
-          <th style="width:16%;">單位</th>
-          <th style="width:22%;">今日出工</th>
-          <th style="width:24%;">累計出工</th>
-        </tr>
-        ${workers.map(w => `
-          <tr>
-            <td><strong>${w.name}</strong></td>
-            <td style="text-align:center;">${w.unit}</td>
-            <td style="text-align:center;font-weight:bold;color:#0C4A6E;">${getTodayQty(w)}</td>
-            <td style="text-align:center;">${(w.priorCumulative || 0) + getTodayQty(w)}</td>
-          </tr>
-        `).join('')}
-      </table>
+      <div style="font-size:12.5px;font-weight:900;color:#0C4A6E;margin:10px 0 4px;">一、工班出工統計 (本日合計：${totalWorkers} 人)</div>
+      <div class="report-table-scroll-container">
+        <table class="rep-table-grid" style="min-width:320px;">
+          <thead>
+            <tr>
+              <th style="width:40%;">工種項目</th>
+              <th style="width:16%;text-align:center;">單位</th>
+              <th style="width:22%;text-align:center;">今日出工</th>
+              <th style="width:22%;text-align:center;">累計出工</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${workers.map(w => `
+              <tr>
+                <td><strong>${w.name}</strong></td>
+                <td style="text-align:center;">${w.unit}</td>
+                <td style="text-align:center;font-weight:bold;color:#0C4A6E;">${getTodayQty(w)}</td>
+                <td style="text-align:center;">${(w.priorCumulative || 0) + getTodayQty(w)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
 
       <!-- 格線表格 4：機具統計 -->
-      <div style="font-size:12.5px;font-weight:900;color:#0C4A6E;margin:8px 0 4px;">二、機具設備統計 (本日合計：${totalMachines} 台/組)</div>
-      <table class="rep-table-grid">
-        <tr>
-          <th style="width:38%;">機具型號設備</th>
-          <th style="width:16%;">單位</th>
-          <th style="width:22%;">今日使用</th>
-          <th style="width:24%;">累計台日</th>
-        </tr>
-        ${machines.map(m => `
-          <tr>
-            <td><strong>${m.name}</strong></td>
-            <td style="text-align:center;">${m.unit}</td>
-            <td style="text-align:center;font-weight:bold;color:#0C4A6E;">${getTodayQty(m)}</td>
-            <td style="text-align:center;">${(m.priorCumulative || 0) + getTodayQty(m)}</td>
-          </tr>
-        `).join('')}
-      </table>
+      <div style="font-size:12.5px;font-weight:900;color:#0C4A6E;margin:10px 0 4px;">二、機具設備統計 (本日合計：${totalMachines} 台/組)</div>
+      <div class="report-table-scroll-container">
+        <table class="rep-table-grid" style="min-width:320px;">
+          <thead>
+            <tr>
+              <th style="width:40%;">機具型號設備</th>
+              <th style="width:16%;text-align:center;">單位</th>
+              <th style="width:22%;text-align:center;">今日使用</th>
+              <th style="width:22%;text-align:center;">累計台日</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${machines.map(m => `
+              <tr>
+                <td><strong>${m.name}</strong></td>
+                <td style="text-align:center;">${m.unit}</td>
+                <td style="text-align:center;font-weight:bold;color:#0C4A6E;">${getTodayQty(m)}</td>
+                <td style="text-align:center;">${(m.priorCumulative || 0) + getTodayQty(m)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
 
       <!-- 簽核欄位 -->
       <table class="rep-table-grid" style="margin-top:12px;">
-        <tr style="height:44px;">
+        <tr style="height:40px;">
           <th style="width:25%;">工地主任</th>
           <th style="width:25%;">現場工程師</th>
           <th style="width:25%;">品管/安衛</th>
           <th style="width:25%;">填表人</th>
         </tr>
-        <tr style="height:40px;">
+        <tr style="height:36px;">
           <td></td><td></td><td></td>
           <td style="text-align:center;font-size:9.5pt;font-weight:bold;">${state.account.name.split(' ')[0]}</td>
         </tr>
       </table>
+    </div>
+
+    <!-- 5. 報表最底部新增「完成填報並複製貼上 LINE」行動總結按鈕區 (Point 6) -->
+    <div class="report-bottom-submit-section no-print">
+      <button class="btn-complete-and-line" onclick="window.appActions.completeReportAndShareLine()">
+        <span>✅</span> 完成填報，複製文字並轉貼 LINE
+      </button>
+      <div class="btn-bottom-sub-row">
+        <button class="btn-bottom-sub-item" onclick="window.print()">
+          <span>🖨️</span> 輸出 PDF
+        </button>
+        <button class="btn-bottom-sub-item" onclick="window.appActions.openLineShareModal()">
+          <span>📋</span> 僅複製文字
+        </button>
+      </div>
     </div>
   `;
 }
@@ -2902,7 +3104,7 @@ function renderPageStatsView() {
     <div class="vertical-hierarchy-header">
       <div class="vh-primary-title">專案總報表與區間統計</div>
       <div class="vh-secondary-meta">
-        <span class="vh-badge-tag">${proj.name}</span>
+        <span class="vh-badge-tag" style="white-space:nowrap;flex-shrink:0;">${proj.name}</span>
         <span>統計區間：<strong>${rangeLabelMap[range]}</strong></span>
       </div>
     </div>
@@ -3259,14 +3461,14 @@ function buildSingleDayMountainSvg(records, mode = 'workers') {
 function buildDonutChartHtml(items) {
   const activeItems = items.filter(it => getTodayQty(it) > 0);
   if (activeItems.length === 0) {
-    return '<div style="font-size:11px;color:var(--text-muted);padding:8px 0;">本日尚無出工數據</div>';
+    return '<div style="font-size:11px;color:var(--text-muted);padding:8px 0;text-align:center;">本日尚無出工數據</div>';
   }
 
   const palette = ['#0EA5E9', '#0284C7', '#059669', '#D97706', '#6366F1', '#EC4899', '#8B5CF6'];
   const grandTotal = activeItems.reduce((acc, it) => acc + getTodayQty(it), 0) || 1;
 
   let cumPct = 0;
-  const r = 36;
+  const r = 42;
   const circum = 2 * Math.PI * r;
 
   const segs = activeItems.map((it, idx) => {
@@ -3274,31 +3476,37 @@ function buildDonutChartHtml(items) {
     const dash = (pct * circum).toFixed(2) + ' ' + circum.toFixed(2);
     const offset = (-cumPct * circum).toFixed(2);
     cumPct += pct;
-    return `<circle r="${r}" cx="46" cy="46" fill="transparent" stroke="${palette[idx % palette.length]}" stroke-width="15" stroke-dasharray="${dash}" stroke-dashoffset="${offset}" transform="rotate(-90 46 46)" />`;
+    return `<circle r="${r}" cx="54" cy="54" fill="transparent" stroke="${palette[idx % palette.length]}" stroke-width="16" stroke-dasharray="${dash}" stroke-dashoffset="${offset}" transform="rotate(-90 54 54)" />`;
   }).join('');
 
   const legend = activeItems.map((it, idx) => {
     const qty = getTodayQty(it);
     const pct = ((qty / grandTotal) * 100).toFixed(1);
     return `
-      <div style="display:flex;justify-content:space-between;font-size:10.5px;padding:3px 0;border-bottom:1px dotted #E2E8F0;gap:6px;">
-        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${palette[idx % palette.length]};margin-right:4px;"></span><strong>${it.name}</strong></span>
-        <strong style="color:var(--primary-dark);">${qty} ${it.unit} (${pct}%)</strong>
+      <div class="pie-chart-legend-row">
+        <span>
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${palette[idx % palette.length]};margin-right:6px;"></span>
+          <strong style="color:var(--text-main);">${it.name}</strong>
+        </span>
+        <strong style="color:var(--primary-dark);font-family:var(--font-heading);font-size:12.5px;">${qty} ${it.unit} (${pct}%)</strong>
       </div>
     `;
   }).join('');
 
   return `
-    <div style="display:grid;grid-template-columns:92px 1fr;gap:12px;align-items:center;background:#F8FAFC;padding:10px;border-radius:6px;border:1px solid #E2E8F0;">
-      <svg width="92" height="92" viewBox="0 0 92 92">
-        <circle r="${r}" cx="46" cy="46" fill="transparent" stroke="#E2E8F0" stroke-width="15" />
-        ${segs}
-      </svg>
-      <div>${legend}</div>
+    <div class="pie-chart-vertical-box">
+      <div class="pie-chart-svg-wrap">
+        <svg width="108" height="108" viewBox="0 0 108 108">
+          <circle r="${r}" cx="54" cy="54" fill="transparent" stroke="#E2E8F0" stroke-width="16" />
+          ${segs}
+        </svg>
+      </div>
+      <div class="pie-chart-legend-full">
+        ${legend}
+      </div>
     </div>
   `;
 }
-
 // 區間全量統計總表 (分類改為「工班」/「機具」)
 function buildSixColTableRows(reports) {
   const itemMap = new Map();
@@ -3794,6 +4002,27 @@ window.appActions = {
     setTimeout(() => {
       window.open('https://line.me/R/ti/p/' + encodeURIComponent(supportLineId), '_blank');
     }, 400);
+  },
+
+  
+  completeReportAndShareLine() {
+    saveState();
+    const proj = getActiveProject();
+    const rep = getActiveReport();
+    const workers = rep.tradeRecords.filter(r => r.category === 'workers');
+    const machines = rep.tradeRecords.filter(r => r.category === 'machinery');
+    const totalW = workers.reduce((sum, w) => sum + getTodayQty(w), 0);
+    const totalM = machines.reduce((sum, m) => sum + getTodayQty(m), 0);
+    
+    const txt = `【${proj.name} 施工日報】\n📅 日期：${formatDateWestern(rep.reportDateISO, 'slash_weekday')}\n☀️ 天候：上午 ${rep.weatherAM} / 下午 ${rep.weatherPM}\n👷 人力機具：出工 ${totalW} 人，機具 ${totalM} 台\n📌 本日施作：${rep.todayProgressSummary || '按進度順利施作'}\n📝 明日預定：${rep.tomorrowPlanSummary || '賡續施作'}\n🏢 承造單位：${proj.contractorCompany || '營造工程'}`;
+    
+    navigator.clipboard.writeText(txt).catch(() => {});
+    state.toastMessage = '✅ 填報完成！已複製日報文字，即將開啟 LINE！';
+    renderApp();
+    
+    setTimeout(() => {
+      window.open('https://line.me/R/msg/text/?' + encodeURIComponent(txt), '_blank');
+    }, 450);
   },
 
   openLineShareModal() {

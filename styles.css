@@ -1622,3 +1622,178 @@ table.rep-table-grid th {
   background: #BAE6FD;
   transform: scale(0.96);
 }
+
+/* ================= V14: 6 大手機版 RWD UI/UX 修正樣式 ================= */
+
+/* 1. 步驟導航列：支援換行 (一排2~3個) 或水平滑動不破版 */
+.tabstrip-steps-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  padding-bottom: 4px !important;
+  margin-bottom: 12px !important;
+  overflow: visible !important;
+}
+
+.tabstrip-pill {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 11.5px;
+  height: 32px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+/* 2. 輸出操作按鈕列：平分寬度 grid 1fr 1fr，確保兩按鈕絕對在螢幕內不被裁切 */
+.action-buttons-grid-2col {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin-bottom: 12px !important;
+  box-sizing: border-box !important;
+}
+
+.action-buttons-grid-2col button {
+  width: 100% !important;
+  height: 44px !important;
+  margin-bottom: 0 !important;
+  padding: 0 8px !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  box-sizing: border-box !important;
+}
+
+/* 3. 圓餅圖：改為上下垂直排列 (flex-direction: column) */
+.pie-chart-vertical-box {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 12px !important;
+  background: #F8FAFC !important;
+  padding: 12px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid var(--border-light) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.pie-chart-svg-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.pie-chart-legend-full {
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pie-chart-legend-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 11.5px !important;
+  padding: 5px 0 !important;
+  border-bottom: 1px dashed #E2E8F0 !important;
+  width: 100% !important;
+}
+
+/* 4. 施工日報表預覽：手機友善垂直表格 + 橫向滑動包覆 */
+.report-table-scroll-container {
+  width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  margin-bottom: 10px !important;
+}
+
+.mobile-info-vertical-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 11.5px !important;
+}
+
+.mobile-info-vertical-table th {
+  background: #E0F2FE !important;
+  color: #0C4A6E !important;
+  padding: 6px 8px !important;
+  border: 1px solid #CBD5E1 !important;
+  font-weight: 800 !important;
+  text-align: left !important;
+  width: 25% !important;
+}
+
+.mobile-info-vertical-table td {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  padding: 6px 8px !important;
+  border: 1px solid #CBD5E1 !important;
+}
+
+/* 5. 報表最底部「完成填報並複製貼上 LINE」行動總結按鈕區 */
+.report-bottom-submit-section {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin-top: 18px !important;
+  margin-bottom: 85px !important; /* 充足預留空間，避免被底部導覽列遮擋 */
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.btn-complete-and-line {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  color: #FFFFFF !important;
+  border: 2px solid #064E3B !important;
+  border-radius: 8px !important;
+  height: 52px !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35) !important;
+  width: 100% !important;
+  transition: transform 0.1s ease, filter 0.1s ease !important;
+}
+
+.btn-complete-and-line:active {
+  transform: scale(0.98) !important;
+  filter: brightness(0.92) !important;
+}
+
+.btn-bottom-sub-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.btn-bottom-sub-item {
+  height: 42px !important;
+  border-radius: 6px !important;
+  border: 1.5px solid var(--border-color) !important;
+  background: var(--card-bg) !important;
+  color: var(--primary-dark) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+}
+
+.btn-bottom-sub-item:active {
+  background: #E0F2FE !important;
+}
