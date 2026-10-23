@@ -1797,3 +1797,49 @@ table.rep-table-grid th {
 .btn-bottom-sub-item:active {
   background: #E0F2FE !important;
 }
+
+
+/* ================= 專案總報表專屬匯出按鈕列樣式 ================= */
+.stats-export-action-bar {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  margin-bottom: 12px !important;
+  width: 100% !important;
+}
+
+.stats-export-btn-pdf {
+  height: 44px !important;
+  border-radius: 8px !important;
+  border: 2px solid #0284C7 !important;
+  background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+  color: #FFFFFF !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25) !important;
+}
+
+.stats-export-btn-excel {
+  height: 44px !important;
+  border-radius: 8px !important;
+  border: 2px solid #059669 !important;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  color: #FFFFFF !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25) !important;
+}
+
+.stats-export-btn-pdf:active, .stats-export-btn-excel:active {
+  transform: scale(0.97) !important;
+}

@@ -340,18 +340,18 @@ function renderExportActionSheetModal() {
         <div style="font-size:16px;font-weight:900;color:var(--text-main);margin-bottom:12px;font-family:var(--font-heading);">
           📤 工程報表與匯出功能
         </div>
-        <button class="action-sheet-item-btn" onclick="window.appActions.exportToPdf();window.appActions.closeExportActionSheet();">
+        <button class="action-sheet-item-btn" onclick="window.appActions.exportStatsToPdf();window.appActions.closeExportActionSheet();">
           <span style="font-size:20px;">📄</span>
           <div style="text-align:left;">
-            <div>輸出正式 A4 日報表 (PDF)</div>
-            <div style="font-size:11px;color:var(--text-muted);font-weight:normal;">瀏覽器列印為 PDF 格式</div>
+            <div>匯出專案總報表 (PDF 列印)</div>
+            <div style="font-size:11px;color:var(--text-muted);font-weight:normal;">含區間山積圖、KPI 指標與項目全量總表</div>
           </div>
         </button>
-        <button class="action-sheet-item-btn" onclick="window.appActions.exportToExcel();window.appActions.closeExportActionSheet();">
+        <button class="action-sheet-item-btn" onclick="window.appActions.exportStatsToExcel();window.appActions.closeExportActionSheet();">
           <span style="font-size:20px;">📊</span>
           <div style="text-align:left;">
-            <div>匯出全工程總統計表 (EXCEL)</div>
-            <div style="font-size:11px;color:var(--text-muted);font-weight:normal;">下載 UTF-8 CSV 完整資料表</div>
+            <div>匯出專案總報表 (EXCEL 試算表)</div>
+            <div style="font-size:11px;color:var(--text-muted);font-weight:normal;">依目前篩選區間下載 UTF-8 CSV 完整數據報表</div>
           </div>
         </button>
         <button class="action-sheet-item-btn" onclick="window.appActions.openLineShareModal();window.appActions.closeExportActionSheet();">
@@ -1293,6 +1293,16 @@ function renderPageStatsView() {
       </div>
     </div>
 
+    <!-- 專案總報表專屬匯出按鈕列 (匯出當前選定區間之總報表) -->
+    <div class="stats-export-action-bar no-print">
+      <button class="stats-export-btn-pdf" onclick="window.appActions.exportStatsToPdf()">
+        <span>📄</span> 匯出總報表 (PDF)
+      </button>
+      <button class="stats-export-btn-excel" onclick="window.appActions.exportStatsToExcel()">
+        <span>📊</span> 匯出總報表 (EXCEL)
+      </button>
+    </div>
+
     <!-- 頂部快速切換專案 -->
     <div class="motion-card" style="padding:10px;">
       <div style="font-size:12px;font-weight:800;color:var(--text-muted);margin-bottom:4px;">⚡ 快速選擇檢視專案：</div>
@@ -1904,6 +1914,118 @@ window.appActions = {
   
   setStatsRange(rangeKey) {
     state.statsFilterRange = rangeKey;
+    renderApp();
+  },
+
+  exportStatsToPdf() {
+    // 切換或確保在總報表視圖後觸發列印
+    if (state.activeBottomTab !== 'stats') {
+      state.activeBottomTab = 'stats';
+      renderApp();
+    }
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  },
+
+  exportStatsToExcel() {
+    const proj = getActiveProject();
+    const allReports = [...(proj.reports || [])].sort((a, b) => a.reportDateISO.localeCompare(b.reportDateISO));
+    const range = state.statsFilterRange || 'all';
+    const now = new Date();
+
+    const filteredReports = allReports.filter(rep => {
+      if (range === 'all') return true;
+      const repDate = new Date(rep.reportDateISO);
+      if (range === 'last30') {
+        const diffDays = (now - repDate) / (1000 * 60 * 60 * 24);
+        return diffDays >= 0 && diffDays <= 30;
+      }
+      if (range === 'month') {
+        return repDate.getFullYear() === now.getFullYear() && repDate.getMonth() === now.getMonth();
+      }
+      if (range === 'quarter') {
+        const currentQuarter = Math.floor(now.getMonth() / 3);
+        const repQuarter = Math.floor(repDate.getMonth() / 3);
+        return repDate.getFullYear() === now.getFullYear() && repQuarter === currentQuarter;
+      }
+      if (range === 'week') {
+        const dayOfWeek = (now.getDay() + 6) % 7;
+        const monday = new Date(now);
+        monday.setDate(now.getDate() - dayOfWeek);
+        monday.setHours(0,0,0,0);
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        sunday.setHours(23,59,59,999);
+        return repDate >= monday && repDate <= sunday;
+      }
+      return true;
+    });
+
+    const reports = filteredReports.length > 0 ? filteredReports : allReports;
+
+    const rangeNames = {
+      all: '全工期',
+      week: '本週報表',
+      month: '本月報表',
+      quarter: '本季報表',
+      last30: '近30天'
+    };
+
+    let csv = '\uFEFF"【' + proj.name.replace(/"/g, '""') + '】專案總報表與區間統計"\n';
+    csv += '"統計區間","' + (rangeNames[range] || '全工期') + ' (共 ' + reports.length + ' 日)","匯出日期","' + new Date().toISOString().slice(0, 10) + '"\n';
+    csv += '"契約總工期","' + proj.contractDays + ' 天","已施工天數","' + proj.usedDays + ' 天","剩餘天數","' + Math.max(0, proj.contractDays - proj.usedDays) + ' 天"\n\n';
+
+    // 區間項目彙總表
+    csv += '"【一、區間各工種與機具全量統計】"\n';
+    csv += '"分類","項目名稱","單位","區間總計","單日峰值","出工天數"\n';
+
+    const itemMap = new Map();
+    reports.forEach(rep => {
+      rep.tradeRecords.forEach(tr => {
+        const q = getTodayQty(tr);
+        if (q > 0 || tr.priorCumulative > 0) {
+          const key = tr.name;
+          if (!itemMap.has(key)) {
+            itemMap.set(key, {
+              category: tr.category === 'machinery' ? '機具' : '工班',
+              name: tr.name,
+              unit: tr.unit,
+              total: 0,
+              activeDays: 0,
+              maxQty: 0
+            });
+          }
+          const it = itemMap.get(key);
+          it.total += q;
+          if (q > 0) it.activeDays += 1;
+          if (q > it.maxQty) it.maxQty = q;
+        }
+      });
+    });
+
+    Array.from(itemMap.values()).forEach(it => {
+      csv += `"${it.category}","${it.name}","${it.unit}","${it.total}","${it.maxQty}","${it.activeDays}"\n`;
+    });
+
+    csv += '\n"【二、區間每日出工明細流水帳】"\n';
+    csv += '"施工日期","天候狀況(上午/下午)","出工人數(人)","進場機具(台)","本日施作進度摘要"\n';
+
+    reports.forEach(r => {
+      const workers = r.tradeRecords.filter(t => t.category === 'workers').reduce((sum, w) => sum + getTodayQty(w), 0);
+      const machines = r.tradeRecords.filter(t => t.category === 'machinery').reduce((sum, m) => sum + getTodayQty(m), 0);
+      csv += `"${r.reportDateISO}","${r.weatherAM} / ${r.weatherPM}","${workers}","${machines}","${(r.todayProgressSummary||'').replace(/"/g, '""')}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${proj.name}_專案總報表_${rangeNames[range] || '全工期'}_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    state.toastMessage = '📊 成功匯出【' + (rangeNames[range] || '全工期') + '】專案總報表 (EXCEL)！';
     renderApp();
   },
 
