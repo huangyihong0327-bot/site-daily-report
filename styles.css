@@ -824,3 +824,111 @@ h1, h2, h3, .heading-font {
     text-align: center;
   }
 }
+
+
+/* 確保新增按鈕與所有操作按鈕文字絕對在同一行、不換行 */
+button, .btn-nowrap-action, .btn-create-proj-locked, .btn-top-item, .chip-weather-btn, .phrase-chip-item {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+.btn-nowrap-action {
+  height: 42px;
+  min-width: 68px;
+  padding: 0 14px;
+  border-radius: var(--radius-base);
+  border: var(--border-width) solid var(--border-dark);
+  background: var(--accent-cta);
+  color: #FFFFFF;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  transition: transform 0.1s ease;
+}
+
+.btn-nowrap-action:active {
+  transform: scale(0.96);
+}
+
+/* 雙按鈕拍照與相簿選取 (Step 6) */
+.dashed-photo-btn {
+  background: var(--card-bg);
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius-base);
+  padding: 16px 10px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background 0.12s ease, transform 0.1s ease;
+}
+
+.dashed-photo-btn:active {
+  background: #E0F2FE;
+  transform: scale(0.97);
+}
+
+/* 專業清晰格線日報表格 (仿上兩版風格) */
+table.rep-table-grid {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 6px 0 10px;
+  font-size: 11.5px;
+  background: #FFFFFF;
+}
+
+table.rep-table-grid th, table.rep-table-grid td {
+  border: 1.5px solid #0C4A6E !important;
+  padding: 6px 8px;
+  color: var(--text-main);
+}
+
+table.rep-table-grid th {
+  background: #E0F2FE;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 進度差異指標卡片 */
+.progress-variance-box {
+  background: #FFFFFF;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-base);
+  padding: 10px 12px;
+  margin: 8px 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.variance-badge-ahead {
+  display: inline-block;
+  background: #DCFCE7;
+  color: #059669;
+  border: 1px solid #86EFAC;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 11px;
+}
+
+.variance-badge-behind {
+  display: inline-block;
+  background: #FEE2E2;
+  color: #DC2626;
+  border: 1px solid #FCA5A5;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 11px;
+}
