@@ -202,6 +202,16 @@ function loadState() {
     console.warn('Load state fallback', e);
   }
 
+  // 清理暫態 UI 狀態，防止重新整理時殘留彈窗或無效的自訂模型參照
+  state.toastMessage = '';
+  state.showExportActionSheet = false;
+  state.selectedDayDetail = null;
+  state.bimSelectedPart = null;
+  if (state.bimActiveModel === 'custom') {
+    state.bimActiveModel = 'u001';
+    state.bimCustomModelName = '';
+  }
+
   if (!state.projects || state.projects.length === 0) {
     state.projects = JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
     state.projects.forEach(p => {
@@ -215,6 +225,30 @@ function loadState() {
       state.activeReportId = curProj.reports[curProj.reports.length - 1].id;
     }
   }
+}
+
+let _toastTimer = null;
+function showToast(message) {
+  if (!message) return;
+  state.toastMessage = '';
+  let toastEl = document.getElementById('global-toast-banner');
+  if (!toastEl) {
+    toastEl = document.createElement('div');
+    toastEl.id = 'global-toast-banner';
+    toastEl.style.cssText = 'position:fixed;bottom:92px;left:50%;transform:translateX(-50%);background:#0C4A6E;color:#FFFFFF;padding:9px 18px;border-radius:20px;font-size:12.5px;font-weight:700;z-index:2147483647;box-shadow:0 6px 18px rgba(0,0,0,0.32);pointer-events:none;transition:opacity 0.25s ease, transform 0.25s ease;opacity:0;';
+    document.body.appendChild(toastEl);
+  }
+  toastEl.textContent = message;
+  toastEl.style.opacity = '1';
+  toastEl.style.transform = 'translateX(-50%) translateY(0)';
+
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => {
+    if (toastEl) {
+      toastEl.style.opacity = '0';
+      toastEl.style.transform = 'translateX(-50%) translateY(8px)';
+    }
+  }, 2400);
 }
 
 function saveState() {
@@ -2287,7 +2321,7 @@ function renderPageBimModelView() {
         <div class="vh-primary-title">工地 BIM 3D 輕量化模型工作台</div>
         <div class="vh-secondary-meta">
           <span class="vh-badge-tag">${proj.name}</span>
-          <span>工務所 3D 空間檢視・支援 IFC / GLB / OBJ・完全 360° 球體任意旋轉</span>
+          <span>工務所 3D 空間檢視・支援 IFC / GLB / OBJ・全構件點擊拾取與爆炸分解・360° 球體旋轉</span>
         </div>
       </div>
 
@@ -2319,23 +2353,21 @@ function renderPageBimModelView() {
             </div>
           </div>
           <div class="bim-hud-actions">
-            <button class="bim-hud-btn" onclick="window.appActions.resetBimCamera()" title="重置為全景中心最佳視角">
+            <button id="bim-btn-reset" class="bim-hud-btn" onclick="window.appActions.resetBimCamera()" title="重置為全景中心最佳視角">
               <span>🔄</span> <span class="btn-text">中心視角</span>
             </button>
-            <button class="bim-hud-btn ${state.bimWideFov ? 'active' : ''}" onclick="window.appActions.toggleBimWideFov()" title="切換標準視角 (45°) 或超廣角全景視野 (65°)">
-              <span>🔭</span> <span class="btn-text">${state.bimWideFov ? '超廣角(65°)' : '廣角視野'}</span>
+            <button id="bim-btn-fov" class="bim-hud-btn ${state.bimWideFov ? 'active' : ''}" onclick="window.appActions.toggleBimWideFov()" title="切換標準視角 (45°) 或超廣角全景視野 (65°)">
+              <span>🔭</span> <span class="btn-text" id="bim-btn-fov-text">${state.bimWideFov ? '超廣角(65°)' : '廣角視野'}</span>
             </button>
-            <button class="bim-hud-btn ${state.bimShowGrid !== false ? 'active' : ''}" onclick="window.appActions.toggleBimGrid()" title="開啟/隱藏參考格線">
+            <button id="bim-btn-grid" class="bim-hud-btn ${state.bimShowGrid !== false ? 'active' : ''}" onclick="window.appActions.toggleBimGrid()" title="開啟/隱藏參考格線">
               <span>📏</span> <span class="btn-text">參考網格</span>
             </button>
-            <button class="bim-hud-btn ${state.bimWireframe ? 'active' : ''}" onclick="window.appActions.toggleBimWireframe()" title="切換線框檢視模式">
+            <button id="bim-btn-wireframe" class="bim-hud-btn ${state.bimWireframe ? 'active' : ''}" onclick="window.appActions.toggleBimWireframe()" title="切換線框檢視模式">
               <span>🌐</span> <span class="btn-text">線框</span>
             </button>
-            ${activeM === 'u001' ? `
-            <button class="bim-hud-btn ${state.bimExploded ? 'active' : ''}" onclick="window.appActions.toggleBimExplode()" title="構件爆炸分解檢視各層構造">
-              <span>💥</span> <span class="btn-text">${state.bimExploded ? '復原組合' : '構件分解'}</span>
+            <button id="bim-btn-explode" class="bim-hud-btn ${state.bimExploded ? 'active' : ''}" onclick="window.appActions.toggleBimExplode()" title="全模型構件徑向爆炸分解檢視 (支援所有內建與上傳的多構件模型)">
+              <span>💥</span> <span class="btn-text" id="bim-btn-explode-text">${state.bimExploded ? '復原組合' : '構件分解'}</span>
             </button>
-            ` : ''}
             <!-- 進入全螢幕按鈕 -->
             <button class="bim-hud-btn bim-enter-fs-btn" onclick="window.appActions.toggleBimFullscreen()" title="進入全螢幕模式">
               <span>⛶</span> <span class="btn-text">進入全螢幕</span>
@@ -2347,7 +2379,10 @@ function renderPageBimModelView() {
           </div>
         </div>
 
-        <!-- 3D Canvas 畫布區塊 (支援拖曳放置檔案) -->
+        <!-- 點選 3D 構件時浮現之即時 BIM 構件屬性 HUD 浮窗 -->
+        <div id="bim-selected-hud" class="bim-selected-hud hidden"></div>
+
+        <!-- 3D Canvas 畫布區塊 (支援拖曳放置檔案與 Raycaster 點擊構件檢視) -->
         <div id="bim-canvas-wrap" class="bim-canvas-wrap" 
              ondragover="window.appActions.handleBimDragOver(event)" 
              ondragleave="window.appActions.handleBimDragLeave(event)" 
@@ -2362,17 +2397,22 @@ function renderPageBimModelView() {
         <!-- 底部浮動操作提示 HUD -->
         <div class="bim-hud-bottom-bar">
           <div class="bim-control-tips">
-            <span>🖱️ <b>左鍵 / 單指滑動</b>：360° 空間旋轉</span>
+            <span>👆 <b>單擊構件</b>：讀取 BIM 屬性</span>
             <span>・</span>
-            <span>🔍 <b>滾輪 / 雙指捏合</b>：無級縮放</span>
+            <span>🖱️ <b>左鍵拖曳</b>：360° 旋轉</span>
             <span>・</span>
-            <span>↔️ <b>右鍵 / 雙指平移</b>：視角平移</span>
+            <span>🔍 <b>滾輪</b>：縮放</span>
+            <span>・</span>
+            <span>↔️ <b>右鍵</b>：平移</span>
           </div>
           <div class="bim-coord-box" id="bim-stat-box">
             <span>WebGL 60 FPS</span>
           </div>
         </div>
       </div>
+
+      <!-- 即時選取構件之動態檢驗卡 (Raycaster 點擊任何構件時即時更新) -->
+      <div id="bim-live-inspector-box"></div>
 
       <!-- 元件屬性與技術規格卡片 (與 中階幕牆族元件製成技術 規格完全對應) -->
       ${renderBimPropertiesCard(activeM)}
@@ -2664,56 +2704,144 @@ function buildCurtainWallU001Group() {
   const leftMullionGeo = new THREE.BoxGeometry(0.065, 3.64, 0.20);
   const leftMullion = new THREE.Mesh(leftMullionGeo, aluMat);
   leftMullion.position.set(-0.8175, 1.82, 0);
-  leftMullion.userData = { part: 'left_mullion', origPos: leftMullion.position.clone(), explodeOffset: new THREE.Vector3(-0.35, 0, 0) };
+  leftMullion.userData = {
+    part: 'left_mullion',
+    origPos: leftMullion.position.clone(),
+    explodeOffset: new THREE.Vector3(-0.45, 0, 0),
+    bimInfo: {
+      elementId: 'CW-U001-ML-L',
+      name: '左公梃鋁擠型立柱 (Left Male Mullion)',
+      category: 'Curtain Wall Mullion (帷幕立柱)',
+      materialName: 'A6063-T5 陽極深灰鋁擠型 (氟碳烤漆)',
+      specNote: '雙腔體斷熱結構・防變形鎖固槽口'
+    }
+  };
   group.add(leftMullion);
 
   // 2. 右母梃 (Right Mullion)
   const rightMullionGeo = new THREE.BoxGeometry(0.065, 3.64, 0.20);
   const rightMullion = new THREE.Mesh(rightMullionGeo, aluMat);
   rightMullion.position.set(0.8175, 1.82, 0);
-  rightMullion.userData = { part: 'right_mullion', origPos: rightMullion.position.clone(), explodeOffset: new THREE.Vector3(0.35, 0, 0) };
+  rightMullion.userData = {
+    part: 'right_mullion',
+    origPos: rightMullion.position.clone(),
+    explodeOffset: new THREE.Vector3(0.45, 0, 0),
+    bimInfo: {
+      elementId: 'CW-U001-ML-R',
+      name: '右母梃鋁擠型立柱 (Right Female Mullion)',
+      category: 'Curtain Wall Mullion (帷幕立柱)',
+      materialName: 'A6063-T5 陽極深灰鋁擠型 (含 EPDM 膠條槽)',
+      specNote: '單元公母插接式氣密水密等壓腔'
+    }
+  };
   group.add(rightMullion);
 
   // 3. 上橫樑 (Top Transom)
   const topTransomGeo = new THREE.BoxGeometry(1.57, 0.08, 0.18);
   const topTransom = new THREE.Mesh(topTransomGeo, aluMat);
   topTransom.position.set(0, 3.56, 0.01);
-  topTransom.userData = { part: 'top_transom', origPos: topTransom.position.clone(), explodeOffset: new THREE.Vector3(0, 0.25, 0) };
+  topTransom.userData = {
+    part: 'top_transom',
+    origPos: topTransom.position.clone(),
+    explodeOffset: new THREE.Vector3(0, 0.35, 0),
+    bimInfo: {
+      elementId: 'CW-U001-TR-TOP',
+      name: '上橫樑鋁擠型 (Top Head Transom)',
+      category: 'Curtain Wall Mullion (帷幕橫樑)',
+      materialName: 'A6063-T5 陽極深灰鋁擠型',
+      specNote: '頂部排水披水構造與下層單元插接頭'
+    }
+  };
   group.add(topTransom);
 
   // 4. 下橫樑 (Bottom Transom)
   const btmTransomGeo = new THREE.BoxGeometry(1.57, 0.09, 0.18);
   const btmTransom = new THREE.Mesh(btmTransomGeo, aluMat);
   btmTransom.position.set(0, 0.06, 0.01);
-  btmTransom.userData = { part: 'btm_transom', origPos: btmTransom.position.clone(), explodeOffset: new THREE.Vector3(0, -0.25, 0) };
+  btmTransom.userData = {
+    part: 'btm_transom',
+    origPos: btmTransom.position.clone(),
+    explodeOffset: new THREE.Vector3(0, -0.35, 0),
+    bimInfo: {
+      elementId: 'CW-U001-TR-BTM',
+      name: '下橫樑鋁擠型底座 (Bottom Sill Transom)',
+      category: 'Curtain Wall Mullion (帷幕橫樑)',
+      materialName: 'A6063-T5 陽極深灰鋁擠型',
+      specNote: '底部導水溝槽與防風壓扣件底座'
+    }
+  };
   group.add(btmTransom);
 
   // 5. 中腰橫樑 (Intermediate Transom)
   const midTransomGeo = new THREE.BoxGeometry(1.57, 0.075, 0.18);
   const midTransom = new THREE.Mesh(midTransomGeo, aluMat);
   midTransom.position.set(0, 1.10, 0.01);
-  midTransom.userData = { part: 'mid_transom', origPos: midTransom.position.clone(), explodeOffset: new THREE.Vector3(0, 0, 0.2) };
+  midTransom.userData = {
+    part: 'mid_transom',
+    origPos: midTransom.position.clone(),
+    explodeOffset: new THREE.Vector3(0, 0, 0.25),
+    bimInfo: {
+      elementId: 'CW-U001-TR-MID',
+      name: '中腰分隔橫樑 (Intermediate Transom)',
+      category: 'Curtain Wall Mullion (中腰橫料)',
+      materialName: 'A6063-T5 陽極深灰鋁擠型',
+      specNote: '分隔上部透光視窗區與下部石材層間區'
+    }
+  };
   group.add(midTransom);
 
   // 6. 複層中空 Low-E 玻璃 (Vision IGU, 35mm 總厚度)
   const glassGeo = new THREE.BoxGeometry(1.57, 2.38, 0.035);
   const glassMesh = new THREE.Mesh(glassGeo, glassMat);
   glassMesh.position.set(0, 2.33, 0.05);
-  glassMesh.userData = { part: 'glass', origPos: glassMesh.position.clone(), explodeOffset: new THREE.Vector3(0, 0, 0.45) };
+  glassMesh.userData = {
+    part: 'glass',
+    origPos: glassMesh.position.clone(),
+    explodeOffset: new THREE.Vector3(0, 0.1, 0.55),
+    bimInfo: {
+      elementId: 'CW-U001-GL-01',
+      name: '35mm 雙強化複層中空 Low-E 玻璃 (Vision IGU)',
+      category: 'Curtain Panels (玻璃嵌板)',
+      materialName: '8mm半反射強化 + 12A氬氣層 + 8mm強化 Low-E',
+      specNote: '簡化為單一 35mm 實體，兼顧渲染光澤與檔案輕量化'
+    }
+  };
   group.add(glassMesh);
 
   // 7. 下段乾掛花崗岩飾板 (Spandrel Stone Panel)
   const stoneGeo = new THREE.BoxGeometry(1.57, 0.95, 0.03);
   const stoneMesh = new THREE.Mesh(stoneGeo, stoneMat);
   stoneMesh.position.set(0, 0.58, 0.055);
-  stoneMesh.userData = { part: 'stone', origPos: stoneMesh.position.clone(), explodeOffset: new THREE.Vector3(0, 0, 0.5) };
+  stoneMesh.userData = {
+    part: 'stone',
+    origPos: stoneMesh.position.clone(),
+    explodeOffset: new THREE.Vector3(0, -0.1, 0.6),
+    bimInfo: {
+      elementId: 'CW-U001-ST-01',
+      name: '下段乾掛花崗岩外飾板 (Spandrel Stone Panel)',
+      category: 'Curtain Panels (石材飾板)',
+      materialName: '30mm 燒面深灰花崗石材 (背栓乾掛)',
+      specNote: '耐候抗污石材面層，含結構矽利康耐候填縫'
+    }
+  };
   group.add(stoneMesh);
 
   // 8. 鍍鋅金屬保溫背板 (Insulation Backpan)
   const backpanGeo = new THREE.BoxGeometry(1.56, 0.94, 0.05);
   const backpanMesh = new THREE.Mesh(backpanGeo, backpanMat);
   backpanMesh.position.set(0, 0.58, -0.04);
-  backpanMesh.userData = { part: 'backpan', origPos: backpanMesh.position.clone(), explodeOffset: new THREE.Vector3(0, 0, -0.35) };
+  backpanMesh.userData = {
+    part: 'backpan',
+    origPos: backpanMesh.position.clone(),
+    explodeOffset: new THREE.Vector3(0, -0.1, -0.45),
+    bimInfo: {
+      elementId: 'CW-U001-BP-01',
+      name: '層間防火岩棉鍍鋅保溫背板 (Insulation Backpan)',
+      category: 'Firestop & Insulation (防火保溫層)',
+      materialName: '2.0mm 鍍鋅鋼板 + 50mm 高密度防火岩棉',
+      specNote: '符合建築技術規則層間防火時效 1 小時以上規定'
+    }
+  };
   group.add(backpanMesh);
 
   // 9. 鋼構牛腿與預埋轉接件 (Steel Anchor Brackets)
@@ -2727,7 +2855,18 @@ function buildCurtainWallU001Group() {
   anchorPositions.forEach((pos, idx) => {
     const anchor = new THREE.Mesh(anchorGeo, steelMat);
     anchor.position.set(pos[0], pos[1], pos[2]);
-    anchor.userData = { part: 'anchor_' + idx, origPos: anchor.position.clone(), explodeOffset: new THREE.Vector3(0, 0, -0.3) };
+    anchor.userData = {
+      part: 'anchor_' + idx,
+      origPos: anchor.position.clone(),
+      explodeOffset: new THREE.Vector3(pos[0] * 0.35, 0, -0.4),
+      bimInfo: {
+        elementId: `CW-U001-ANC-0${idx + 1}`,
+        name: `三維可調式鋼構牛腿轉接件 #${idx + 1} (Anchor Bracket)`,
+        category: 'Structural Connections (結構轉接件)',
+        materialName: 'SN490B 熱浸鍍鋅加勁角鋼 + M20 化學錨栓',
+        specNote: '提供 X/Y/Z 三向施工誤差微調 (±25mm)'
+      }
+    };
     group.add(anchor);
   });
 
@@ -2735,17 +2874,41 @@ function buildCurtainWallU001Group() {
   const slabTopGeo = new THREE.BoxGeometry(2.4, 0.2, 0.6);
   const slabTop = new THREE.Mesh(slabTopGeo, slabMat);
   slabTop.position.set(0, 3.5, -0.4);
+  slabTop.userData = {
+    part: 'slab_top',
+    origPos: slabTop.position.clone(),
+    explodeOffset: new THREE.Vector3(0, 0.3, -0.65),
+    bimInfo: {
+      elementId: 'STR-SLAB-UPPER',
+      name: '上層 RC 結構樓板邊緣 (Upper Floor Slab)',
+      category: 'Structural Floors (RC 樓板)',
+      materialName: 'RC 鋼筋混凝土 (fc\'=280 kgf/cm²)',
+      specNote: '帷幕吊掛固定基準面'
+    }
+  };
   group.add(slabTop);
 
   const slabBtmGeo = new THREE.BoxGeometry(2.4, 0.2, 0.6);
   const slabBtm = new THREE.Mesh(slabBtmGeo, slabMat);
   slabBtm.position.set(0, 0.1, -0.4);
+  slabBtm.userData = {
+    part: 'slab_btm',
+    origPos: slabBtm.position.clone(),
+    explodeOffset: new THREE.Vector3(0, -0.3, -0.65),
+    bimInfo: {
+      elementId: 'STR-SLAB-LOWER',
+      name: '本層 RC 結構樓板邊緣 (Lower Floor Slab)',
+      category: 'Structural Floors (RC 樓板)',
+      materialName: 'RC 鋼筋混凝土 (fc\'=280 kgf/cm²)',
+      specNote: '層間塞水路與防火填塞基準面'
+    }
+  };
   group.add(slabBtm);
 
   return group;
 }
 
-// 建立 5F RC 現場結構主體 3D 模型
+// 建立 5F RC 現場結構主體 3D 模型 (支援構件分解與點擊檢視)
 function buildRcStructureGroup() {
   const group = new THREE.Group();
   group.name = 'rc_structure';
@@ -2772,20 +2935,39 @@ function buildRcStructureGroup() {
   const slabGeo = new THREE.BoxGeometry(6, 0.18, 6);
   const slab = new THREE.Mesh(slabGeo, concreteMat);
   slab.position.set(0, 0.09, 0);
+  slab.userData = {
+    bimInfo: {
+      elementId: 'RC-5F-SLAB-S1',
+      name: '5F S1 雙層雙向 RC 結構樓地板 (厚180mm)',
+      category: 'Structural Floors (結構樓板)',
+      materialName: '預拌混凝土 fc\'=280 kgf/cm² (已完成養護)',
+      specNote: '雙向 #4@150mm 鋼筋網配置'
+    }
+  };
   group.add(slab);
 
   // 4 根柱子: 0.6m x 3.2m x 0.6m
   const colGeo = new THREE.BoxGeometry(0.6, 3.2, 0.6);
   const colCoords = [
-    [-2.2, 1.69, -2.2],
-    [2.2, 1.69, -2.2],
-    [-2.2, 1.69, 2.2],
-    [2.2, 1.69, 2.2]
+    [-2.2, 1.69, -2.2, 'C1-A1 (西北角柱)'],
+    [2.2, 1.69, -2.2, 'C1-B1 (東北角柱)'],
+    [-2.2, 1.69, 2.2, 'C1-A2 (西南角柱)'],
+    [2.2, 1.69, 2.2, 'C1-B2 (東南角柱・模板組立中)']
   ];
   colCoords.forEach((c, idx) => {
-    const mat = (idx === 3) ? formworkMat : concreteMat;
+    const isFormwork = (idx === 3);
+    const mat = isFormwork ? formworkMat : concreteMat;
     const col = new THREE.Mesh(colGeo, mat);
     col.position.set(c[0], c[1], c[2]);
+    col.userData = {
+      bimInfo: {
+        elementId: `RC-5F-COL-0${idx + 1}`,
+        name: `5F 結構柱 ${c[3]} (600×600mm)`,
+        category: 'Structural Columns (RC 結構柱)',
+        materialName: isFormwork ? '清水複合模板組立加固中 (待查驗)' : 'RC 鋼筋混凝土 fc\'=280 kgf/cm² (已拆模)',
+        specNote: '主筋 16-#8 SD420W，箍筋 #4@100/150mm'
+      }
+    };
     group.add(col);
   });
 
@@ -2793,33 +2975,89 @@ function buildRcStructureGroup() {
   const beamXGeo = new THREE.BoxGeometry(4.4, 0.7, 0.4);
   const beamX1 = new THREE.Mesh(beamXGeo, concreteMat);
   beamX1.position.set(0, 3.29 - 0.35, -2.2);
+  beamX1.userData = {
+    bimInfo: {
+      elementId: 'RC-5F-BM-G1N',
+      name: '5F 北側主大樑 G1-N (400×700mm)',
+      category: 'Structural Framing (RC 主樑)',
+      materialName: 'RC 鋼筋混凝土 fc\'=280 kgf/cm²',
+      specNote: '抗彎主筋與兩端耐震韌性箍筋加密區'
+    }
+  };
   group.add(beamX1);
 
   const beamX2 = new THREE.Mesh(beamXGeo, concreteMat);
   beamX2.position.set(0, 3.29 - 0.35, 2.2);
+  beamX2.userData = {
+    bimInfo: {
+      elementId: 'RC-5F-BM-G1S',
+      name: '5F 南側主大樑 G1-S (400×700mm)',
+      category: 'Structural Framing (RC 主樑)',
+      materialName: 'RC 鋼筋混凝土 fc\'=280 kgf/cm²',
+      specNote: '抗彎主筋與穿樑套管自主檢查合格'
+    }
+  };
   group.add(beamX2);
 
   const beamZGeo = new THREE.BoxGeometry(0.4, 0.7, 4.4);
   const beamZ1 = new THREE.Mesh(beamZGeo, concreteMat);
   beamZ1.position.set(-2.2, 3.29 - 0.35, 0);
+  beamZ1.userData = {
+    bimInfo: {
+      elementId: 'RC-5F-BM-G2W',
+      name: '5F 西側主大樑 G2-W (400×700mm)',
+      category: 'Structural Framing (RC 主樑)',
+      materialName: 'RC 鋼筋混凝土 fc\'=280 kgf/cm²',
+      specNote: '與 C1 角柱剛接節點'
+    }
+  };
   group.add(beamZ1);
 
   const beamZ2 = new THREE.Mesh(beamZGeo, concreteMat);
   beamZ2.position.set(2.2, 3.29 - 0.35, 0);
+  beamZ2.userData = {
+    bimInfo: {
+      elementId: 'RC-5F-BM-G2E',
+      name: '5F 東側主大樑 G2-E (400×700mm)',
+      category: 'Structural Framing (RC 主樑)',
+      materialName: 'RC 鋼筋混凝土 fc\'=280 kgf/cm²',
+      specNote: '與 C1 角柱剛接節點'
+    }
+  };
   group.add(beamZ2);
 
   // 頂層樑板綁筋指示 (鋼筋網格)
+  let rebarIdx = 1;
   for (let i = -2; i <= 2; i += 0.5) {
     const barGeo = new THREE.CylinderGeometry(0.015, 0.015, 4.4);
     const barX = new THREE.Mesh(barGeo, rebarMat);
     barX.rotation.z = Math.PI / 2;
     barX.position.set(0, 3.35, i);
+    barX.userData = {
+      bimInfo: {
+        elementId: `RC-6F-REB-X${rebarIdx}`,
+        name: `頂層樓板 X向竹節鋼筋 #${rebarIdx} (SD420W)`,
+        category: 'Structural Rebar (鋼筋籠待驗)',
+        materialName: 'SD420W 高拉力竹節鋼筋 (#5@150mm)',
+        specNote: '保護層墊塊與綁紮間距自主查驗中'
+      }
+    };
     group.add(barX);
 
     const barZ = new THREE.Mesh(barGeo, rebarMat);
     barZ.rotation.x = Math.PI / 2;
     barZ.position.set(i, 3.37, 0);
+    barZ.userData = {
+      bimInfo: {
+        elementId: `RC-6F-REB-Z${rebarIdx}`,
+        name: `頂層樓板 Y向竹節鋼筋 #${rebarIdx} (SD420W)`,
+        category: 'Structural Rebar (鋼筋籠待驗)',
+        materialName: 'SD420W 高拉力竹節鋼筋 (#5@150mm)',
+        specNote: '保護層墊塊與水電管路預埋查驗中'
+      }
+    };
     group.add(barZ);
+    rebarIdx++;
   }
 
   return group;
@@ -2878,33 +3116,75 @@ function buildFourTowersMegaProjectGroup() {
   const baseGeo = new THREE.BoxGeometry(240, 2, 240);
   const baseMesh = new THREE.Mesh(baseGeo, siteGroundMat);
   baseMesh.position.set(0, -1, 0);
+  baseMesh.userData = {
+    explodeOffset: new THREE.Vector3(0, -18, 0),
+    bimInfo: {
+      elementId: 'SITE-BASE-240',
+      name: '全區綜合開發街廓基地盤 (240m×240m)',
+      category: 'Toposolid & Site (基地地盤與地下室頂板)',
+      materialName: '筏式基礎與地下 5 層連續壁結構體',
+      specNote: '基地總面積 57,600 m²'
+    }
+  };
   group.add(baseMesh);
 
   // 外環環狀道路 (寬度 14m)
   const roadGeo = new THREE.BoxGeometry(232, 0.1, 232);
   const roadMesh = new THREE.Mesh(roadGeo, roadMat);
   roadMesh.position.set(0, 0.05, 0);
+  roadMesh.userData = {
+    explodeOffset: new THREE.Vector3(0, -10, 0),
+    bimInfo: {
+      elementId: 'SITE-ROAD-RING',
+      name: '基地外環景觀車道與消防救災動線',
+      category: 'Site Roads (環狀道路)',
+      materialName: '透水瀝青混凝土鋪面 (厚100mm)',
+      specNote: '全區雙向環狀車道與無障礙人行步道'
+    }
+  };
   group.add(roadMesh);
 
   // 中央下沉綠化廣場 (90m × 90m)
   const plazaGeo = new THREE.BoxGeometry(90, 0.2, 90);
   const plazaMesh = new THREE.Mesh(plazaGeo, plazaMat);
   plazaMesh.position.set(0, 0.1, 0);
+  plazaMesh.userData = {
+    explodeOffset: new THREE.Vector3(0, -5, 0),
+    bimInfo: {
+      elementId: 'SITE-PLAZA-CENTRAL',
+      name: '中央生態綠化中庭廣場 (90m×90m)',
+      category: 'Landscape Plaza (中央景觀綠地)',
+      materialName: '複層植栽綠化與雨水貯留回收系統',
+      specNote: '開放空間綠覆率 > 65%'
+    }
+  };
   group.add(plazaMesh);
 
   // 2. 4 棟 30 層大樓 (A/B/C/D 棟，每棟高達 108m ~ 125m)
   const towerPositions = [
-    { name: 'A棟 (30F 智慧商辦)', x: -62, z: -62 },
-    { name: 'B棟 (30F 旗艦豪邸)', x: 62, z: -62 },
-    { name: 'C棟 (30F 科技大樓)', x: -62, z: 62 },
-    { name: 'D棟 (30F 國際中心)', x: 62, z: 62 }
+    { code: 'A', name: 'A棟 (30F 智慧商辦大樓)', x: -62, z: -62 },
+    { code: 'B', name: 'B棟 (30F 旗艦景觀豪邸)', x: 62, z: -62 },
+    { code: 'C', name: 'C棟 (30F 研發科技總部)', x: -62, z: 62 },
+    { code: 'D', name: 'D棟 (30F 國際會議中心)', x: 62, z: 62 }
   ];
 
   towerPositions.forEach((tp) => {
+    const radialDir = new THREE.Vector3(tp.x, 0, tp.z).normalize();
+
     // 裙樓 (1F~3F 商業基座: 36m × 36m × 12m)
     const podiumGeo = new THREE.BoxGeometry(36, 12, 36);
     const podium = new THREE.Mesh(podiumGeo, concreteMat);
     podium.position.set(tp.x, 6, tp.z);
+    podium.userData = {
+      explodeOffset: radialDir.clone().multiplyScalar(22),
+      bimInfo: {
+        elementId: `TWR-${tp.code}-PODIUM`,
+        name: `${tp.name} - 1F~3F 商業裙樓基座`,
+        category: 'Building Podium (商業裙樓)',
+        materialName: 'SRC 鋼骨鋼筋混凝土 + 乾掛石材基座',
+        specNote: '挑高迎賓大廳與商業空間 (36m×36m×12m)'
+      }
+    };
     group.add(podium);
 
     // 主塔身 (4F~30F: 27層主體，高度 86.4m，斷面 26m × 26m)
@@ -2913,17 +3193,47 @@ function buildFourTowersMegaProjectGroup() {
     const bodyGeo = new THREE.BoxGeometry(26, towerH, 26);
     const body = new THREE.Mesh(bodyGeo, spandrelMat);
     body.position.set(tp.x, towerY, tp.z);
+    body.userData = {
+      explodeOffset: radialDir.clone().multiplyScalar(32).add(new THREE.Vector3(0, 12, 0)),
+      bimInfo: {
+        elementId: `TWR-${tp.code}-CORE`,
+        name: `${tp.name} - 4F~30F 核心筒與結構主體`,
+        category: 'Structural Core & Frame (超高層主體)',
+        materialName: 'CFT 柱內灌漿高強度鋼骨結構 + 鋁板立面',
+        specNote: '單層高 3.2m，共 30 層標準樓層'
+      }
+    };
     group.add(body);
 
     // 4 向大面積玻璃帷幕立面
     const glassSideGeo1 = new THREE.BoxGeometry(26.2, towerH - 2, 21);
     const glassSide1 = new THREE.Mesh(glassSideGeo1, glassMat);
     glassSide1.position.set(tp.x, towerY, tp.z);
+    glassSide1.userData = {
+      explodeOffset: radialDir.clone().multiplyScalar(48).add(new THREE.Vector3(0, 15, 0)),
+      bimInfo: {
+        elementId: `TWR-${tp.code}-CW-EW`,
+        name: `${tp.name} - 東西向單元式 Low-E 玻璃帷幕系統`,
+        category: 'Curtain Wall System (東西向單元帷幕)',
+        materialName: '雙銀 Low-E 複層中空玻璃單元幕牆',
+        specNote: '抗風壓 4500 Pa，水密性 1500 Pa'
+      }
+    };
     group.add(glassSide1);
 
     const glassSideGeo2 = new THREE.BoxGeometry(21, towerH - 2, 26.2);
     const glassSide2 = new THREE.Mesh(glassSideGeo2, glassMat);
     glassSide2.position.set(tp.x, towerY, tp.z);
+    glassSide2.userData = {
+      explodeOffset: radialDir.clone().multiplyScalar(62).add(new THREE.Vector3(0, 18, 0)),
+      bimInfo: {
+        elementId: `TWR-${tp.code}-CW-NS`,
+        name: `${tp.name} - 南北向單元式 Low-E 玻璃帷幕系統`,
+        category: 'Curtain Wall System (南北向單元帷幕)',
+        materialName: '雙銀 Low-E 複層中空玻璃單元幕牆',
+        specNote: '全棟模組化吊裝單元幕牆'
+      }
+    };
     group.add(glassSide2);
 
     // 樓層層間水平飾帶 (30 層完整層線)
@@ -2932,6 +3242,16 @@ function buildFourTowersMegaProjectGroup() {
       const ringGeo = new THREE.BoxGeometry(26.6, 0.4, 26.6);
       const ring = new THREE.Mesh(ringGeo, concreteMat);
       ring.position.set(tp.x, slabY, tp.z);
+      ring.userData = {
+        explodeOffset: radialDir.clone().multiplyScalar(32 + f * 0.45).add(new THREE.Vector3(0, f * 0.65, 0)),
+        bimInfo: {
+          elementId: `TWR-${tp.code}-FL-${String(f).padStart(2, '0')}F`,
+          name: `${tp.name} - 第 ${f}F 結構樓板與層間飾帶`,
+          category: 'Floor Slabs (標準層樓板)',
+          materialName: '鋼承板複合 RC 樓板 + 陽極鋁合金層間飾帶',
+          specNote: `設計高程 GL+${slabY.toFixed(1)}m`
+        }
+      };
       group.add(ring);
     }
 
@@ -2939,12 +3259,32 @@ function buildFourTowersMegaProjectGroup() {
     const crownGeo = new THREE.BoxGeometry(20, 10, 20);
     const crown = new THREE.Mesh(crownGeo, crownMat);
     crown.position.set(tp.x, 98.4 + 5, tp.z);
+    crown.userData = {
+      explodeOffset: radialDir.clone().multiplyScalar(38).add(new THREE.Vector3(0, 38, 0)),
+      bimInfo: {
+        elementId: `TWR-${tp.code}-CROWN`,
+        name: `${tp.name} - R1~R3 屋頂星空花園冠頂`,
+        category: 'Roof Crown (屋突冠頂構造)',
+        materialName: '天際線金屬格柵與太陽能光電帷幕頂冠',
+        specNote: '含阻尼器室 (TMD) 與高空景觀會所'
+      }
+    };
     group.add(crown);
 
     // 建築避雷針與天際立柱 (高度 16m)
     const mastGeo = new THREE.CylinderGeometry(0.3, 0.8, 16);
     const mast = new THREE.Mesh(mastGeo, crownMat);
     mast.position.set(tp.x, 108.4 + 8, tp.z);
+    mast.userData = {
+      explodeOffset: radialDir.clone().multiplyScalar(42).add(new THREE.Vector3(0, 56, 0)),
+      bimInfo: {
+        elementId: `TWR-${tp.code}-SPIRE`,
+        name: `${tp.name} - 航空障礙燈與避雷針塔尖`,
+        category: 'Roof Spire (避雷塔尖)',
+        materialName: 'SUS316 不鏽鋼抗風圓管立柱',
+        specNote: '塔尖總高度 GL+124.4m'
+      }
+    };
     group.add(mast);
   });
 
@@ -2952,14 +3292,18 @@ function buildFourTowersMegaProjectGroup() {
 }
 
 // =========================================================================
-// 🏛️ 原生 IFC (ISO-10303-21) 輕量化三維幾何解析引擎 (Pure-JS Step Parser)
+// 🏛️ 業界標準多構件語義化 IFC (ISO-10303-21) 三維幾何解析引擎
+// 每個 ClosedShell / OpenShell / TriangulatedFaceSet 獨立生成 Mesh，
+// 自動判別建築構件類別、配置 PBR 材質並支援獨立點擊檢視與爆炸分解！
 // =========================================================================
 function parseIFCToThreeGeometry(ifcText, THREE) {
   const points = new Map();
+  const pointLists3D = new Map();
   const polyloops = new Map();
   const faces = new Map();
   const closedShells = new Map();
-  
+  const triangulatedSets = new Map();
+
   // 逐段解析 STEP 語句 (分號結尾)
   const statements = ifcText.split(';');
   const total = statements.length;
@@ -2970,7 +3314,8 @@ function parseIFCToThreeGeometry(ifcText, THREE) {
     const eqIdx = raw.indexOf('=');
     if (eqIdx === -1) continue;
 
-    const id = parseInt(raw.slice(1, eqIdx));
+    const id = parseInt(raw.slice(1, eqIdx), 10);
+    if (isNaN(id)) continue;
     const rest = raw.slice(eqIdx + 1);
     const parenIdx = rest.indexOf('(');
     if (parenIdx === -1) continue;
@@ -2984,26 +3329,40 @@ function parseIFCToThreeGeometry(ifcText, THREE) {
         const coords = match[1].split(',').map(s => parseFloat(s.trim()) || 0);
         points.set(id, coords);
       }
+    } else if (type === 'IFCCARTESIANPOINTLIST3D') {
+      const coordMatches = argsStr.match(/\(\s*-?\d[^)]+\)/g);
+      if (coordMatches) {
+        const list = coordMatches.map(cm => cm.replace(/[()]/g, '').split(',').map(s => parseFloat(s.trim()) || 0));
+        pointLists3D.set(id, list);
+      }
+    } else if (type === 'IFCTRIANGULATEDFACESET') {
+      const ptListMatch = argsStr.match(/#(\d+)/);
+      const idxMatches = argsStr.match(/\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/g);
+      if (ptListMatch && idxMatches) {
+        const ptListId = parseInt(ptListMatch[1], 10);
+        const tris = idxMatches.map(im => im.replace(/[()]/g, '').split(',').map(s => parseInt(s.trim(), 10) - 1));
+        triangulatedSets.set(id, { ptListId, tris });
+      }
     } else if (type === 'IFCPOLYLOOP') {
       const match = argsStr.match(/\(([^)]+)\)/);
       if (match) {
-        const ptIds = match[1].split(',').map(s => parseInt(s.trim().replace('#', ''))).filter(n => !isNaN(n));
+        const ptIds = match[1].split(',').map(s => parseInt(s.trim().replace('#', ''), 10)).filter(n => !isNaN(n));
         polyloops.set(id, ptIds);
       }
     } else if (type === 'IFCFACEOUTERBOUND' || type === 'IFCFACEBOUND') {
       const match = argsStr.match(/#(\d+)/);
       if (match) {
-        faces.set(id, parseInt(match[1]));
+        faces.set(id, parseInt(match[1], 10));
       }
     } else if (type === 'IFCFACE') {
       const match = argsStr.match(/#(\d+)/);
       if (match) {
-        faces.set(id, parseInt(match[1]));
+        faces.set(id, parseInt(match[1], 10));
       }
     } else if (type === 'IFCCLOSEDSHELL' || type === 'IFCOPENSHELL') {
       const match = argsStr.match(/\(([^)]+)\)/);
       if (match) {
-        const faceIds = match[1].split(',').map(s => parseInt(s.trim().replace('#', ''))).filter(n => !isNaN(n));
+        const faceIds = match[1].split(',').map(s => parseInt(s.trim().replace('#', ''), 10)).filter(n => !isNaN(n));
         closedShells.set(id, faceIds);
       }
     }
@@ -3011,29 +3370,118 @@ function parseIFCToThreeGeometry(ifcText, THREE) {
 
   // 自動檢測長度單位 (公釐 mm vs 公尺 m)：若數值常態大於 50 則自動除以 1000
   let maxCoord = 0;
-  for (const [id, pt] of points.entries()) {
+  for (const [, pt] of points.entries()) {
     for (const val of pt) {
       if (Math.abs(val) > maxCoord) maxCoord = Math.abs(val);
     }
     if (points.size > 150 && maxCoord > 100) break;
+  }
+  if (maxCoord === 0 && pointLists3D.size > 0) {
+    for (const [, list] of pointLists3D.entries()) {
+      for (const pt of list) {
+        for (const val of pt) {
+          if (Math.abs(val) > maxCoord) maxCoord = Math.abs(val);
+        }
+      }
+      if (maxCoord > 100) break;
+    }
   }
   const scale = maxCoord > 50 ? 0.001 : 1.0;
 
   const group = new THREE.Group();
   group.name = 'IFC_Imported_Model';
 
-  // 建築材質色彩 (雙面材質確保 360° 翻轉仰俯視皆不破面)
-  const defaultMat = new THREE.MeshStandardMaterial({
-    color: 0x94A3B8,
-    roughness: 0.65,
-    metalness: 0.25,
-    side: THREE.DoubleSide
-  });
+  // 依據幾何長寬高比例智慧推斷 IFC 構件語義與材質
+  const buildSemanticIfcMesh = (verts, expressId, indexNum) => {
+    if (!verts || verts.length < 9) return null;
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+    geo.computeVertexNormals();
+    geo.computeBoundingBox();
 
-  const vertices = [];
+    const bb = geo.boundingBox;
+    const center = new THREE.Vector3();
+    bb.getCenter(center);
+    const size = new THREE.Vector3();
+    bb.getSize(size);
 
-  // 1. 重建 ClosedShell / FacetedBRep
+    // 將頂點轉為構件自身局部座標，並將 Mesh.position 設於該構件自身幾何中心 (確保爆炸分解與點擊精準)
+    geo.translate(-center.x, -center.y, -center.z);
+
+    let category = 'IfcBuildingElement (建築實體構件)';
+    let matColor = 0x94A3B8;
+    let metalness = 0.25;
+    let roughness = 0.65;
+    let opacity = 1.0;
+    let transparent = false;
+    let matName = 'BIM 標準建築結構材質';
+
+    const minHorizontal = Math.min(size.x, size.z);
+    const maxHorizontal = Math.max(size.x, size.z);
+
+    if (minHorizontal < 0.08 && size.y > 0.6 && maxHorizontal > 0.5) {
+      // 薄型直立大面積版片 -> 玻璃嵌板或幕牆飾板
+      category = 'IfcPlate / IfcCurtainWallPanel (帷幕嵌板/玻璃)';
+      matColor = 0x38BDF8;
+      metalness = 0.15;
+      roughness = 0.1;
+      opacity = 0.82;
+      transparent = true;
+      matName = '複層 Low-E 玻璃 / 帷幕單元嵌板';
+    } else if (size.y > maxHorizontal * 2.2) {
+      // 細長直立構件 -> 結構柱或帷幕立柱 (Mullion / Column)
+      category = size.x < 0.35 ? 'IfcMember (帷幕鋁擠型立柱 Mullion)' : 'IfcColumn (結構柱構件)';
+      matColor = size.x < 0.35 ? 0x334155 : 0x64748B;
+      metalness = 0.75;
+      roughness = 0.35;
+      matName = size.x < 0.35 ? 'A6063-T5 陽極鋁擠型立柱' : 'RC / 鋼骨結構柱';
+    } else if (size.y < 0.45 && maxHorizontal > size.y * 3) {
+      if (minHorizontal < 0.35) {
+        // 水平細長構件 -> 橫樑 (Transom / Beam)
+        category = 'IfcBeam / IfcMember (水平橫樑構件)';
+        matColor = 0x475569;
+        metalness = 0.7;
+        roughness = 0.4;
+        matName = '鋁擠型橫料 / 結構橫樑';
+      } else {
+        // 扁平大面積 -> 樓板 (Slab)
+        category = 'IfcSlab (結構樓板/平臺)';
+        matColor = 0x94A3B8;
+        metalness = 0.15;
+        roughness = 0.85;
+        matName = 'RC 鋼筋混凝土樓板';
+      }
+    }
+
+    const mat = new THREE.MeshStandardMaterial({
+      color: matColor,
+      roughness,
+      metalness,
+      transparent,
+      opacity,
+      side: THREE.DoubleSide
+    });
+
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.copy(center);
+    mesh.userData = {
+      part: `ifc_${expressId}`,
+      bimInfo: {
+        elementId: `IFC-#${expressId}`,
+        name: `IFC 構件 #${expressId} (序號 ${indexNum})`,
+        category,
+        materialName: matName,
+        specNote: `STEP ExpressID #${expressId}・自動語義幾何分件`
+      }
+    };
+    return mesh;
+  };
+
+  let meshCounter = 1;
+
+  // 1. 逐個 ClosedShell / OpenShell 建立獨立 Mesh (支援構件分解與單獨點選)
   for (const [shellId, faceIds] of closedShells.entries()) {
+    const shellVerts = [];
     for (const faceId of faceIds) {
       let loopId = faces.get(faceId) || faceId;
       let polyPtIds = polyloops.get(loopId);
@@ -3045,25 +3493,51 @@ function parseIFCToThreeGeometry(ifcText, THREE) {
       const polyPts = polyPtIds.map(pid => points.get(pid)).filter(p => !!p);
       if (polyPts.length < 3) continue;
 
-      // 三角扇 (Triangle Fan) 剖分多邊形面
       const p0 = polyPts[0];
       for (let j = 1; j < polyPts.length - 1; j++) {
         const p1 = polyPts[j];
         const p2 = polyPts[j + 1];
-
-        // Three.js 座標系轉換: [X, Z_height, -Y_depth]
-        vertices.push(
+        shellVerts.push(
           p0[0] * scale, (p0[2] !== undefined ? p0[2] : 0) * scale, (p0[1] !== undefined ? -p0[1] : 0) * scale,
           p1[0] * scale, (p1[2] !== undefined ? p1[2] : 0) * scale, (p1[1] !== undefined ? -p1[1] : 0) * scale,
           p2[0] * scale, (p2[2] !== undefined ? p2[2] : 0) * scale, (p2[1] !== undefined ? -p2[1] : 0) * scale
         );
       }
     }
+    const m = buildSemanticIfcMesh(shellVerts, shellId, meshCounter);
+    if (m) {
+      group.add(m);
+      meshCounter++;
+    }
   }
 
-  // 2. 若無完整 Shell 則直接從 PolyLoop 建構幾何
-  if (vertices.length === 0) {
-    for (const [loopId, polyPtIds] of polyloops.entries()) {
+  // 2. 支援 IFC4 IfcTriangulatedFaceSet
+  for (const [setId, setObj] of triangulatedSets.entries()) {
+    const ptList = pointLists3D.get(setObj.ptListId);
+    if (!ptList || ptList.length === 0) continue;
+    const setVerts = [];
+    for (const tri of setObj.tris) {
+      const p0 = ptList[tri[0]];
+      const p1 = ptList[tri[1]];
+      const p2 = ptList[tri[2]];
+      if (!p0 || !p1 || !p2) continue;
+      setVerts.push(
+        p0[0] * scale, (p0[2] !== undefined ? p0[2] : 0) * scale, (p0[1] !== undefined ? -p0[1] : 0) * scale,
+        p1[0] * scale, (p1[2] !== undefined ? p1[2] : 0) * scale, (p1[1] !== undefined ? -p1[1] : 0) * scale,
+        p2[0] * scale, (p2[2] !== undefined ? p2[2] : 0) * scale, (p2[1] !== undefined ? -p2[1] : 0) * scale
+      );
+    }
+    const m = buildSemanticIfcMesh(setVerts, setId, meshCounter);
+    if (m) {
+      group.add(m);
+      meshCounter++;
+    }
+  }
+
+  // 3. 若無 Shell 則從 PolyLoop 回退建構
+  if (group.children.length === 0 && polyloops.size > 0) {
+    const fallbackVerts = [];
+    for (const [, polyPtIds] of polyloops.entries()) {
       if (!polyPtIds || polyPtIds.length < 3) continue;
       const polyPts = polyPtIds.map(pid => points.get(pid)).filter(p => !!p);
       if (polyPts.length < 3) continue;
@@ -3071,40 +3545,44 @@ function parseIFCToThreeGeometry(ifcText, THREE) {
       for (let j = 1; j < polyPts.length - 1; j++) {
         const p1 = polyPts[j];
         const p2 = polyPts[j + 1];
-        vertices.push(
+        fallbackVerts.push(
           p0[0] * scale, (p0[2] !== undefined ? p0[2] : 0) * scale, (p0[1] !== undefined ? -p0[1] : 0) * scale,
           p1[0] * scale, (p1[2] !== undefined ? p1[2] : 0) * scale, (p1[1] !== undefined ? -p1[1] : 0) * scale,
           p2[0] * scale, (p2[2] !== undefined ? p2[2] : 0) * scale, (p2[1] !== undefined ? -p2[1] : 0) * scale
         );
       }
     }
-  }
-
-  if (vertices.length > 0) {
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    geo.computeVertexNormals();
-    const mesh = new THREE.Mesh(geo, defaultMat);
-    group.add(mesh);
+    const m = buildSemanticIfcMesh(fallbackVerts, 100, 1);
+    if (m) group.add(m);
   }
 
   return group;
 }
 
-// 3D BIM 管理器單例物件 (支援 100,000 米超廣闊視野與完全 360° 球面旋轉)
+// =========================================================================
+// 🏢 3D BIM 管理器單例物件 (業界標準 WebGL 架構：零記憶體洩漏、全模型自動爆炸、Raycaster 點選檢視)
+// =========================================================================
 const bim3DManager = {
   scene: null,
   camera: null,
   renderer: null,
   controls: null,
+  raycaster: null,
   animId: null,
   grid: null,
   currentGroup: null,
+  selectedMesh: null,
   activeModelType: 'u001',
   isWireframe: false,
   isExploded: false,
   customObject: null,
+  explodableMeshes: [],
+  pointerDownPos: { x: 0, y: 0 },
   onResizeBound: null,
+  onFsChangeBound: null,
+  onKeyDownBound: null,
+  onPointerDownBound: null,
+  onPointerUpBound: null,
 
   init(containerEl, canvasEl) {
     if (typeof THREE === 'undefined') {
@@ -3118,10 +3596,10 @@ const bim3DManager = {
     const width = containerEl.clientWidth || 800;
     const height = containerEl.clientHeight || 520;
 
-    // 1. 場景 (徹底移除霧氣限制，讓百米超高大樓與全區地平線清晰展現)
+    // 1. 場景 (無霧氣阻擋，百米超高大樓與全區地平線清晰展現)
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x0F172A);
-    this.scene.fog = null; // 零距離霧氣阻擋
+    this.scene.fog = null;
 
     // 2. 相機 (遠裁剪面拓展至 100,000 米，可同時鳥瞰 4 棟 30 層大樓乃至整個都市基地)
     const fov = state.bimWideFov ? 65 : 45;
@@ -3140,7 +3618,10 @@ const bim3DManager = {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
 
-    // 4. OrbitControls 空間軌道控制器 (無死角全角度球面旋轉 + 拓展最大縮放距離至 100,000 米)
+    // 4. Raycaster 射線拾取器 (支援點擊 3D 構件高亮與屬性檢視)
+    this.raycaster = new THREE.Raycaster();
+
+    // 5. OrbitControls 空間軌道控制器 (無死角全角度球面旋轉 + 拓展最大縮放距離至 100,000 米)
     if (typeof THREE.OrbitControls !== 'undefined') {
       this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
       this.controls.enableDamping = true;
@@ -3149,7 +3630,7 @@ const bim3DManager = {
       this.controls.enableRotate = true;
       this.controls.rotateSpeed = 0.95;
       this.controls.minDistance = 0.05;
-      this.controls.maxDistance = 100000; // 允許縮小至 100 公里外鳥瞰！
+      this.controls.maxDistance = 100000;
       this.controls.minPolarAngle = 0;
       this.controls.maxPolarAngle = Math.PI;
       this.controls.minAzimuthAngle = -Infinity;
@@ -3157,7 +3638,7 @@ const bim3DManager = {
       this.controls.target.set(0, 0, 0);
     }
 
-    // 5. 建築光影 (上下左右多光源照射，確保從任何仰視俯視角度都有清晰光澤)
+    // 6. 建築光影 (全向多光源照射，確保仰視俯視角度皆立體分明)
     const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.85);
     this.scene.add(ambientLight);
 
@@ -3177,29 +3658,33 @@ const bim3DManager = {
     rimLight.position.set(0, 150, -250);
     this.scene.add(rimLight);
 
-    // 6. 基準格線 (Grid)
+    // 7. 基準格線 (Grid)
     this.grid = new THREE.GridHelper(300, 30, 0x38BDF8, 0x334155);
     this.grid.position.y = -1;
     this.grid.visible = state.bimShowGrid !== false;
     this.scene.add(this.grid);
 
-    // 7. 加載當前模型
+    // 8. 加載當前模型
+    this.isWireframe = !!state.bimWireframe;
+    this.isExploded = !!state.bimExploded;
     this.loadActiveModel();
 
-    // 8. 渲染迴圈
+    // 9. 渲染迴圈 (支援所有模型子構件平滑爆炸插值)
     const animate = () => {
       this.animId = requestAnimationFrame(animate);
 
-      // 構件平滑爆炸/復原插值
-      if (this.currentGroup && this.currentGroup.children) {
-        this.currentGroup.children.forEach(child => {
-          if (child.userData && child.userData.origPos && child.userData.explodeOffset) {
-            const targetPos = this.isExploded
-              ? child.userData.origPos.clone().add(child.userData.explodeOffset)
-              : child.userData.origPos.clone();
-            child.position.lerp(targetPos, 0.08);
+      if (this.explodableMeshes && this.explodableMeshes.length > 0) {
+        for (let i = 0; i < this.explodableMeshes.length; i++) {
+          const mesh = this.explodableMeshes[i];
+          if (mesh.userData && mesh.userData.origPos && mesh.userData.explodeOffset) {
+            const targetX = mesh.userData.origPos.x + (this.isExploded ? mesh.userData.explodeOffset.x : 0);
+            const targetY = mesh.userData.origPos.y + (this.isExploded ? mesh.userData.explodeOffset.y : 0);
+            const targetZ = mesh.userData.origPos.z + (this.isExploded ? mesh.userData.explodeOffset.z : 0);
+            mesh.position.x += (targetX - mesh.position.x) * 0.1;
+            mesh.position.y += (targetY - mesh.position.y) * 0.1;
+            mesh.position.z += (targetZ - mesh.position.z) * 0.1;
           }
-        });
+        }
       }
 
       if (this.controls) {
@@ -3212,14 +3697,25 @@ const bim3DManager = {
     };
     animate();
 
-    // 監聽尺寸調整
-    if (this.onResizeBound) {
-      window.removeEventListener('resize', this.onResizeBound);
-    }
+    // 10. 綁定事件監聽 (含視窗調整、全螢幕與 Raycaster 點擊拾取)
     this.onResizeBound = () => this.handleResize();
     window.addEventListener('resize', this.onResizeBound);
 
-    // 全螢幕監聽與 ESC 鍵綁定
+    this.onPointerDownBound = (e) => {
+      this.pointerDownPos.x = e.clientX;
+      this.pointerDownPos.y = e.clientY;
+    };
+    this.onPointerUpBound = (e) => {
+      const dx = Math.abs(e.clientX - this.pointerDownPos.x);
+      const dy = Math.abs(e.clientY - this.pointerDownPos.y);
+      // 移動距離小於 6px 視為「點擊拾取構件」，大於 6px 為旋轉/平移拖曳
+      if (dx < 6 && dy < 6 && e.button === 0) {
+        this.handleCanvasClickInspect(e, canvasEl);
+      }
+    };
+    canvasEl.addEventListener('pointerdown', this.onPointerDownBound);
+    canvasEl.addEventListener('pointerup', this.onPointerUpBound);
+
     this.bindFullscreenEvents();
   },
 
@@ -3234,10 +3730,56 @@ const bim3DManager = {
     this.renderer.setSize(w, h);
   },
 
+  disposeGroupVRAM(group) {
+    if (!group) return;
+    group.traverse((child) => {
+      if (child.isMesh) {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach(m => m && m.dispose && m.dispose());
+          } else if (child.material.dispose) {
+            child.material.dispose();
+          }
+        }
+      }
+    });
+  },
+
   dispose() {
     if (this.animId) {
       cancelAnimationFrame(this.animId);
       this.animId = null;
+    }
+    if (this.onResizeBound) {
+      window.removeEventListener('resize', this.onResizeBound);
+      this.onResizeBound = null;
+    }
+    if (this.onFsChangeBound) {
+      document.removeEventListener('fullscreenchange', this.onFsChangeBound);
+      document.removeEventListener('webkitfullscreenchange', this.onFsChangeBound);
+      this.onFsChangeBound = null;
+    }
+    if (this.onKeyDownBound) {
+      window.removeEventListener('keydown', this.onKeyDownBound);
+      this.onKeyDownBound = null;
+    }
+    if (this.renderer && this.renderer.domElement) {
+      if (this.onPointerDownBound) {
+        this.renderer.domElement.removeEventListener('pointerdown', this.onPointerDownBound);
+      }
+      if (this.onPointerUpBound) {
+        this.renderer.domElement.removeEventListener('pointerup', this.onPointerUpBound);
+      }
+    }
+    this.onPointerDownBound = null;
+    this.onPointerUpBound = null;
+
+    if (this.currentGroup && this.activeModelType !== 'custom') {
+      this.disposeGroupVRAM(this.currentGroup);
+    }
+    if (this.grid) {
+      this.disposeGroupVRAM(this.grid);
     }
     if (this.controls) {
       this.controls.dispose();
@@ -3250,13 +3792,20 @@ const bim3DManager = {
     this.scene = null;
     this.camera = null;
     this.currentGroup = null;
+    this.selectedMesh = null;
+    this.explodableMeshes = [];
     this.grid = null;
   },
 
   loadActiveModel() {
     if (!this.scene) return;
+    this.clearSelectedMeshHighlight();
+
     if (this.currentGroup) {
       this.scene.remove(this.currentGroup);
+      if (this.activeModelType !== 'custom') {
+        this.disposeGroupVRAM(this.currentGroup);
+      }
       this.currentGroup = null;
     }
 
@@ -3265,38 +3814,123 @@ const bim3DManager = {
 
     if (type === 'u001') {
       this.currentGroup = buildCurtainWallU001Group();
-      this.scene.add(this.currentGroup);
-      this.fitModelAndCenterPivot(this.currentGroup);
     } else if (type === 'mega_towers') {
       this.currentGroup = buildFourTowersMegaProjectGroup();
-      this.scene.add(this.currentGroup);
-      this.fitModelAndCenterPivot(this.currentGroup);
     } else if (type === 'rc_structure') {
       this.currentGroup = buildRcStructureGroup();
-      this.scene.add(this.currentGroup);
-      this.fitModelAndCenterPivot(this.currentGroup);
     } else if (type === 'custom') {
       if (this.customObject) {
         this.currentGroup = this.customObject;
-        this.scene.add(this.currentGroup);
-        this.fitModelAndCenterPivot(this.currentGroup);
+      } else {
+        this.currentGroup = buildCurtainWallU001Group();
+        state.bimActiveModel = 'u001';
       }
+    }
+
+    if (this.currentGroup) {
+      this.scene.add(this.currentGroup);
+      this.fitModelAndCenterPivot(this.currentGroup);
+      this.prepareBimModelMetadataAndExplode(this.currentGroup);
     }
 
     this.applyWireframe();
   },
 
-  // 🎯 核心升級：大視野自動運算演算法 (支援 4 棟 30 層大樓超大基地或大型 IFC 全景視圖)
+  // 🎯 核心升級 1：全模型通用型自動爆炸向量與 BIM 構件元數據生成引擎
+  // 確保任何模型 (U001 / 4棟30層大樓 / 5F RC結構 / 上傳的 IFC, GLB, OBJ) 皆可爆炸分解與點擊讀取尺寸！
+  prepareBimModelMetadataAndExplode(group) {
+    if (!group) return;
+    this.explodableMeshes = [];
+
+    group.updateMatrixWorld(true);
+    const assemblyBox = new THREE.Box3().setFromObject(group);
+    const assemblyCenter = assemblyBox.getCenter(new THREE.Vector3());
+    const assemblySize = assemblyBox.getSize(new THREE.Vector3());
+    const maxAssemblyDim = Math.max(assemblySize.x, assemblySize.y, assemblySize.z) || 5;
+
+    let idx = 1;
+    group.traverse((child) => {
+      if (!child.isMesh || !child.geometry) return;
+
+      if (!child.geometry.boundingBox) {
+        child.geometry.computeBoundingBox();
+      }
+
+      // 儲存初始未偏移之基準局部座標 (防止重複調用時發生座標漂移)
+      if (!child.userData.origPos) {
+        child.userData.origPos = child.position.clone();
+      } else {
+        child.position.copy(child.userData.origPos);
+      }
+
+      // 計算該子構件在世界空間中的包圍盒與幾何中心
+      const meshBox = new THREE.Box3().setFromObject(child);
+      const meshCenter = meshBox.getCenter(new THREE.Vector3());
+      const meshSize = meshBox.getSize(new THREE.Vector3());
+
+      // 若該子構件尚未定義 explodeOffset，自動依構件中心與模型總中心之徑向向量計算爆炸位移
+      if (!child.userData.explodeOffset) {
+        const radial = meshCenter.clone().sub(assemblyCenter);
+        if (radial.lengthSq() < 0.0001) {
+          // 若子構件中心剛好與整體中心重疊，給予螺旋分層展開向量
+          const angle = idx * 1.15;
+          radial.set(Math.cos(angle), ((idx % 5) - 2) * 0.35, Math.sin(angle)).normalize().multiplyScalar(maxAssemblyDim * 0.22);
+        } else {
+          const dist = radial.length();
+          radial.normalize().multiplyScalar(dist * 0.55 + maxAssemblyDim * 0.08);
+        }
+        child.userData.explodeOffset = radial;
+      }
+
+      // 補齊完整 BIM 構件規格屬性 (供點擊 Raycaster 即時讀取)
+      const wMm = Math.max(1, Math.round(meshSize.x * 1000));
+      const hMm = Math.max(1, Math.round(meshSize.y * 1000));
+      const dMm = Math.max(1, Math.round(meshSize.z * 1000));
+      const volM3 = (meshSize.x * meshSize.y * meshSize.z).toFixed(3);
+
+      const existingInfo = child.userData.bimInfo || {};
+      child.userData.bimInfo = {
+        elementId: existingInfo.elementId || `BIM-EL-${String(idx).padStart(3, '0')}`,
+        name: existingInfo.name || child.name || `3D 建築構件 #${idx}`,
+        category: existingInfo.category || 'BIM Building Element (建築構件)',
+        materialName: existingInfo.materialName || (child.material && child.material.name ? child.material.name : 'PBR 工程結構材質'),
+        dimensionsMm: `${wMm.toLocaleString()} × ${hMm.toLocaleString()} × ${dMm.toLocaleString()} mm`,
+        elevationM: `GL ${meshCenter.y >= 0 ? '+' : ''}${meshCenter.y.toFixed(2)} m`,
+        volumeM3: `${volM3} m³`,
+        specNote: existingInfo.specNote || '支援 360° 檢視與構件爆炸分解'
+      };
+
+      this.explodableMeshes.push(child);
+      idx++;
+    });
+
+    // 更新底部狀態列顯示構件總數
+    const statBox = document.getElementById('bim-stat-box');
+    if (statBox) {
+      statBox.innerHTML = `<span>構件數：<b>${this.explodableMeshes.length}</b> 件｜WebGL 60 FPS</span>`;
+    }
+  },
+
+  // 🎯 核心升級 2：大視野零偏移自動置中演算法 (徹底修復重複呼叫時的位置累積漂移 Bug)
   fitModelAndCenterPivot(group) {
     if (!group || !this.scene) return;
 
-    // 1. 計算幾何包圍盒
+    // 1. 先將群組位移歸零，並將所有子構件還原至基準位置後再計算真實包圍盒
+    group.position.set(0, 0, 0);
+    group.traverse((child) => {
+      if (child.isMesh && child.userData && child.userData.origPos) {
+        child.position.copy(child.userData.origPos);
+      }
+    });
+    group.updateMatrixWorld(true);
+
     const box = new THREE.Box3().setFromObject(group);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
 
     // 2. 將模型的物理重心嚴格平移至 (0, 0, 0)
     group.position.sub(center);
+    group.updateMatrixWorld(true);
 
     // 3. 將 OrbitControls 的旋轉中心點直接設在 (0, 0, 0)
     if (this.controls) {
@@ -3319,8 +3953,7 @@ const bim3DManager = {
       let fitDist = (maxDim / 2) / Math.tan(fovRad / 2) * 1.45;
       fitDist = Math.max(fitDist, 4);
 
-      // 動態更新近遠裁剪面，防止微縮模型或超大基地破面 (遠裁剪面可達 100,000 米)
-      this.camera.near = Math.max(0.1, maxDim / 10000);
+      this.camera.near = Math.max(0.05, maxDim / 10000);
       this.camera.far = Math.max(100000, maxDim * 50);
       this.camera.updateProjectionMatrix();
 
@@ -3333,12 +3966,130 @@ const bim3DManager = {
     }
   },
 
+  // 🎯 核心升級 3：Raycaster 3D 構件點擊拾取與發光高亮檢視器
+  handleCanvasClickInspect(event, canvasEl) {
+    if (!this.raycaster || !this.camera || !this.currentGroup || !canvasEl) return;
+
+    const rect = canvasEl.getBoundingClientRect();
+    const mouse = new THREE.Vector2(
+      ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      -((event.clientY - rect.top) / rect.height) * 2 + 1
+    );
+
+    this.raycaster.setFromCamera(mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(this.explodableMeshes, false);
+
+    if (intersects.length > 0) {
+      const hitMesh = intersects[0].object;
+      this.selectAndHighlightMesh(hitMesh);
+    } else {
+      this.clearSelectedMeshHighlight();
+    }
+  },
+
+  selectAndHighlightMesh(mesh) {
+    if (!mesh) return;
+    this.clearSelectedMeshHighlight();
+
+    // 若共用材質則先行獨立複製一份材質，避免同材質構件一起變色
+    if (mesh.material && !mesh.userData._matCloned) {
+      mesh.material = mesh.material.clone();
+      mesh.userData._matCloned = true;
+    }
+
+    if (mesh.material && mesh.material.emissive) {
+      mesh.userData._origEmissiveHex = mesh.material.emissive.getHex();
+      mesh.userData._origEmissiveIntensity = mesh.material.emissiveIntensity || 0;
+      mesh.material.emissive.setHex(0x0EA5E9);
+      mesh.material.emissiveIntensity = 0.55;
+    }
+
+    this.selectedMesh = mesh;
+    const info = (mesh.userData && mesh.userData.bimInfo) ? mesh.userData.bimInfo : null;
+    if (info) {
+      this.renderSelectedComponentUI(info);
+    }
+  },
+
+  clearSelectedMeshHighlight() {
+    if (this.selectedMesh && this.selectedMesh.material && this.selectedMesh.material.emissive) {
+      const origHex = this.selectedMesh.userData._origEmissiveHex !== undefined ? this.selectedMesh.userData._origEmissiveHex : 0x000000;
+      const origInt = this.selectedMesh.userData._origEmissiveIntensity !== undefined ? this.selectedMesh.userData._origEmissiveIntensity : 0;
+      this.selectedMesh.material.emissive.setHex(origHex);
+      this.selectedMesh.material.emissiveIntensity = origInt;
+    }
+    this.selectedMesh = null;
+
+    const hudEl = document.getElementById('bim-selected-hud');
+    if (hudEl) {
+      hudEl.classList.add('hidden');
+      hudEl.innerHTML = '';
+    }
+    const inspectorBox = document.getElementById('bim-live-inspector-box');
+    if (inspectorBox) {
+      inspectorBox.innerHTML = '';
+    }
+  },
+
+  renderSelectedComponentUI(info) {
+    const hudEl = document.getElementById('bim-selected-hud');
+    if (hudEl) {
+      hudEl.classList.remove('hidden');
+      hudEl.innerHTML = `
+        <div class="bim-selected-hud-header">
+          <span>🎯 已選取構件：<b>${info.name}</b></span>
+          <button class="bim-selected-hud-close" onclick="window.appActions.clearBimSelection()">✕</button>
+        </div>
+        <div class="bim-selected-hud-body">
+          <span>編號：${info.elementId}</span>
+          <span>｜</span>
+          <span>外包尺寸：<b>${info.dimensionsMm}</b></span>
+          <span>｜</span>
+          <span>材質：${info.materialName}</span>
+        </div>
+      `;
+    }
+
+    const inspectorBox = document.getElementById('bim-live-inspector-box');
+    if (inspectorBox) {
+      inspectorBox.innerHTML = `
+        <div class="motion-card" style="margin-bottom:16px;border:2px solid #0EA5E9;background:#F0F9FF;">
+          <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #BAE6FD;padding-bottom:8px;margin-bottom:10px;">
+            <div>
+              <div style="font-size:14.5px;font-weight:900;color:#0369A1;display:flex;align-items:center;gap:6px;">
+                <span>🎯</span> 3D 點選構件即時 BIM 屬性檢測 (Raycaster Live Inspector)
+              </div>
+              <div style="font-size:11.5px;color:#0284C7;">點擊畫布空白處或右上按鈕即可取消選取高亮</div>
+            </div>
+            <button class="phrase-chip-item" style="background:#FFFFFF;border-color:#0284C7;color:#0284C7;" onclick="window.appActions.clearBimSelection()">取消選取 ✕</button>
+          </div>
+          <div class="bim-specs-grid" style="margin-bottom:0;">
+            <div>
+              <table class="bim-param-table">
+                <tr><td class="bim-param-label">構件編號 (ID)</td><td class="bim-param-value" style="color:#0284C7;">${info.elementId}</td></tr>
+                <tr><td class="bim-param-label">構件名稱</td><td class="bim-param-value">${info.name}</td></tr>
+                <tr><td class="bim-param-label">BIM 分類</td><td class="bim-param-value">${info.category}</td></tr>
+              </table>
+            </div>
+            <div>
+              <table class="bim-param-table">
+                <tr><td class="bim-param-label">實測外包尺寸</td><td class="bim-param-value" style="color:#059669;">${info.dimensionsMm}</td></tr>
+                <tr><td class="bim-param-label">工程材質規格</td><td class="bim-param-value">${info.materialName}</td></tr>
+                <tr><td class="bim-param-label">空間高程 / 備註</td><td class="bim-param-value">${info.elevationM} (${info.specNote})</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  },
+
   applyWireframe() {
     if (!this.currentGroup) return;
     this.currentGroup.traverse((child) => {
       if (child.isMesh && child.material) {
         if (Array.isArray(child.material)) {
-          child.material.forEach(m => m.wireframe = this.isWireframe);
+          child.material.forEach(m => { if (m) m.wireframe = this.isWireframe; });
         } else {
           child.material.wireframe = this.isWireframe;
         }
@@ -3347,23 +4098,26 @@ const bim3DManager = {
   },
 
   bindFullscreenEvents() {
-    const handleFsChange = () => {
+    if (this.onFsChangeBound) {
+      document.removeEventListener('fullscreenchange', this.onFsChangeBound);
+      document.removeEventListener('webkitfullscreenchange', this.onFsChangeBound);
+    }
+    this.onFsChangeBound = () => {
       const container = document.getElementById('bim-viewer-container');
       const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || (container && container.classList.contains('is-fullscreen')));
-      if (container) {
-        if (!isFs) {
-          container.classList.remove('is-fullscreen');
-        }
+      if (container && !isFs) {
+        container.classList.remove('is-fullscreen');
       }
       setTimeout(() => this.handleResize(), 60);
     };
 
-    document.removeEventListener('fullscreenchange', handleFsChange);
-    document.addEventListener('fullscreenchange', handleFsChange);
-    document.removeEventListener('webkitfullscreenchange', handleFsChange);
-    document.addEventListener('webkitfullscreenchange', handleFsChange);
+    document.addEventListener('fullscreenchange', this.onFsChangeBound);
+    document.addEventListener('webkitfullscreenchange', this.onFsChangeBound);
 
-    window.addEventListener('keydown', (e) => {
+    if (this.onKeyDownBound) {
+      window.removeEventListener('keydown', this.onKeyDownBound);
+    }
+    this.onKeyDownBound = (e) => {
       if (e.key === 'Escape') {
         const container = document.getElementById('bim-viewer-container');
         if (container && container.classList.contains('is-fullscreen')) {
@@ -3372,7 +4126,8 @@ const bim3DManager = {
           }
         }
       }
-    });
+    };
+    window.addEventListener('keydown', this.onKeyDownBound);
   }
 };
 
@@ -3502,29 +4257,46 @@ function renderPageSettingsView() {
 }
 
 function renderToastNotice() {
-  if (!state.toastMessage) return '';
-  setTimeout(() => {
+  if (state.toastMessage) {
+    const msg = state.toastMessage;
     state.toastMessage = '';
-    renderApp();
-  }, 2200);
-
-  return `
-    <div style="position:fixed;bottom:92px;left:50%;transform:translateX(-50%);background:#0C4A6E;color:#FFFFFF;padding:8px 16px;border-radius:20px;font-size:12.5px;font-weight:700;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.25);">
-      ${state.toastMessage}
-    </div>
-  `;
+    setTimeout(() => showToast(msg), 15);
+  }
+  return '';
 }
 
 // =========================================================================
 // 全域動作控制器 (window.appActions)
 // =========================================================================
 window.appActions = {
-  // 🏢 3D BIM 輕量化檢視器動作
+  // 🏢 3D BIM 輕量化檢視器動作 (業界標準無損局部 DOM 更新，絕不中斷 WebGL 與全螢幕)
   initBim3DViewer() {
     const container = document.getElementById('bim-canvas-wrap');
     const canvas = document.getElementById('bim-three-canvas');
     if (!container || !canvas) return;
     bim3DManager.init(container, canvas);
+  },
+
+  updateBimHudUI() {
+    const fovBtn = document.getElementById('bim-btn-fov');
+    const fovText = document.getElementById('bim-btn-fov-text');
+    if (fovBtn) fovBtn.classList.toggle('active', !!state.bimWideFov);
+    if (fovText) fovText.textContent = state.bimWideFov ? '超廣角(65°)' : '廣角視野';
+
+    const gridBtn = document.getElementById('bim-btn-grid');
+    if (gridBtn) gridBtn.classList.toggle('active', state.bimShowGrid !== false);
+
+    const wireBtn = document.getElementById('bim-btn-wireframe');
+    if (wireBtn) wireBtn.classList.toggle('active', !!state.bimWireframe);
+
+    const expBtn = document.getElementById('bim-btn-explode');
+    const expText = document.getElementById('bim-btn-explode-text');
+    if (expBtn) expBtn.classList.toggle('active', !!state.bimExploded);
+    if (expText) expText.textContent = state.bimExploded ? '復原組合' : '構件分解';
+  },
+
+  clearBimSelection() {
+    bim3DManager.clearSelectedMeshHighlight();
   },
 
   switchBimModel(modelKey) {
@@ -3540,18 +4312,15 @@ window.appActions = {
 
     const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || container.classList.contains('is-fullscreen'));
     if (!isFs) {
+      container.classList.add('is-fullscreen');
       if (container.requestFullscreen) {
         container.requestFullscreen().catch(() => {
-          container.classList.add('is-fullscreen');
           bim3DManager.handleResize();
         });
       } else if (container.webkitRequestFullscreen) {
         container.webkitRequestFullscreen();
-      } else {
-        container.classList.add('is-fullscreen');
-        bim3DManager.handleResize();
       }
-      state.toastMessage = '⛶ 已進入 3D 全螢幕模式 (按 ESC 或右上角按鈕退出)';
+      showToast('⛶ 已進入 3D 全螢幕模式 (按 ESC 或右上角按鈕退出)');
     } else {
       this.exitBimFullscreen();
     }
@@ -3560,29 +4329,36 @@ window.appActions = {
 
   exitBimFullscreen() {
     const container = document.getElementById('bim-viewer-container');
-    if (document.fullscreenElement) {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
       if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
       else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
     if (container) {
       container.classList.remove('is-fullscreen');
     }
-    state.toastMessage = '✕ 已退出全螢幕';
+    showToast('✕ 已退出全螢幕模式');
     setTimeout(() => bim3DManager.handleResize(), 80);
   },
 
   resetBimCamera() {
-    bim3DManager.loadActiveModel();
-    state.toastMessage = '🔄 視角已重置為最佳觀測角度';
-    renderApp();
+    state.bimExploded = false;
+    bim3DManager.isExploded = false;
+    bim3DManager.clearSelectedMeshHighlight();
+    if (bim3DManager.currentGroup) {
+      bim3DManager.fitModelAndCenterPivot(bim3DManager.currentGroup);
+    } else {
+      bim3DManager.loadActiveModel();
+    }
+    this.updateBimHudUI();
+    showToast('🔄 視角與構件已重置為全景中心最佳角度');
   },
 
   toggleBimWireframe() {
     state.bimWireframe = !state.bimWireframe;
     bim3DManager.isWireframe = state.bimWireframe;
     bim3DManager.applyWireframe();
-    state.toastMessage = state.bimWireframe ? '🌐 已切換為線框檢視模式' : '🧱 已還原為實體材質模式';
-    renderApp();
+    this.updateBimHudUI();
+    showToast(state.bimWireframe ? '🌐 已切換為線框檢視模式' : '🧱 已還原為實體材質模式');
   },
 
   toggleBimGrid() {
@@ -3590,8 +4366,8 @@ window.appActions = {
     if (bim3DManager.grid) {
       bim3DManager.grid.visible = state.bimShowGrid;
     }
-    state.toastMessage = state.bimShowGrid ? '📏 參考網格已開啟' : '📏 參考網格已隱藏';
-    renderApp();
+    this.updateBimHudUI();
+    showToast(state.bimShowGrid ? '📏 參考網格已開啟' : '📏 參考網格已隱藏');
   },
 
   toggleBimWideFov() {
@@ -3600,15 +4376,15 @@ window.appActions = {
       bim3DManager.camera.fov = state.bimWideFov ? 65 : 45;
       bim3DManager.camera.updateProjectionMatrix();
     }
-    state.toastMessage = state.bimWideFov ? '🔭 已切換為超廣角全景視野 (65°)' : '🔭 已還原為標準視角 (45°)';
-    renderApp();
+    this.updateBimHudUI();
+    showToast(state.bimWideFov ? '🔭 已切換為超廣角全景視野 (65°)' : '🔭 已還原為標準視角 (45°)');
   },
 
   toggleBimExplode() {
     state.bimExploded = !state.bimExploded;
     bim3DManager.isExploded = state.bimExploded;
-    state.toastMessage = state.bimExploded ? '💥 構件分解展開檢視中' : '🧩 構件復原組合完成';
-    renderApp();
+    this.updateBimHudUI();
+    showToast(state.bimExploded ? '💥 構件平滑爆炸分解檢視中 (可點擊任一構件查看尺寸)' : '🧩 構件平滑復原組合完成');
   },
 
   triggerBimFileInput() {
@@ -3621,6 +4397,7 @@ window.appActions = {
     if (file) {
       this.loadBimFileObject(file);
     }
+    if (event.target) event.target.value = '';
   },
 
   handleBimDragOver(e) {
@@ -3657,6 +4434,20 @@ window.appActions = {
 
     const reader = new FileReader();
 
+    const applyCustomLoadedModel = (obj3D, labelType) => {
+      if (bim3DManager.customObject && bim3DManager.customObject !== obj3D) {
+        bim3DManager.disposeGroupVRAM(bim3DManager.customObject);
+      }
+      bim3DManager.customObject = obj3D;
+      state.bimActiveModel = 'custom';
+      state.bimCustomModelName = fileName;
+      state.bimExploded = false;
+      bim3DManager.isExploded = false;
+      if (overlay) overlay.classList.add('hidden');
+      renderApp();
+      showToast(`✅ 成功載入 ${labelType} 模型：${fileName} (支援點擊構件與爆炸分解)`);
+    };
+
     if (ext === 'glb' || ext === 'gltf') {
       reader.onload = (e) => {
         try {
@@ -3667,12 +4458,7 @@ window.appActions = {
           }
           const loader = new THREE.GLTFLoader();
           loader.parse(e.target.result, '', (gltf) => {
-            bim3DManager.customObject = gltf.scene;
-            state.bimActiveModel = 'custom';
-            state.bimCustomModelName = fileName;
-            state.toastMessage = `✅ 成功載入 3D 模型：${fileName}`;
-            if (overlay) overlay.classList.add('hidden');
-            renderApp();
+            applyCustomLoadedModel(gltf.scene, 'GLB/GLTF');
           }, (err) => {
             console.error(err);
             alert('3D 模型解析失敗：' + (err.message || '格式異常'));
@@ -3695,12 +4481,7 @@ window.appActions = {
           }
           const loader = new THREE.OBJLoader();
           const obj = loader.parse(e.target.result);
-          bim3DManager.customObject = obj;
-          state.bimActiveModel = 'custom';
-          state.bimCustomModelName = fileName;
-          state.toastMessage = `✅ 成功載入 OBJ 模型：${fileName}`;
-          if (overlay) overlay.classList.add('hidden');
-          renderApp();
+          applyCustomLoadedModel(obj, 'OBJ');
         } catch (err) {
           console.error(err);
           alert('OBJ 模型解析失敗：' + err.message);
@@ -3716,12 +4497,7 @@ window.appActions = {
           if (!ifcGroup || ifcGroup.children.length === 0) {
             throw new Error('未在該 IFC 檔案中找到可識別的三維網格或實體面 (可能為純專案結構或非實體視圖)');
           }
-          bim3DManager.customObject = ifcGroup;
-          state.bimActiveModel = 'custom';
-          state.bimCustomModelName = fileName;
-          state.toastMessage = `✅ 成功解析並載入 IFC 模型：${fileName}`;
-          if (overlay) overlay.classList.add('hidden');
-          renderApp();
+          applyCustomLoadedModel(ifcGroup, 'IFC');
         } catch (err) {
           console.error(err);
           alert('IFC 模型載入失敗：' + err.message);
@@ -4296,11 +5072,19 @@ if (document.readyState === 'loading') {
 }
 
 
-// 監聽視窗尺寸自適應
+// 監聽視窗尺寸自適應 (業界標準：僅動態更新 CSS 容器模式類別，絕不觸發 renderApp 重建 DOM，避免破壞 WebGL 與全螢幕狀態)
 if (typeof window !== 'undefined') {
   window.addEventListener('resize', () => {
     if (state.deviceMode === 'auto') {
-      renderApp();
+      const root = document.getElementById('app-root');
+      if (!root) return;
+      const isPcNow = window.innerWidth >= 900;
+      root.classList.toggle('is-pc-mode', isPcNow);
+      root.classList.remove('is-mobile-preview');
+      const devBtn = document.querySelector('.device-toggle-btn');
+      if (devBtn) {
+        devBtn.innerHTML = isPcNow ? '🖥️ 電腦版' : '📱 手機版';
+      }
     }
   });
 }
