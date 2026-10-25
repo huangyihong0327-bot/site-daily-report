@@ -5171,6 +5171,9 @@ function renderPageBimModelView() {
         <button class="bim-model-chip ${activeM === 'u001' ? 'active' : ''}" onclick="window.appActions.switchBimModel('u001')">
           <span>🏢</span> U001 1700×3600 中階單元帷幕牆 (示範)
         </button>
+        <button class="bim-model-chip ${activeM === 'mega_towers' ? 'active' : ''}" onclick="window.appActions.switchBimModel('mega_towers')">
+          <span>🏙️</span> 4棟30層大樓超大基地 (全景視野示範)
+        </button>
         <button class="bim-model-chip ${activeM === 'rc_structure' ? 'active' : ''}" onclick="window.appActions.switchBimModel('rc_structure')">
           <span>🏗️</span> 5F 現場 RC 結構主體框架 (示範)
         </button>
@@ -5187,12 +5190,15 @@ function renderPageBimModelView() {
           <div class="bim-hud-left">
             <div class="bim-status-pill">
               <span class="pulse-dot"></span>
-              <span id="bim-hud-title">${activeM === 'u001' ? 'U001 中階單元帷幕牆 (1700×3600)' : activeM === 'rc_structure' ? '5F RC 結構主體框架' : (state.bimCustomModelName || '自訂 3D 模型')}</span>
+              <span id="bim-hud-title">${activeM === 'u001' ? 'U001 中階單元帷幕牆 (1700×3600)' : activeM === 'mega_towers' ? '4棟30層大樓超大基地 (120m高/240m基地)' : activeM === 'rc_structure' ? '5F RC 結構主體框架' : (state.bimCustomModelName || '自訂 3D 模型')}</span>
             </div>
           </div>
           <div class="bim-hud-actions">
-            <button class="bim-hud-btn" onclick="window.appActions.resetBimCamera()" title="重置為最佳中心視角">
+            <button class="bim-hud-btn" onclick="window.appActions.resetBimCamera()" title="重置為全景中心最佳視角">
               <span>🔄</span> <span class="btn-text">中心視角</span>
+            </button>
+            <button class="bim-hud-btn ${state.bimWideFov ? 'active' : ''}" onclick="window.appActions.toggleBimWideFov()" title="切換標準視角 (45°) 或超廣角全景視野 (65°)">
+              <span>🔭</span> <span class="btn-text">${state.bimWideFov ? '超廣角(65°)' : '廣角視野'}</span>
             </button>
             <button class="bim-hud-btn ${state.bimShowGrid !== false ? 'active' : ''}" onclick="window.appActions.toggleBimGrid()" title="開啟/隱藏參考格線">
               <span>📏</span> <span class="btn-text">參考網格</span>
@@ -5307,6 +5313,57 @@ function renderBimPropertiesCard(activeM) {
               <tr>
                 <td class="bim-param-label">結構固定節點</td>
                 <td class="bim-param-value">鋼構角鋼牛腿轉接件 + M20 化學錨栓預埋件</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (activeM === 'mega_towers') {
+    return `
+      <div class="motion-card" style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--border-light);padding-bottom:10px;margin-bottom:14px;">
+          <div>
+            <div style="font-size:15px;font-weight:900;color:var(--text-main);display:flex;align-items:center;gap:6px;">
+              <span>🏙️</span> 4 棟 30 層大樓超大基地綜合開發案 (百米超高層建築群)
+            </div>
+            <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">
+              超大視野驗證模型・涵蓋 A/B/C/D 棟 30F 高塔、裙樓、景觀廣場與周邊道路
+            </div>
+          </div>
+          <span class="vh-badge-tag" style="background:#E0E7FF;color:#4338CA;border-color:#C7D2FE;">全區大視野 240m</span>
+        </div>
+
+        <div class="bim-specs-grid">
+          <div>
+            <table class="bim-param-table">
+              <tr>
+                <td class="bim-param-label">建物規模</td>
+                <td class="bim-param-value">共 4 棟 30 層超高層大樓 (單棟高度約 108m ~ 125m)</td>
+              </tr>
+              <tr>
+                <td class="bim-param-label">基地範圍</td>
+                <td class="bim-param-value">240 m × 240 m 綜合開發街廓 (總樓地板 > 120,000 m²)</td>
+              </tr>
+              <tr>
+                <td class="bim-param-label">外觀立面</td>
+                <td class="bim-param-value">Low-E 複層玻璃帷幕帶 + 鋁料飾帶 + 頂層星空花園冠頂</td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <table class="bim-param-table">
+              <tr>
+                <td class="bim-param-label">視野相機設定</td>
+                <td class="bim-param-value">視野極限拓展至 100,000m (無霧氣阻擋 / 零距離衰減)</td>
+              </tr>
+              <tr>
+                <td class="bim-param-label">旋轉軸心</td>
+                <td class="bim-param-value">鎖定於全區 4 棟建築群幾何正中心，360° 仰俯翻轉穩定無偏擺</td>
+              </tr>
+              <tr>
+                <td class="bim-param-label">縮放視野深度</td>
+                <td class="bim-param-value">支援遠距全區鳥瞰 ↔ 近距單層窗框細節自由穿梭</td>
               </tr>
             </table>
           </div>
@@ -5643,6 +5700,132 @@ function buildRcStructureGroup() {
   return group;
 }
 
+// 🏢 建立 4 棟 30 層大樓超大基地綜合開發案模型 (全景大視野驗證模型)
+function buildFourTowersMegaProjectGroup() {
+  const group = new THREE.Group();
+  group.name = 'mega_4_towers_30f';
+
+  // 材質庫
+  const concreteMat = new THREE.MeshStandardMaterial({
+    color: 0x94A3B8,
+    roughness: 0.8,
+    metalness: 0.15
+  });
+
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0x38BDF8,
+    transmission: 0.72,
+    opacity: 0.85,
+    transparent: true,
+    roughness: 0.05,
+    metalness: 0.25,
+    reflectivity: 0.95
+  });
+
+  const spandrelMat = new THREE.MeshStandardMaterial({
+    color: 0x334155, // 陽極暗青鐵灰
+    roughness: 0.35,
+    metalness: 0.75
+  });
+
+  const crownMat = new THREE.MeshStandardMaterial({
+    color: 0x0284C7, // 天際線皇冠科技藍
+    roughness: 0.25,
+    metalness: 0.85
+  });
+
+  const siteGroundMat = new THREE.MeshStandardMaterial({
+    color: 0x1E293B,
+    roughness: 0.92
+  });
+
+  const roadMat = new THREE.MeshStandardMaterial({
+    color: 0x0F172A,
+    roughness: 0.95
+  });
+
+  const plazaMat = new THREE.MeshStandardMaterial({
+    color: 0x059669, // 中庭綠意公園
+    roughness: 0.85
+  });
+
+  // 1. 超大基地地盤 (240m × 240m)
+  const baseGeo = new THREE.BoxGeometry(240, 2, 240);
+  const baseMesh = new THREE.Mesh(baseGeo, siteGroundMat);
+  baseMesh.position.set(0, -1, 0);
+  group.add(baseMesh);
+
+  // 外環環狀道路 (寬度 14m)
+  const roadGeo = new THREE.BoxGeometry(232, 0.1, 232);
+  const roadMesh = new THREE.Mesh(roadGeo, roadMat);
+  roadMesh.position.set(0, 0.05, 0);
+  group.add(roadMesh);
+
+  // 中央下沉綠化廣場 (90m × 90m)
+  const plazaGeo = new THREE.BoxGeometry(90, 0.2, 90);
+  const plazaMesh = new THREE.Mesh(plazaGeo, plazaMat);
+  plazaMesh.position.set(0, 0.1, 0);
+  group.add(plazaMesh);
+
+  // 2. 4 棟 30 層大樓 (A/B/C/D 棟，每棟高達 108m ~ 125m)
+  const towerPositions = [
+    { name: 'A棟 (30F 智慧商辦)', x: -62, z: -62 },
+    { name: 'B棟 (30F 旗艦豪邸)', x: 62, z: -62 },
+    { name: 'C棟 (30F 科技大樓)', x: -62, z: 62 },
+    { name: 'D棟 (30F 國際中心)', x: 62, z: 62 }
+  ];
+
+  towerPositions.forEach((tp) => {
+    // 裙樓 (1F~3F 商業基座: 36m × 36m × 12m)
+    const podiumGeo = new THREE.BoxGeometry(36, 12, 36);
+    const podium = new THREE.Mesh(podiumGeo, concreteMat);
+    podium.position.set(tp.x, 6, tp.z);
+    group.add(podium);
+
+    // 主塔身 (4F~30F: 27層主體，高度 86.4m，斷面 26m × 26m)
+    const towerH = 86.4;
+    const towerY = 12 + towerH / 2;
+    const bodyGeo = new THREE.BoxGeometry(26, towerH, 26);
+    const body = new THREE.Mesh(bodyGeo, spandrelMat);
+    body.position.set(tp.x, towerY, tp.z);
+    group.add(body);
+
+    // 4 向大面積玻璃帷幕立面
+    const glassSideGeo1 = new THREE.BoxGeometry(26.2, towerH - 2, 21);
+    const glassSide1 = new THREE.Mesh(glassSideGeo1, glassMat);
+    glassSide1.position.set(tp.x, towerY, tp.z);
+    group.add(glassSide1);
+
+    const glassSideGeo2 = new THREE.BoxGeometry(21, towerH - 2, 26.2);
+    const glassSide2 = new THREE.Mesh(glassSideGeo2, glassMat);
+    glassSide2.position.set(tp.x, towerY, tp.z);
+    group.add(glassSide2);
+
+    // 樓層層間水平飾帶 (30 層完整層線)
+    for (let f = 1; f <= 30; f++) {
+      const slabY = f * 3.2;
+      const ringGeo = new THREE.BoxGeometry(26.6, 0.4, 26.6);
+      const ring = new THREE.Mesh(ringGeo, concreteMat);
+      ring.position.set(tp.x, slabY, tp.z);
+      group.add(ring);
+    }
+
+    // 屋頂星空會所 / 科技冠頂 (高度 10m)
+    const crownGeo = new THREE.BoxGeometry(20, 10, 20);
+    const crown = new THREE.Mesh(crownGeo, crownMat);
+    crown.position.set(tp.x, 98.4 + 5, tp.z);
+    group.add(crown);
+
+    // 建築避雷針與天際立柱 (高度 16m)
+    const mastGeo = new THREE.CylinderGeometry(0.3, 0.8, 16);
+    const mast = new THREE.Mesh(mastGeo, crownMat);
+    mast.position.set(tp.x, 108.4 + 8, tp.z);
+    group.add(mast);
+  });
+
+  return group;
+}
+
 // =========================================================================
 // 🏛️ 原生 IFC (ISO-10303-21) 輕量化三維幾何解析引擎 (Pure-JS Step Parser)
 // =========================================================================
@@ -5783,7 +5966,7 @@ function parseIFCToThreeGeometry(ifcText, THREE) {
   return group;
 }
 
-// 3D BIM 管理器單例物件
+// 3D BIM 管理器單例物件 (支援 100,000 米超廣闊視野與完全 360° 球面旋轉)
 const bim3DManager = {
   scene: null,
   camera: null,
@@ -5810,14 +5993,15 @@ const bim3DManager = {
     const width = containerEl.clientWidth || 800;
     const height = containerEl.clientHeight || 520;
 
-    // 1. 場景
+    // 1. 場景 (徹底移除霧氣限制，讓百米超高大樓與全區地平線清晰展現)
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x0F172A);
-    this.scene.fog = new THREE.FogExp2(0x0F172A, 0.025);
+    this.scene.fog = null; // 零距離霧氣阻擋
 
-    // 2. 相機
-    this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    this.camera.position.set(2.8, 2.5, 4.2);
+    // 2. 相機 (遠裁剪面拓展至 100,000 米，可同時鳥瞰 4 棟 30 層大樓乃至整個都市基地)
+    const fov = state.bimWideFov ? 65 : 45;
+    this.camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 100000);
+    this.camera.position.set(200, 150, 250);
 
     // 3. 渲染器
     this.renderer = new THREE.WebGLRenderer({
@@ -5831,7 +6015,7 @@ const bim3DManager = {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
 
-    // 4. OrbitControls 空間軌道控制器 (無死角全角度球面旋轉)
+    // 4. OrbitControls 空間軌道控制器 (無死角全角度球面旋轉 + 拓展最大縮放距離至 100,000 米)
     if (typeof THREE.OrbitControls !== 'undefined') {
       this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
       this.controls.enableDamping = true;
@@ -5839,40 +6023,38 @@ const bim3DManager = {
       this.controls.screenSpacePanning = true;
       this.controls.enableRotate = true;
       this.controls.rotateSpeed = 0.95;
-      this.controls.minDistance = 0.1;
-      this.controls.maxDistance = 150;
-      // 核心升級：解除任何上下角度限制，允許 0 ~ 180° 完全從頂俯視到由底仰視！
+      this.controls.minDistance = 0.05;
+      this.controls.maxDistance = 100000; // 允許縮小至 100 公里外鳥瞰！
       this.controls.minPolarAngle = 0;
       this.controls.maxPolarAngle = Math.PI;
       this.controls.minAzimuthAngle = -Infinity;
       this.controls.maxAzimuthAngle = Infinity;
-      // 旋轉中心點嚴格鎖定於 (0, 0, 0)
       this.controls.target.set(0, 0, 0);
     }
 
     // 5. 建築光影 (上下左右多光源照射，確保從任何仰視俯視角度都有清晰光澤)
-    const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.8);
+    const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.85);
     this.scene.add(ambientLight);
 
     const dirLightTop = new THREE.DirectionalLight(0xFFFFFF, 0.95);
-    dirLightTop.position.set(6, 12, 8);
+    dirLightTop.position.set(150, 300, 200);
     this.scene.add(dirLightTop);
 
     const dirLightBtm = new THREE.DirectionalLight(0xFFFFFF, 0.65);
-    dirLightBtm.position.set(-6, -10, -6);
+    dirLightBtm.position.set(-150, -200, -150);
     this.scene.add(dirLightBtm);
 
     const fillLight = new THREE.DirectionalLight(0x38BDF8, 0.45);
-    fillLight.position.set(-6, 2, -6);
+    fillLight.position.set(-150, 50, -150);
     this.scene.add(fillLight);
 
     const rimLight = new THREE.DirectionalLight(0xFFFFFF, 0.4);
-    rimLight.position.set(0, 6, -8);
+    rimLight.position.set(0, 150, -250);
     this.scene.add(rimLight);
 
     // 6. 基準格線 (Grid)
-    this.grid = new THREE.GridHelper(12, 12, 0x38BDF8, 0x334155);
-    this.grid.position.y = -1.8;
+    this.grid = new THREE.GridHelper(300, 30, 0x38BDF8, 0x334155);
+    this.grid.position.y = -1;
     this.grid.visible = state.bimShowGrid !== false;
     this.scene.add(this.grid);
 
@@ -5960,6 +6142,10 @@ const bim3DManager = {
       this.currentGroup = buildCurtainWallU001Group();
       this.scene.add(this.currentGroup);
       this.fitModelAndCenterPivot(this.currentGroup);
+    } else if (type === 'mega_towers') {
+      this.currentGroup = buildFourTowersMegaProjectGroup();
+      this.scene.add(this.currentGroup);
+      this.fitModelAndCenterPivot(this.currentGroup);
     } else if (type === 'rc_structure') {
       this.currentGroup = buildRcStructureGroup();
       this.scene.add(this.currentGroup);
@@ -5975,7 +6161,7 @@ const bim3DManager = {
     this.applyWireframe();
   },
 
-  // 🎯 核心升級：將旋轉中心點嚴格鎖定在模型正中心，完全解決旋轉偏心與參考面遮蔽問題
+  // 🎯 核心升級：大視野自動運算演算法 (支援 4 棟 30 層大樓超大基地或大型 IFC 全景視圖)
   fitModelAndCenterPivot(group) {
     if (!group || !this.scene) return;
 
@@ -5984,7 +6170,7 @@ const bim3DManager = {
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
 
-    // 2. 將模型的物理中心平移至 (0, 0, 0)
+    // 2. 將模型的物理重心嚴格平移至 (0, 0, 0)
     group.position.sub(center);
 
     // 3. 將 OrbitControls 的旋轉中心點直接設在 (0, 0, 0)
@@ -5992,20 +6178,32 @@ const bim3DManager = {
       this.controls.target.set(0, 0, 0);
     }
 
-    // 4. 動態調整基準參考網格位置：貼齊模型底部下方，且依模型尺寸自適應縮放
+    // 4. 動態調整基準參考網格位置與範圍 (自適應百米大樓或小構件)
     if (this.grid) {
       const bottomY = -size.y / 2 - 0.05;
       this.grid.position.set(0, bottomY, 0);
-      const span = Math.max(size.x, size.z, 4);
-      this.grid.scale.set(span / 6, 1, span / 6);
+      const span = Math.max(size.x, size.z, 20);
+      this.grid.scale.set(span / 10, 1, span / 10);
       this.grid.visible = state.bimShowGrid !== false;
     }
 
-    // 5. 最佳觀測相機距離與視角
+    // 5. 自動自適應計算相機距離 (依據包圍盒最大維度與視角 FOV 精確運算，保證 100% 完整容納全景全貌)
     if (this.camera && this.controls) {
-      const maxDim = Math.max(size.x, size.y, size.z) || 3;
-      this.camera.position.set(maxDim * 1.25, maxDim * 0.85, maxDim * 1.55);
+      const maxDim = Math.max(size.x, size.y, size.z) || 10;
+      const fovRad = (this.camera.fov * Math.PI) / 180;
+      let fitDist = (maxDim / 2) / Math.tan(fovRad / 2) * 1.45;
+      fitDist = Math.max(fitDist, 4);
+
+      // 動態更新近遠裁剪面，防止微縮模型或超大基地破面 (遠裁剪面可達 100,000 米)
+      this.camera.near = Math.max(0.1, maxDim / 10000);
+      this.camera.far = Math.max(100000, maxDim * 50);
+      this.camera.updateProjectionMatrix();
+
+      this.camera.position.set(fitDist * 0.95, fitDist * 0.65, fitDist * 1.15);
       this.camera.lookAt(0, 0, 0);
+
+      this.controls.minDistance = Math.max(0.05, maxDim / 5000);
+      this.controls.maxDistance = Math.max(100000, maxDim * 50);
       this.controls.update();
     }
   },
@@ -6268,6 +6466,16 @@ window.appActions = {
       bim3DManager.grid.visible = state.bimShowGrid;
     }
     state.toastMessage = state.bimShowGrid ? '📏 參考網格已開啟' : '📏 參考網格已隱藏';
+    renderApp();
+  },
+
+  toggleBimWideFov() {
+    state.bimWideFov = !state.bimWideFov;
+    if (bim3DManager.camera) {
+      bim3DManager.camera.fov = state.bimWideFov ? 65 : 45;
+      bim3DManager.camera.updateProjectionMatrix();
+    }
+    state.toastMessage = state.bimWideFov ? '🔭 已切換為超廣角全景視野 (65°)' : '🔭 已還原為標準視角 (45°)';
     renderApp();
   },
 
