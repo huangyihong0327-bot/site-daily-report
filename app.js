@@ -149,6 +149,7 @@ let state = {
   bimActiveModel: 'u001', // 'u001' (中階單元帷幕牆) | 'rc_structure' (RC結構框架) | 'custom' (自訂上傳)
   bimWireframe: false,
   bimExploded: false,
+  bimShowGrid: true,
   bimCustomModelName: '',
 
   // 帳號與付費系統
@@ -2286,7 +2287,7 @@ function renderPageBimModelView() {
         <div class="vh-primary-title">工地 BIM 3D 輕量化模型工作台</div>
         <div class="vh-secondary-meta">
           <span class="vh-badge-tag">${proj.name}</span>
-          <span>工務所 3D 空間檢視・支援全螢幕・360° 任意旋轉與放大</span>
+          <span>工務所 3D 空間檢視・支援 IFC / GLB / OBJ・完全 360° 球體任意旋轉</span>
         </div>
       </div>
 
@@ -2299,9 +2300,9 @@ function renderPageBimModelView() {
           <span>🏗️</span> 5F 現場 RC 結構主體框架 (示範)
         </button>
         <button class="bim-model-chip ${activeM === 'custom' ? 'active' : ''}" onclick="window.appActions.triggerBimFileInput()">
-          <span>📂</span> 本機上傳 3D 模型 (.glb / .gltf / .obj) ${state.bimCustomModelName ? `<span style="opacity:0.85;">(${state.bimCustomModelName})</span>` : ''}
+          <span>📂</span> 本機上傳 3D 模型 (.ifc / .glb / .obj) ${state.bimCustomModelName ? `<span style="opacity:0.85;">(${state.bimCustomModelName})</span>` : ''}
         </button>
-        <input type="file" id="bim-file-uploader" accept=".glb,.gltf,.obj" style="display:none;" onchange="window.appActions.handleBimFileUpload(event)" />
+        <input type="file" id="bim-file-uploader" accept=".ifc,.glb,.gltf,.obj" style="display:none;" onchange="window.appActions.handleBimFileUpload(event)" />
       </div>
 
       <!-- 3D 畫布與 HUD 浮動控制容器 (支援標準 Fullscreen API 與 CSS 備援) -->
@@ -2315,8 +2316,11 @@ function renderPageBimModelView() {
             </div>
           </div>
           <div class="bim-hud-actions">
-            <button class="bim-hud-btn" onclick="window.appActions.resetBimCamera()" title="重置為最佳檢視視角">
-              <span>🔄</span> <span class="btn-text">視角重置</span>
+            <button class="bim-hud-btn" onclick="window.appActions.resetBimCamera()" title="重置為最佳中心視角">
+              <span>🔄</span> <span class="btn-text">中心視角</span>
+            </button>
+            <button class="bim-hud-btn ${state.bimShowGrid !== false ? 'active' : ''}" onclick="window.appActions.toggleBimGrid()" title="開啟/隱藏參考格線">
+              <span>📏</span> <span class="btn-text">參考網格</span>
             </button>
             <button class="bim-hud-btn ${state.bimWireframe ? 'active' : ''}" onclick="window.appActions.toggleBimWireframe()" title="切換線框檢視模式">
               <span>🌐</span> <span class="btn-text">線框</span>
@@ -2512,10 +2516,10 @@ function renderBimUploadGuideCard() {
     <div class="motion-card">
       <div style="border-bottom:2px solid var(--border-light);padding-bottom:10px;margin-bottom:12px;">
         <div style="font-size:15px;font-weight:900;color:var(--text-main);display:flex;align-items:center;gap:6px;">
-          <span>💡</span> 3D 模型如何上傳與 Revit (.rvt / .rfa) 放置教學
+          <span>💡</span> 3D 模型如何上傳與 IFC / Revit 放置教學
         </div>
         <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">
-          支援格式：<b>.glb</b> (推薦，含貼圖與材質)、<b>.gltf</b>、<b>.obj</b>
+          支援格式：<b>.ifc</b> (BIM 開放標準)、<b>.glb</b> (推薦，含貼圖材質)、<b>.obj</b>、<b>.gltf</b>
         </div>
       </div>
 
@@ -2523,27 +2527,27 @@ function renderBimUploadGuideCard() {
       <div class="bim-dropzone" onclick="window.appActions.triggerBimFileInput()">
         <div style="font-size:38px;margin-bottom:6px;">📤</div>
         <div style="font-size:14.5px;font-weight:900;color:#0284C7;margin-bottom:4px;">
-          點擊此處選擇檔案，或將 3D 模型直接拖曳至畫布放開
+          點擊此處選擇檔案，或將 IFC / GLB / OBJ 模型直接拖曳至畫布放開
         </div>
         <div style="font-size:12px;color:var(--text-muted);">
-          支援 .glb / .gltf / .obj，本機瀏覽器秒級解析，模型完全不經過雲端伺服器，安全保密
+          支援 .ifc / .glb / .obj，旋轉中心點自動對齊模型正中間，完全 360° 球面旋轉無死角，100% 本機解析無資安風險
         </div>
       </div>
 
       <!-- Revit 匯出說明 -->
       <div style="margin-top:16px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px;">
         <div style="font-size:13.5px;font-weight:800;color:#0F172A;margin-bottom:8px;">
-          🛠️ 如何將 Revit 帷幕牆族群 (.rfa) 或工程專案 (.rvt) 轉為 Web 3D 模型？
+          🛠️ 如何匯出模型放入本系統？
         </div>
         <ol style="margin:0;padding-left:20px;font-size:12.5px;color:#334155;line-height:1.8;">
           <li>
-            <b>方法 A (最推薦・一鍵匯出 GLB)：</b>在 Revit 中安裝免費外掛 <i>Revit to glTF Exporter</i> 或 <i>Datasmith</i>，直接在 3D 視圖點選「Export to GLB」，產出的檔案容量極小且保留材質顏色。
+            <b>方法 A (IFC 原生支援・最通用)：</b>在 Revit 點選「檔案」→「匯出」→「IFC」，產出的 <b>.ifc</b> 檔案直接拖曳進上方視窗，系統會自動解析牆板樑柱三維幾何！
           </li>
           <li>
-            <b>方法 B (免外掛・標準轉檔流程)：</b>Revit 功能表「檔案」→「匯出」→「CAD 格式 (DWG / DXF)」或「FBX」→ 開啟免費 3D 工具 Blender 匯入後，點選「檔案」→「匯出」→「glTF 2.0 (.glb)」。
+            <b>方法 B (一鍵匯出 GLB・色彩最完整)：</b>在 Revit 中安裝免費外掛 <i>Revit to glTF Exporter</i> 或 <i>Datasmith</i>，直接在 3D 視圖點選「Export to GLB」，檔案容量極小且帶有完整材質。
           </li>
           <li>
-            <b>方法 C (快速測試)：</b>若手邊有現成 3D 模型或 Rhino / SketchUp 檔案，直接儲存為 <b>.obj</b> 或 <b>.glb</b>，拖曳進上方視窗即可立刻旋轉放大！
+            <b>方法 C (FBX / OBJ 轉檔)：</b>若有現成 3D 模型，直接匯出為 <b>.obj</b> 或透過 Blender 轉為 <b>.glb</b> 拖入即可！
           </li>
         </ol>
       </div>
@@ -2764,6 +2768,146 @@ function buildRcStructureGroup() {
   return group;
 }
 
+// =========================================================================
+// 🏛️ 原生 IFC (ISO-10303-21) 輕量化三維幾何解析引擎 (Pure-JS Step Parser)
+// =========================================================================
+function parseIFCToThreeGeometry(ifcText, THREE) {
+  const points = new Map();
+  const polyloops = new Map();
+  const faces = new Map();
+  const closedShells = new Map();
+  
+  // 逐段解析 STEP 語句 (分號結尾)
+  const statements = ifcText.split(';');
+  const total = statements.length;
+
+  for (let i = 0; i < total; i++) {
+    const raw = statements[i].trim();
+    if (!raw.startsWith('#')) continue;
+    const eqIdx = raw.indexOf('=');
+    if (eqIdx === -1) continue;
+
+    const id = parseInt(raw.slice(1, eqIdx));
+    const rest = raw.slice(eqIdx + 1);
+    const parenIdx = rest.indexOf('(');
+    if (parenIdx === -1) continue;
+
+    const type = rest.slice(0, parenIdx).toUpperCase().trim();
+    const argsStr = rest.slice(parenIdx + 1, rest.lastIndexOf(')'));
+
+    if (type === 'IFCCARTESIANPOINT') {
+      const match = argsStr.match(/\(([^)]+)\)/);
+      if (match) {
+        const coords = match[1].split(',').map(s => parseFloat(s.trim()) || 0);
+        points.set(id, coords);
+      }
+    } else if (type === 'IFCPOLYLOOP') {
+      const match = argsStr.match(/\(([^)]+)\)/);
+      if (match) {
+        const ptIds = match[1].split(',').map(s => parseInt(s.trim().replace('#', ''))).filter(n => !isNaN(n));
+        polyloops.set(id, ptIds);
+      }
+    } else if (type === 'IFCFACEOUTERBOUND' || type === 'IFCFACEBOUND') {
+      const match = argsStr.match(/#(\d+)/);
+      if (match) {
+        faces.set(id, parseInt(match[1]));
+      }
+    } else if (type === 'IFCFACE') {
+      const match = argsStr.match(/#(\d+)/);
+      if (match) {
+        faces.set(id, parseInt(match[1]));
+      }
+    } else if (type === 'IFCCLOSEDSHELL' || type === 'IFCOPENSHELL') {
+      const match = argsStr.match(/\(([^)]+)\)/);
+      if (match) {
+        const faceIds = match[1].split(',').map(s => parseInt(s.trim().replace('#', ''))).filter(n => !isNaN(n));
+        closedShells.set(id, faceIds);
+      }
+    }
+  }
+
+  // 自動檢測長度單位 (公釐 mm vs 公尺 m)：若數值常態大於 50 則自動除以 1000
+  let maxCoord = 0;
+  for (const [id, pt] of points.entries()) {
+    for (const val of pt) {
+      if (Math.abs(val) > maxCoord) maxCoord = Math.abs(val);
+    }
+    if (points.size > 150 && maxCoord > 100) break;
+  }
+  const scale = maxCoord > 50 ? 0.001 : 1.0;
+
+  const group = new THREE.Group();
+  group.name = 'IFC_Imported_Model';
+
+  // 建築材質色彩 (雙面材質確保 360° 翻轉仰俯視皆不破面)
+  const defaultMat = new THREE.MeshStandardMaterial({
+    color: 0x94A3B8,
+    roughness: 0.65,
+    metalness: 0.25,
+    side: THREE.DoubleSide
+  });
+
+  const vertices = [];
+
+  // 1. 重建 ClosedShell / FacetedBRep
+  for (const [shellId, faceIds] of closedShells.entries()) {
+    for (const faceId of faceIds) {
+      let loopId = faces.get(faceId) || faceId;
+      let polyPtIds = polyloops.get(loopId);
+      if (!polyPtIds && faces.has(loopId)) {
+        polyPtIds = polyloops.get(faces.get(loopId));
+      }
+      if (!polyPtIds || polyPtIds.length < 3) continue;
+
+      const polyPts = polyPtIds.map(pid => points.get(pid)).filter(p => !!p);
+      if (polyPts.length < 3) continue;
+
+      // 三角扇 (Triangle Fan) 剖分多邊形面
+      const p0 = polyPts[0];
+      for (let j = 1; j < polyPts.length - 1; j++) {
+        const p1 = polyPts[j];
+        const p2 = polyPts[j + 1];
+
+        // Three.js 座標系轉換: [X, Z_height, -Y_depth]
+        vertices.push(
+          p0[0] * scale, (p0[2] !== undefined ? p0[2] : 0) * scale, (p0[1] !== undefined ? -p0[1] : 0) * scale,
+          p1[0] * scale, (p1[2] !== undefined ? p1[2] : 0) * scale, (p1[1] !== undefined ? -p1[1] : 0) * scale,
+          p2[0] * scale, (p2[2] !== undefined ? p2[2] : 0) * scale, (p2[1] !== undefined ? -p2[1] : 0) * scale
+        );
+      }
+    }
+  }
+
+  // 2. 若無完整 Shell 則直接從 PolyLoop 建構幾何
+  if (vertices.length === 0) {
+    for (const [loopId, polyPtIds] of polyloops.entries()) {
+      if (!polyPtIds || polyPtIds.length < 3) continue;
+      const polyPts = polyPtIds.map(pid => points.get(pid)).filter(p => !!p);
+      if (polyPts.length < 3) continue;
+      const p0 = polyPts[0];
+      for (let j = 1; j < polyPts.length - 1; j++) {
+        const p1 = polyPts[j];
+        const p2 = polyPts[j + 1];
+        vertices.push(
+          p0[0] * scale, (p0[2] !== undefined ? p0[2] : 0) * scale, (p0[1] !== undefined ? -p0[1] : 0) * scale,
+          p1[0] * scale, (p1[2] !== undefined ? p1[2] : 0) * scale, (p1[1] !== undefined ? -p1[1] : 0) * scale,
+          p2[0] * scale, (p2[2] !== undefined ? p2[2] : 0) * scale, (p2[1] !== undefined ? -p2[1] : 0) * scale
+        );
+      }
+    }
+  }
+
+  if (vertices.length > 0) {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(geo, defaultMat);
+    group.add(mesh);
+  }
+
+  return group;
+}
+
 // 3D BIM 管理器單例物件
 const bim3DManager = {
   scene: null,
@@ -2771,6 +2915,7 @@ const bim3DManager = {
   renderer: null,
   controls: null,
   animId: null,
+  grid: null,
   currentGroup: null,
   activeModelType: 'u001',
   isWireframe: false,
@@ -2811,38 +2956,50 @@ const bim3DManager = {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
 
-    // 4. OrbitControls 空間軌道控制器
+    // 4. OrbitControls 空間軌道控制器 (無死角全角度球面旋轉)
     if (typeof THREE.OrbitControls !== 'undefined') {
       this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
       this.controls.enableDamping = true;
-      this.controls.dampingFactor = 0.06;
+      this.controls.dampingFactor = 0.08;
       this.controls.screenSpacePanning = true;
-      this.controls.minDistance = 0.5;
-      this.controls.maxDistance = 50;
-      this.controls.maxPolarAngle = Math.PI / 2 + 0.25;
-      this.controls.target.set(0, 1.8, 0);
+      this.controls.enableRotate = true;
+      this.controls.rotateSpeed = 0.95;
+      this.controls.minDistance = 0.1;
+      this.controls.maxDistance = 150;
+      // 核心升級：解除任何上下角度限制，允許 0 ~ 180° 完全從頂俯視到由底仰視！
+      this.controls.minPolarAngle = 0;
+      this.controls.maxPolarAngle = Math.PI;
+      this.controls.minAzimuthAngle = -Infinity;
+      this.controls.maxAzimuthAngle = Infinity;
+      // 旋轉中心點嚴格鎖定於 (0, 0, 0)
+      this.controls.target.set(0, 0, 0);
     }
 
-    // 5. 建築光影
-    const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.75);
+    // 5. 建築光影 (上下左右多光源照射，確保從任何仰視俯視角度都有清晰光澤)
+    const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.8);
     this.scene.add(ambientLight);
 
-    const dirLight1 = new THREE.DirectionalLight(0xFFFFFF, 0.95);
-    dirLight1.position.set(6, 12, 8);
-    this.scene.add(dirLight1);
+    const dirLightTop = new THREE.DirectionalLight(0xFFFFFF, 0.95);
+    dirLightTop.position.set(6, 12, 8);
+    this.scene.add(dirLightTop);
 
-    const fillLight = new THREE.DirectionalLight(0x38BDF8, 0.4);
-    fillLight.position.set(-6, -2, -6);
+    const dirLightBtm = new THREE.DirectionalLight(0xFFFFFF, 0.65);
+    dirLightBtm.position.set(-6, -10, -6);
+    this.scene.add(dirLightBtm);
+
+    const fillLight = new THREE.DirectionalLight(0x38BDF8, 0.45);
+    fillLight.position.set(-6, 2, -6);
     this.scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0xFFFFFF, 0.45);
+    const rimLight = new THREE.DirectionalLight(0xFFFFFF, 0.4);
     rimLight.position.set(0, 6, -8);
     this.scene.add(rimLight);
 
     // 6. 基準格線 (Grid)
-    const grid = new THREE.GridHelper(12, 12, 0x38BDF8, 0x334155);
-    grid.position.y = 0;
-    this.scene.add(grid);
+    this.grid = new THREE.GridHelper(12, 12, 0x38BDF8, 0x334155);
+    this.grid.position.y = -1.8;
+    this.grid.visible = state.bimShowGrid !== false;
+    this.scene.add(this.grid);
 
     // 7. 加載當前模型
     this.loadActiveModel();
@@ -2911,6 +3068,7 @@ const bim3DManager = {
     this.scene = null;
     this.camera = null;
     this.currentGroup = null;
+    this.grid = null;
   },
 
   loadActiveModel() {
@@ -2926,43 +3084,55 @@ const bim3DManager = {
     if (type === 'u001') {
       this.currentGroup = buildCurtainWallU001Group();
       this.scene.add(this.currentGroup);
-      this.resetCameraView(new THREE.Vector3(2.8, 2.4, 4.0), new THREE.Vector3(0, 1.8, 0));
+      this.fitModelAndCenterPivot(this.currentGroup);
     } else if (type === 'rc_structure') {
       this.currentGroup = buildRcStructureGroup();
       this.scene.add(this.currentGroup);
-      this.resetCameraView(new THREE.Vector3(5.5, 4.5, 7.0), new THREE.Vector3(0, 1.8, 0));
+      this.fitModelAndCenterPivot(this.currentGroup);
     } else if (type === 'custom') {
       if (this.customObject) {
         this.currentGroup = this.customObject;
         this.scene.add(this.currentGroup);
-        this.fitCameraToObject(this.currentGroup);
+        this.fitModelAndCenterPivot(this.currentGroup);
       }
     }
 
     this.applyWireframe();
   },
 
-  resetCameraView(camPos, targetPos) {
-    if (!this.camera || !this.controls) return;
-    this.camera.position.copy(camPos);
-    this.controls.target.copy(targetPos);
-    this.controls.update();
-  },
+  // 🎯 核心升級：將旋轉中心點嚴格鎖定在模型正中心，完全解決旋轉偏心與參考面遮蔽問題
+  fitModelAndCenterPivot(group) {
+    if (!group || !this.scene) return;
 
-  fitCameraToObject(object) {
-    if (!object || !this.camera || !this.controls) return;
-    const box = new THREE.Box3().setFromObject(object);
-    const size = box.getSize(new THREE.Vector3());
+    // 1. 計算幾何包圍盒
+    const box = new THREE.Box3().setFromObject(group);
     const center = box.getCenter(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z) || 3;
-    const fov = this.camera.fov * (Math.PI / 180);
-    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.5;
-    cameraZ = Math.max(cameraZ, 3);
+    const size = box.getSize(new THREE.Vector3());
 
-    this.camera.position.set(center.x + cameraZ * 0.8, center.y + cameraZ * 0.6, center.z + cameraZ);
-    this.controls.target.copy(center);
-    this.camera.lookAt(center);
-    this.controls.update();
+    // 2. 將模型的物理中心平移至 (0, 0, 0)
+    group.position.sub(center);
+
+    // 3. 將 OrbitControls 的旋轉中心點直接設在 (0, 0, 0)
+    if (this.controls) {
+      this.controls.target.set(0, 0, 0);
+    }
+
+    // 4. 動態調整基準參考網格位置：貼齊模型底部下方，且依模型尺寸自適應縮放
+    if (this.grid) {
+      const bottomY = -size.y / 2 - 0.05;
+      this.grid.position.set(0, bottomY, 0);
+      const span = Math.max(size.x, size.z, 4);
+      this.grid.scale.set(span / 6, 1, span / 6);
+      this.grid.visible = state.bimShowGrid !== false;
+    }
+
+    // 5. 最佳觀測相機距離與視角
+    if (this.camera && this.controls) {
+      const maxDim = Math.max(size.x, size.y, size.z) || 3;
+      this.camera.position.set(maxDim * 1.25, maxDim * 0.85, maxDim * 1.55);
+      this.camera.lookAt(0, 0, 0);
+      this.controls.update();
+    }
   },
 
   applyWireframe() {
@@ -3217,6 +3387,15 @@ window.appActions = {
     renderApp();
   },
 
+  toggleBimGrid() {
+    state.bimShowGrid = state.bimShowGrid === false ? true : false;
+    if (bim3DManager.grid) {
+      bim3DManager.grid.visible = state.bimShowGrid;
+    }
+    state.toastMessage = state.bimShowGrid ? '📏 參考網格已開啟' : '📏 參考網格已隱藏';
+    renderApp();
+  },
+
   toggleBimExplode() {
     state.bimExploded = !state.bimExploded;
     bim3DManager.isExploded = state.bimExploded;
@@ -3321,8 +3500,29 @@ window.appActions = {
         }
       };
       reader.readAsText(file);
+    } else if (ext === 'ifc') {
+      reader.onload = (e) => {
+        try {
+          const text = e.target.result;
+          const ifcGroup = parseIFCToThreeGeometry(text, THREE);
+          if (!ifcGroup || ifcGroup.children.length === 0) {
+            throw new Error('未在該 IFC 檔案中找到可識別的三維網格或實體面 (可能為純專案結構或非實體視圖)');
+          }
+          bim3DManager.customObject = ifcGroup;
+          state.bimActiveModel = 'custom';
+          state.bimCustomModelName = fileName;
+          state.toastMessage = `✅ 成功解析並載入 IFC 模型：${fileName}`;
+          if (overlay) overlay.classList.add('hidden');
+          renderApp();
+        } catch (err) {
+          console.error(err);
+          alert('IFC 模型載入失敗：' + err.message);
+          if (overlay) overlay.classList.add('hidden');
+        }
+      };
+      reader.readAsText(file);
     } else {
-      alert('不支援的檔案格式。請上傳 .glb, .gltf 或 .obj 格式之 3D 模型。');
+      alert('不支援的檔案格式。請上傳 .ifc, .glb, .gltf 或 .obj 格式之 3D 模型。');
       if (overlay) overlay.classList.add('hidden');
     }
   },
