@@ -124,7 +124,9 @@ function generateSampleReportsForProject(proj, count = 20) {
 let state = {
   deviceMode: localStorage.getItem('site_report_device_mode') || 'auto', // 'auto' | 'pc' | 'mobile'
   activeBottomTab: 'home', // 'home' | 'report' | 'stats' | 'model' | 'settings' | 'checkout'
-  statsFilterRange: 'all', // 'all' | 'week' | 'month' | 'quarter' | 'last30'
+  statsFilterRange: 'all',
+  statsCustomStartDate: '',
+  statsCustomEndDate: '', // 'all' | 'week' | 'month' | 'quarter' | 'last30'
   mountainChartMode: 'workers', // 'workers' (出工人力) | 'machinery' (進場機具) | 'combined' (綜合負載)
   showExportActionSheet: false,
   selectedDayDetail: null,
@@ -1251,18 +1253,27 @@ function renderPage07DailyReportAndA4(proj, rep) {
 }
 
 // =========================================================================
-// 📊 專案總報表 (括號文字拿掉、提示文字改為「(左右滑動檢視)」單行不換行、分類簡化)
+// 📊 專案總體分析與資源配置總報表 (含專業公文 A4 總報表輸出與自訂時間區間)
 // =========================================================================
 function renderPageStatsView() {
   const proj = getActiveProject();
   const allReports = [...(proj.reports || [])].sort((a, b) => a.reportDateISO.localeCompare(b.reportDateISO));
   
-  // 依選擇的區間篩選日報
+  // 依選擇的區間篩選日報 (支援：全工期、本週、本月、本季、近30天、自訂時間區間)
   const range = state.statsFilterRange || 'all';
   const now = new Date();
-  
+
+  // 若未設定自訂時間，預設為第一天至最後一天
+  const defaultStart = allReports.length > 0 ? allReports[0].reportDateISO : '2026-10-01';
+  const defaultEnd = allReports.length > 0 ? allReports[allReports.length - 1].reportDateISO : '2026-10-25';
+  const customStart = state.statsCustomStartDate || defaultStart;
+  const customEnd = state.statsCustomEndDate || defaultEnd;
+
   const filteredReports = allReports.filter(rep => {
     if (range === 'all') return true;
+    if (range === 'custom') {
+      return rep.reportDateISO >= customStart && rep.reportDateISO <= customEnd;
+    }
     const repDate = new Date(rep.reportDateISO);
     if (range === 'last30') {
       const diffDays = (now - repDate) / (1000 * 60 * 60 * 24);
@@ -1291,20 +1302,68 @@ function renderPageStatsView() {
 
   const reports = filteredReports.length > 0 ? filteredReports : allReports;
 
-  const totalWorkers = reports.reduce((acc, rep) => {
-    return acc + rep.tradeRecords.filter(r => r.category === 'workers').reduce((s, r) => s + getTodayQty(r), 0);
-  }, 0);
+  // 1. 核心數據指標匯總計算
+  let totalWorkers = 0;
+  let totalMachines = 0;
+  let peakWorkers = 0;
+  let peakWorkerDay = '無紀錄';
+  let sunnyDays = 0;
+  let rainyDays = 0;
 
-  const totalMachines = reports.reduce((acc, rep) => {
-    return acc + rep.tradeRecords.filter(r => r.category === 'machinery').reduce((s, r) => s + getTodayQty(r), 0);
-  }, 0);
+  // 各工種出工匯總 Map
+  const tradeAccumMap = {};
+  const machineAccumMap = {};
+
+  reports.forEach(r => {
+    const dayWorkers = r.tradeRecords.filter(t => t.category === 'workers');
+    const dayMachines = r.tradeRecords.filter(t => t.category === 'machinery');
+    
+    let dayTotalW = 0;
+    dayWorkers.forEach(w => {
+      const qty = getTodayQty(w);
+      dayTotalW += qty;
+      if (!tradeAccumMap[w.name]) {
+        tradeAccumMap[w.name] = { name: w.name, unit: w.unit, total: 0, peak: 0, note: w.todayWorkNote || '' };
+      }
+      tradeAccumMap[w.name].total += qty;
+      tradeAccumMap[w.name].peak = Math.max(tradeAccumMap[w.name].peak, qty);
+    });
+
+    dayMachines.forEach(m => {
+      const qty = getTodayQty(m);
+      totalMachines += qty;
+      if (!machineAccumMap[m.name]) {
+        machineAccumMap[m.name] = { name: m.name, unit: m.unit, total: 0, peak: 0 };
+      }
+      machineAccumMap[m.name].total += qty;
+      machineAccumMap[m.name].peak = Math.max(machineAccumMap[m.name].peak, qty);
+    });
+
+    totalWorkers += dayTotalW;
+    if (dayTotalW > peakWorkers) {
+      peakWorkers = dayTotalW;
+      peakWorkerDay = r.reportDateISO;
+    }
+
+    if (r.weatherAM === '晴' || r.weatherPM === '晴') sunnyDays++;
+    if (r.weatherAM === '雨' || r.weatherPM === '雨') rainyDays++;
+  });
+
+  const sortedTrades = Object.values(tradeAccumMap).sort((a, b) => b.total - a.total);
+  const sortedMachines = Object.values(machineAccumMap).sort((a, b) => b.total - a.total);
+
+  const avgDailyWorkers = reports.length > 0 ? (totalWorkers / reports.length).toFixed(1) : '0';
+  const rangeDaysCount = reports.length;
+  const activeStart = reports.length > 0 ? reports[0].reportDateISO : customStart;
+  const activeEnd = reports.length > 0 ? reports[reports.length - 1].reportDateISO : customEnd;
 
   const rangeLabelMap = {
     all: '全工期 (' + allReports.length + '日)',
     week: '本週報表',
     month: '本月報表',
     quarter: '本季報表',
-    last30: '近 30 天'
+    last30: '近 30 天',
+    custom: '自訂時間區間 (' + activeStart + ' ～ ' + activeEnd + ')'
   };
 
   const plannedPct = Number(proj.plannedProgress || 43.5);
@@ -1319,27 +1378,27 @@ function renderPageStatsView() {
   const mountainChartSvg = buildDoubleAxisMountainSvg(reports, chartMode);
 
   return `
-    <!-- 1. 垂直主次分明標題列 (移除頂部擠壓的雙按鈕) -->
-    <div class="vertical-hierarchy-header">
-      <div class="vh-primary-title">專案總報表與區間統計</div>
+    <!-- 1. 螢幕端主次分明標題列 (no-print) -->
+    <div class="vertical-hierarchy-header no-print">
+      <div class="vh-primary-title">專案總報表與工務數據儀表板</div>
       <div class="vh-secondary-meta">
         <span class="vh-badge-tag" style="white-space:nowrap;flex-shrink:0;">${proj.name}</span>
-        <span>統計區間：<strong>${rangeLabelMap[range]}</strong></span>
+        <span>當前呈現區間：<strong style="color:var(--primary-dark);">${rangeLabelMap[range]}</strong></span>
       </div>
     </div>
 
-    <!-- 專案總報表專屬匯出按鈕列 (匯出當前選定區間之總報表) -->
+    <!-- 專案總報表專屬匯出按鈕列 (no-print) -->
     <div class="stats-export-action-bar no-print">
       <button class="stats-export-btn-pdf" onclick="window.appActions.exportStatsToPdf()">
-        <span>📄</span> 匯出總報表 (PDF)
+        <span>📄</span> 輸出正式總報表 (PDF公文格式)
       </button>
       <button class="stats-export-btn-excel" onclick="window.appActions.exportStatsToExcel()">
-        <span>📊</span> 匯出總報表 (EXCEL)
+        <span>📊</span> 匯出完整總報表 (EXCEL)
       </button>
     </div>
 
-    <!-- 頂部快速切換專案 -->
-    <div class="motion-card" style="padding:10px;">
+    <!-- 頂部快速切換專案 (no-print) -->
+    <div class="motion-card no-print" style="padding:10px;">
       <div style="font-size:12px;font-weight:800;color:var(--text-muted);margin-bottom:4px;">⚡ 快速選擇檢視專案：</div>
       <select class="native-input-box" style="height:42px;font-size:14.5px;font-weight:800;"
               onchange="window.appActions.switchStatsProject(this.value)">
@@ -1349,54 +1408,61 @@ function renderPageStatsView() {
       </select>
     </div>
 
-    <!-- 區間篩選晶片 -->
-    <div class="stats-filter-chips-row">
+    <!-- 區間篩選晶片列 (支援自訂時間區間) (no-print) -->
+    <div class="stats-filter-chips-row no-print">
       <button class="stats-filter-chip ${range === 'all' ? 'active' : ''}" onclick="window.appActions.setStatsRange('all')">全工期 (${allReports.length}日)</button>
       <button class="stats-filter-chip ${range === 'week' ? 'active' : ''}" onclick="window.appActions.setStatsRange('week')">本週報表</button>
       <button class="stats-filter-chip ${range === 'month' ? 'active' : ''}" onclick="window.appActions.setStatsRange('month')">本月報表</button>
       <button class="stats-filter-chip ${range === 'quarter' ? 'active' : ''}" onclick="window.appActions.setStatsRange('quarter')">本季報表</button>
       <button class="stats-filter-chip ${range === 'last30' ? 'active' : ''}" onclick="window.appActions.setStatsRange('last30')">近 30 天</button>
+      <button class="stats-filter-chip ${range === 'custom' ? 'active' : ''}" style="border-color:#0EA5E9;color:#0284C7;font-weight:800;" onclick="window.appActions.setStatsRange('custom')">
+        <span>📅</span> 自訂區間
+      </button>
     </div>
 
-    <!-- 2. 採用 2×2 網格卡片：放大核心數值，次列顯示輔助標籤 -->
-    <div class="kpi-matrix-2x2">
+    <!-- 自訂時間區間選擇面板 (點選自訂區間時自動展開) (no-print) -->
+    ${range === 'custom' ? `
+      <div class="custom-date-filter-box no-print">
+        <div class="custom-date-label">📅 自訂統計起訖日期：</div>
+        <div class="custom-date-inputs">
+          <input type="date" id="stats-start-date" value="${customStart}" />
+          <span style="font-weight:800;color:var(--text-muted);">至</span>
+          <input type="date" id="stats-end-date" value="${customEnd}" />
+          <button class="btn-nowrap-action" style="height:38px;padding:0 12px;font-size:12.5px;" onclick="window.appActions.applyCustomDateRange()">
+            🔍 套用查詢
+          </button>
+        </div>
+      </div>
+    ` : ''}
+
+    <!-- 2. 4 大核心營建工程指針 KPI 矩陣 (no-print) -->
+    <div class="kpi-matrix-2x2 no-print">
       <div class="kpi-matrix-card">
-        <span class="kpi-matrix-label">總出工總結</span>
+        <span class="kpi-matrix-label">👷 區間總出工數</span>
         <span class="kpi-matrix-val" style="color:var(--accent-cta);">${totalWorkers} <span style="font-size:13px;color:var(--text-muted);">人·日</span></span>
-        <span class="kpi-matrix-sub">日均出工：${Math.round(totalWorkers / Math.max(1, reports.length))} 人</span>
+        <span class="kpi-matrix-sub">日均出工：${avgDailyWorkers} 人 ｜ 峰值：${peakWorkers} 人</span>
       </div>
       <div class="kpi-matrix-card">
-        <span class="kpi-matrix-label">進場機具總計</span>
+        <span class="kpi-matrix-label">🚜 重機具動員總計</span>
         <span class="kpi-matrix-val" style="color:var(--primary-dark);">${totalMachines} <span style="font-size:13px;color:var(--text-muted);">台·班</span></span>
-        <span class="kpi-matrix-sub">運轉稼動率：${reports.length > 0 ? '88%' : '0%'}</span>
+        <span class="kpi-matrix-sub">出動機具種類：${sortedMachines.length} 款 ｜ 稼動率：92%</span>
       </div>
       <div class="kpi-matrix-card">
-        <span class="kpi-matrix-label">統計區間天數</span>
-        <span class="kpi-matrix-val" style="color:var(--primary);">${reports.length} <span style="font-size:13px;color:var(--text-muted);">日</span></span>
-        <span class="kpi-matrix-sub">累積日報填報完整</span>
+        <span class="kpi-matrix-label">📈 合約與進度分析</span>
+        <span class="kpi-matrix-val" style="color:${isAhead ? '#059669' : '#DC2626'};">${actualPct}% <span style="font-size:12px;">(預定 ${plannedPct}%)</span></span>
+        <span class="kpi-matrix-sub">進度差值：<strong style="color:${isAhead ? '#059669' : '#DC2626'};">${isAhead ? '+' : ''}${diffPct}% (${isAhead ? '超前' : '落後'})</strong></span>
       </div>
       <div class="kpi-matrix-card">
-        <span class="kpi-matrix-label">契約工期進度</span>
-        <span class="kpi-matrix-val" style="color:var(--text-main);">${Math.round((usedDays/contractDays)*100)}%</span>
-        <span class="kpi-matrix-sub">已用 ${usedDays}天 / 餘 ${remainDays}天</span>
+        <span class="kpi-matrix-label">⏱️ 統計工期天候</span>
+        <span class="kpi-matrix-val" style="color:var(--text-main);">${reports.length} <span style="font-size:13px;color:var(--text-muted);">日曆天</span></span>
+        <span class="kpi-matrix-sub">晴天 ${sunnyDays}日 ｜ 雨天 ${rainyDays}日 ｜ 餘 ${remainDays}天</span>
       </div>
     </div>
 
-    <!-- 落後警示全寬標註列 -->
-    <div class="variance-fullwidth-alert ${isAhead ? 'variance-ahead-alert' : ''}">
-      <div class="variance-alert-text ${isAhead ? 'variance-ahead-text' : ''}">
-        <span>${isAhead ? '⚡ 施工進度超前穩定' : '⚠️ 進度落後警示分析'}</span>
-        <span style="font-size:11px;font-weight:normal;">(預定 ${plannedPct}% ｜ 實際 ${actualPct}%)</span>
-      </div>
-      <span class="variance-alert-badge ${isAhead ? 'variance-ahead-badge' : ''}">
-        ${isAhead ? '超前 +' + diffPct + '%' : '落後 ' + Math.abs(diffPct) + '%'}
-      </span>
-    </div>
-
-    <!-- 3. 雙維度工務山積圖 (人力負荷 ＋ 施工重機具) -->
-    <div class="motion-card">
+    <!-- 3. 雙維度工務資源配置山積圖 (no-print) -->
+    <div class="motion-card no-print">
       <div style="font-size:14.5px;font-weight:900;color:var(--text-main);margin-bottom:8px;">
-        資源配置山積圖 (每日投入與累積曲線)
+        📊 資源配置山積圖 (每日投入與 S-Curve 累計曲線)
       </div>
 
       <!-- Segmented Control 切換 [出工人力] / [進場機具] / [綜合負載] -->
@@ -1408,50 +1474,240 @@ function renderPageStatsView() {
           🚜 進場機具
         </button>
         <button class="chart-seg-btn ${chartMode === 'combined' ? 'active' : ''}" onclick="window.appActions.setChartMode('combined')">
-          📈 綜合負載
+          📈 綜合負載 S-Curve
         </button>
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <span style="font-size:11px;color:var(--text-muted);">
-          點選柱體可滑出當日工種/機具細項
+          長條圖為單日投入量，藍色曲線為累積負荷
         </span>
         <span style="font-size:11px;color:var(--primary-dark);font-weight:800;">
-          左右平滑滾動檢視 ${reports.length} 日區間 ➔
+          已呈現 ${reports.length} 日區間完整數據 ➔
         </span>
       </div>
 
-      <!-- 優化滑動容器：overflow-x: auto & scroll-snap-type -->
       <div class="mountain-chart-scroll-box-smooth">
         ${mountainChartSvg}
       </div>
     </div>
 
-    <!-- 全量項目統計總表 -->
-    <div class="motion-card">
-      <div style="font-size:13.5px;font-weight:900;color:var(--text-main);margin-bottom:6px;">
-        📋 區間已填寫項目全量統計總表
+    <!-- 4. 各工種出工結構佔比儀表板 (no-print) -->
+    <div class="trade-alloc-card no-print">
+      <div style="font-size:14px;font-weight:900;color:var(--text-main);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+        <span>🍩 各工種出工投入結構排行 (共 ${totalWorkers} 人·日)</span>
+        <span style="font-size:11.5px;color:var(--text-muted);">依總工數排序</span>
+      </div>
+      <div>
+        ${sortedTrades.map(t => {
+          const pct = totalWorkers > 0 ? ((t.total / totalWorkers) * 100).toFixed(1) : 0;
+          return `
+            <div class="trade-alloc-item">
+              <div class="trade-alloc-header">
+                <span>${t.name}</span>
+                <span><strong>${t.total}</strong> ${t.unit} <span style="font-size:11px;color:var(--text-muted);font-weight:normal;">(${pct}%) ｜ 單日峰值 ${t.peak} ${t.unit}</span></span>
+              </div>
+              <div class="trade-alloc-bar-bg">
+                <div class="trade-alloc-bar-fill" style="width: ${pct}%;"></div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- 5. 區間逐日工程進度與施工日誌一覽表 (no-print) -->
+    <div class="motion-card no-print">
+      <div style="font-size:13.5px;font-weight:900;color:var(--text-main);margin-bottom:8px;">
+        📋 區間逐日施工日誌與項目統計表 (共 ${reports.length} 篇日報)
       </div>
       <div style="overflow-x:auto;">
         <table class="rep-table-grid" style="font-size:11px;margin-bottom:0;">
           <thead>
             <tr>
-              <th style="width:58px;white-space:nowrap;">分類</th>
-              <th style="white-space:nowrap;">項目名稱</th>
-              <th style="white-space:nowrap;text-align:right;">區間總計</th>
-              <th style="white-space:nowrap;text-align:right;">月均 30日</th>
-              <th style="white-space:nowrap;text-align:right;">單日峰值</th>
-              <th style="white-space:nowrap;text-align:center;">天數</th>
+              <th style="width:75px;white-space:nowrap;">日期</th>
+              <th style="width:50px;white-space:nowrap;text-align:center;">天候</th>
+              <th style="width:55px;white-space:nowrap;text-align:right;">出工數</th>
+              <th style="width:55px;white-space:nowrap;text-align:right;">機具數</th>
+              <th style="white-space:nowrap;">本日施工進度摘要</th>
+              <th style="width:55px;white-space:nowrap;text-align:center;">操作</th>
             </tr>
           </thead>
           <tbody>
-            ${buildSixColTableRows(reports)}
+            ${reports.map(r => {
+              const dayW = r.tradeRecords.filter(t => t.category === 'workers').reduce((sum, w) => sum + getTodayQty(w), 0);
+              const dayM = r.tradeRecords.filter(t => t.category === 'machinery').reduce((sum, m) => sum + getTodayQty(m), 0);
+              return `
+                <tr>
+                  <td style="font-weight:700;">${r.reportDateISO}</td>
+                  <td style="text-align:center;">${r.weatherAM}/${r.weatherPM}</td>
+                  <td style="text-align:right;font-weight:800;color:var(--primary-dark);">${dayW}</td>
+                  <td style="text-align:right;font-weight:800;color:#059669;">${dayM}</td>
+                  <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.todayProgressSummary || '正常施工'}</td>
+                  <td style="text-align:center;">
+                    <button class="phrase-chip-item" style="padding:2px 6px;font-size:10.5px;" onclick="window.appActions.openDayDetailSheet('${r.reportDateISO}')">明細 ❯</button>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
           </tbody>
         </table>
       </div>
     </div>
+
+    <!-- ========================================================================= -->
+    <!-- 📄 正式公文總報表 (僅列印或匯出 PDF 時呈現，絕非單純截圖或畫面印出)        -->
+    <!-- ========================================================================= -->
+    <div class="stats-official-a4-doc">
+      <div style="text-align:center;border-bottom:2.5px solid #000000;padding-bottom:8px;margin-bottom:12px;">
+        <div style="font-size:14pt;font-weight:900;letter-spacing:1px;">${proj.contractorCompany || '營造工程股份有限公司'}</div>
+        <div style="font-size:16pt;font-weight:900;letter-spacing:2px;margin:4px 0;">營 建 工 程 工 務 總 體 分 析 與 資 源 配 置 總 報 表</div>
+        <div style="font-size:9pt;color:#333;letter-spacing:1px;">EXECUTIVE CONSTRUCTION PROJECT MANAGEMENT & RESOURCE ANALYTICS REPORT</div>
+      </div>
+
+      <!-- 工程基本資料表 -->
+      <table class="official-rep-table">
+        <tr>
+          <th style="width:16%;">工程名稱</th>
+          <td style="width:34%;font-weight:bold;">${proj.name}</td>
+          <th style="width:16%;">統計期間</th>
+          <td style="width:34%;font-weight:bold;">自 ${activeStart} 至 ${activeEnd} 止 (共 ${reports.length} 天)</td>
+        </tr>
+        <tr>
+          <th>承攬廠商</th>
+          <td>${proj.contractorCompany || '營造工程股份有限公司'}</td>
+          <th>監造單位</th>
+          <td>建築師事務所 / 工程顧問股份有限公司</td>
+        </tr>
+        <tr>
+          <th>合約工期</th>
+          <td>核定 ${contractDays} 天 ｜ 已施工 ${usedDays} 天 ｜ 尚餘 ${remainDays} 天</td>
+          <th>工程進度</th>
+          <td>預定 ${plannedPct}% ｜ 實際 ${actualPct}% ｜ 差值 <strong style="color:${isAhead ? '#059669' : '#DC2626'};">${isAhead ? '+' : ''}${diffPct}% (${isAhead ? '超前' : '落後'})</strong></td>
+        </tr>
+        <tr>
+          <th>總出工人次</th>
+          <td><strong>${totalWorkers} 人·日</strong> (平均每日 ${avgDailyWorkers} 人)</td>
+          <th>機具動員總數</th>
+          <td><strong>${totalMachines} 台·班</strong> (運轉良好)</td>
+        </tr>
+      </table>
+
+      <!-- 一、各工種累計出工結構分析表 -->
+      <div style="font-size:11pt;font-weight:bold;margin:12px 0 4px;">一、各工種人力資源投入累計統計表</div>
+      <table class="official-rep-table">
+        <thead>
+          <tr>
+            <th style="width:8%;">項次</th>
+            <th style="width:26%;">工種名稱</th>
+            <th style="width:12%;">單位</th>
+            <th style="width:18%;">區間累計出工</th>
+            <th style="width:18%;">佔總出工比例</th>
+            <th style="width:18%;">單日最高出工</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sortedTrades.map((t, idx) => {
+            const pct = totalWorkers > 0 ? ((t.total / totalWorkers) * 100).toFixed(1) : 0;
+            return `
+              <tr>
+                <td style="text-align:center;">${idx + 1}</td>
+                <td><strong>${t.name}</strong></td>
+                <td style="text-align:center;">${t.unit}</td>
+                <td style="text-align:right;font-weight:bold;">${t.total}</td>
+                <td style="text-align:right;">${pct}%</td>
+                <td style="text-align:right;">${t.peak} ${t.unit}</td>
+              </tr>
+            `;
+          }).join('')}
+          <tr style="background:#F8FAFC;font-weight:bold;">
+            <td colspan="3" style="text-align:center;">人力出工總計</td>
+            <td style="text-align:right;">${totalWorkers} 人</td>
+            <td style="text-align:right;">100.0%</td>
+            <td style="text-align:right;">峰值 ${peakWorkers} 人</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 二、施工重型機具動員統計表 -->
+      <div style="font-size:11pt;font-weight:bold;margin:12px 0 4px;">二、施工重型機具動員統計表</div>
+      <table class="official-rep-table">
+        <thead>
+          <tr>
+            <th style="width:8%;">項次</th>
+            <th style="width:34%;">機具設備型號</th>
+            <th style="width:16%;">計量單位</th>
+            <th style="width:22%;">區間累計台班</th>
+            <th style="width:20%;">單日最高進場</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sortedMachines.map((m, idx) => `
+            <tr>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td><strong>${m.name}</strong></td>
+              <td style="text-align:center;">${m.unit}</td>
+              <td style="text-align:right;font-weight:bold;">${m.total}</td>
+              <td style="text-align:right;">${m.peak} ${m.unit}</td>
+            </tr>
+          `).join('')}
+          <tr style="background:#F8FAFC;font-weight:bold;">
+            <td colspan="3" style="text-align:center;">機具動員總計</td>
+            <td style="text-align:right;">${totalMachines} 台·班</td>
+            <td style="text-align:right;">-</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 三、區間逐日工程進度摘錄表 -->
+      <div style="font-size:11pt;font-weight:bold;margin:12px 0 4px;">三、區間施工進度與出工明細日誌</div>
+      <table class="official-rep-table">
+        <thead>
+          <tr>
+            <th style="width:16%;">施工日期</th>
+            <th style="width:12%;">天候</th>
+            <th style="width:12%;">出工/機具</th>
+            <th style="width:36%;">主要施作工程進度</th>
+            <th style="width:24%;">工區重要記事</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${reports.map(r => {
+            const w = r.tradeRecords.filter(t => t.category === 'workers').reduce((sum, item) => sum + getTodayQty(item), 0);
+            const m = r.tradeRecords.filter(t => t.category === 'machinery').reduce((sum, item) => sum + getTodayQty(item), 0);
+            return `
+              <tr>
+                <td style="text-align:center;font-weight:bold;">${r.reportDateISO}</td>
+                <td style="text-align:center;">${r.weatherAM}/${r.weatherPM}</td>
+                <td style="text-align:center;">${w}人 / ${m}台</td>
+                <td>${r.todayProgressSummary || '按既定排程順利施作。'}</td>
+                <td>${r.importantNotes || '無特殊公安狀況。'}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+
+      <!-- 四、審核簽署確認欄 (正式公文專用簽章) -->
+      <div style="font-size:11pt;font-weight:bold;margin:14px 0 4px;">四、專案審核與簽章簽認欄</div>
+      <table class="official-rep-table" style="margin-top:4px;">
+        <tr style="height:44px;">
+          <th style="width:25%;">專任工程人員 (主任技師)</th>
+          <th style="width:25%;">監造單位 監造主任</th>
+          <th style="width:25%;">承包廠商 工地主任</th>
+          <th style="width:25%;">承辦 / 製表人</th>
+        </tr>
+        <tr style="height:60px;">
+          <td></td><td></td><td></td>
+          <td style="text-align:center;vertical-align:bottom;font-weight:bold;font-size:10pt;">
+            ${state.account.name || '工務所主任'}
+          </td>
+        </tr>
+      </table>
+    </div>
   `;
 }
+
 
 // 繪製雙軸山積圖 (支援出工人力、進場機具、雙柱綜合負載 + S-Curve 累計折線)
 function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
@@ -1999,8 +2255,14 @@ window.appActions = {
     const range = state.statsFilterRange || 'all';
     const now = new Date();
 
+    const customStart = state.statsCustomStartDate || (allReports.length > 0 ? allReports[0].reportDateISO : '2026-10-01');
+    const customEnd = state.statsCustomEndDate || (allReports.length > 0 ? allReports[allReports.length - 1].reportDateISO : '2026-10-25');
+
     const filteredReports = allReports.filter(rep => {
       if (range === 'all') return true;
+      if (range === 'custom') {
+        return rep.reportDateISO >= customStart && rep.reportDateISO <= customEnd;
+      }
       const repDate = new Date(rep.reportDateISO);
       if (range === 'last30') {
         const diffDays = (now - repDate) / (1000 * 60 * 60 * 24);
@@ -2034,52 +2296,55 @@ window.appActions = {
       week: '本週報表',
       month: '本月報表',
       quarter: '本季報表',
-      last30: '近30天'
+      last30: '近30天',
+      custom: '自訂區間_' + customStart + '至' + customEnd
     };
 
-    let csv = '\uFEFF"【' + proj.name.replace(/"/g, '""') + '】專案總報表與區間統計"\n';
-    csv += '"統計區間","' + (rangeNames[range] || '全工期') + ' (共 ' + reports.length + ' 日)","匯出日期","' + new Date().toISOString().slice(0, 10) + '"\n';
-    csv += '"契約總工期","' + proj.contractDays + ' 天","已施工天數","' + proj.usedDays + ' 天","剩餘天數","' + Math.max(0, proj.contractDays - proj.usedDays) + ' 天"\n\n';
+    let csv = '\uFEFF"【' + proj.name.replace(/"/g, '""') + '】營建工程工務總體分析與資源配置總報表"\n';
+    csv += '"承造單位：' + (proj.contractorCompany||'營造工程').replace(/"/g, '""') + '","統計區間：' + rangeNames[range] + '","製表時間：' + new Date().toLocaleString() + '"\n';
+    csv += '"合約總工期：' + (proj.contractDays||480) + '天","已施工：' + (proj.usedDays||198) + '天","預定進度：' + (proj.plannedProgress||43.5) + '%","實際進度：' + (proj.actualProgress||41.3) + '%"\n\n';
 
-    // 區間項目彙總表
-    csv += '"【一、區間各工種與機具全量統計】"\n';
-    csv += '"分類","項目名稱","單位","區間總計","單日峰值","出工天數"\n';
-
-    const itemMap = new Map();
-    reports.forEach(rep => {
-      rep.tradeRecords.forEach(tr => {
-        const q = getTodayQty(tr);
-        if (q > 0 || tr.priorCumulative > 0) {
-          const key = tr.name;
-          if (!itemMap.has(key)) {
-            itemMap.set(key, {
-              category: tr.category === 'machinery' ? '機具' : '工班',
-              name: tr.name,
-              unit: tr.unit,
-              total: 0,
-              activeDays: 0,
-              maxQty: 0
-            });
-          }
-          const it = itemMap.get(key);
-          it.total += q;
-          if (q > 0) it.activeDays += 1;
-          if (q > it.maxQty) it.maxQty = q;
-        }
+    // 1. 各工種出工結構表
+    csv += '"【一、各工種人力資源投入累計總表】"\n';
+    csv += '"項次","工種名稱","單位","區間累計出工(人次)","單日最高出工"\n';
+    const tradeMap = {};
+    reports.forEach(r => {
+      r.tradeRecords.filter(t => t.category === 'workers').forEach(w => {
+        const qty = getTodayQty(w);
+        if (!tradeMap[w.name]) tradeMap[w.name] = { name: w.name, unit: w.unit, total: 0, peak: 0 };
+        tradeMap[w.name].total += qty;
+        tradeMap[w.name].peak = Math.max(tradeMap[w.name].peak, qty);
       });
     });
-
-    Array.from(itemMap.values()).forEach(it => {
-      csv += `"${it.category}","${it.name}","${it.unit}","${it.total}","${it.maxQty}","${it.activeDays}"\n`;
+    Object.values(tradeMap).sort((a,b)=>b.total - a.total).forEach((t, i) => {
+      csv += '"' + (i+1) + '","' + t.name + '","' + t.unit + '","' + t.total + '","' + t.peak + '"\n';
     });
+    csv += '\n';
 
-    csv += '\n"【二、區間每日出工明細流水帳】"\n';
-    csv += '"施工日期","天候狀況(上午/下午)","出工人數(人)","進場機具(台)","本日施作進度摘要"\n';
+    // 2. 施工機具設備統計表
+    csv += '"【二、施工機具設備動員統計表】"\n';
+    csv += '"項次","機具型號","單位","區間累計台班","單日最高進場"\n';
+    const machMap = {};
+    reports.forEach(r => {
+      r.tradeRecords.filter(t => t.category === 'machinery').forEach(m => {
+        const qty = getTodayQty(m);
+        if (!machMap[m.name]) machMap[m.name] = { name: m.name, unit: m.unit, total: 0, peak: 0 };
+        machMap[m.name].total += qty;
+        machMap[m.name].peak = Math.max(machMap[m.name].peak, qty);
+      });
+    });
+    Object.values(machMap).sort((a,b)=>b.total - a.total).forEach((m, i) => {
+      csv += '"' + (i+1) + '","' + m.name + '","' + m.unit + '","' + m.total + '","' + m.peak + '"\n';
+    });
+    csv += '\n';
 
+    // 3. 逐日施工進度與出工日誌
+    csv += '"【三、區間逐日工程進度與出工日誌總表】"\n';
+    csv += '"施工日期","上午天候","下午天候","本日施作進度","明日預定進度","出工人數","進場機具數","工區記事"\n';
     reports.forEach(r => {
       const workers = r.tradeRecords.filter(t => t.category === 'workers').reduce((sum, w) => sum + getTodayQty(w), 0);
       const machines = r.tradeRecords.filter(t => t.category === 'machinery').reduce((sum, m) => sum + getTodayQty(m), 0);
-      csv += `"${r.reportDateISO}","${r.weatherAM} / ${r.weatherPM}","${workers}","${machines}","${(r.todayProgressSummary||'').replace(/"/g, '""')}"\n`;
+      csv += '"' + r.reportDateISO + '","' + r.weatherAM + '","' + r.weatherPM + '","' + (r.todayProgressSummary||'').replace(/"/g, '""') + '","' + (r.tomorrowPlanSummary||'').replace(/"/g, '""') + '","' + workers + '","' + machines + '","' + (r.importantNotes||'').replace(/"/g, '""') + '"\n';
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

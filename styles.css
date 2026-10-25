@@ -2177,3 +2177,183 @@ table.rep-table-grid th {
 .is-mobile-preview .bottom-quick-tabbar {
   max-width: 392px !important;
 }
+
+
+
+/* ========================================================================= */
+/* 📄 正式公文報表輸出樣式 (Official Print Styles - Zero Web UI Cruft)          */
+/* ========================================================================= */
+
+/* 預設在一般螢幕上隱藏專屬列印公文總報表 */
+.stats-official-a4-doc {
+  display: none;
+}
+
+/* 自訂區間篩選列樣式 */
+.custom-date-filter-box {
+  background: #F0F9FF;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-base);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.custom-date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.custom-date-inputs input[type="date"] {
+  height: 38px;
+  padding: 0 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-color);
+  background: #FFFFFF;
+  color: var(--text-main);
+}
+
+.custom-date-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary-dark);
+}
+
+/* 專業數據儀表板 - 工種出工結構佔比橫條圖 */
+.trade-alloc-card {
+  background: var(--card-bg);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius-base);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.trade-alloc-item {
+  margin-bottom: 10px;
+}
+
+.trade-alloc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.trade-alloc-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: #E2E8F0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.trade-alloc-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #0EA5E9 0%, #0284C7 100%);
+  transition: width 0.3s ease;
+}
+
+/* 專業列印模式：只顯示正式公文報表，徹底屏蔽手機或電腦的網頁介面 */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+
+  body, html {
+    background: #FFFFFF !important;
+    background-image: none !important;
+    color: #000000 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 10pt !important;
+  }
+
+  /* 隱藏所有網頁介面元素 (按鈕、導覽列、頁頭、切換器、輸入框等) */
+  .no-print,
+  .minimal-header-nav,
+  .app-header-nav,
+  .bottom-quick-tabbar,
+  .pc-top-nav-tabs,
+  .minimal-header-actions,
+  .stats-export-action-bar,
+  .stats-filter-chips-row,
+  .custom-date-filter-box,
+  .chart-segmented-control,
+  .mountain-chart-scroll-box-smooth,
+  .device-toggle-btn,
+  .btn-create-proj-locked,
+  .btn-backup-item,
+  .floating-jump-btn,
+  .report-bottom-submit-section,
+  .tabstrip-steps-row,
+  .action-buttons-grid-2col,
+  .kpi-matrix-2x2,
+  .variance-fullwidth-alert,
+  .trade-alloc-card {
+    display: none !important;
+  }
+
+  .app-shell {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+  }
+
+  /* 顯示正式公文總報表 (僅列印時顯現) */
+  .stats-official-a4-doc {
+    display: block !important;
+    width: 100% !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif !important;
+    line-height: 1.4 !important;
+  }
+
+  /* 正式公文日報表 (單日日報) */
+  .a4-print-sheet {
+    display: block !important;
+    width: 100% !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif !important;
+  }
+
+  /* 表格黑色實線標準工程公文格式 */
+  table.official-rep-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 8px !important;
+    page-break-inside: avoid;
+  }
+
+  table.official-rep-table th, table.official-rep-table td {
+    border: 1px solid #000000 !important;
+    padding: 5px 7px !important;
+    font-size: 9pt !important;
+    color: #000000 !important;
+  }
+
+  table.official-rep-table th {
+    background: #F1F5F9 !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+  }
+}
