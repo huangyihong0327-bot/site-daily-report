@@ -2357,3 +2357,110 @@ table.rep-table-grid th {
     text-align: center !important;
   }
 }
+
+
+
+/* ========================================================================= */
+/* 📊 工務數據儀表板 - 分項工種自由篩選與多維度圖表樣式                         */
+/* ========================================================================= */
+
+.subtrade-filter-container {
+  background: #F8FAFC;
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-base);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.subtrade-filter-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.subtrade-chips-scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.subtrade-chips-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.subtrade-chip-btn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-light);
+  background: #FFFFFF;
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.12s ease;
+}
+
+.subtrade-chip-btn:hover {
+  background: #E0F2FE;
+  border-color: #0EA5E9;
+  color: var(--primary-dark);
+}
+
+.subtrade-chip-btn.active {
+  background: #0284C7 !important;
+  color: #FFFFFF !important;
+  border-color: #0C4A6E !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3) !important;
+}
+
+/* 雙圖表桌面並排容器 */
+@media (min-width: 900px) {
+  .charts-2col-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+/* 列印樣式 - 確保所有專業圖表在 A4 公文輸出中高解析呈現 */
+@media print {
+  .stats-official-a4-doc {
+    display: block !important;
+    width: 100% !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif !important;
+  }
+
+  .stats-official-a4-doc svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .print-page-break {
+    page-break-before: always !important;
+  }
+
+  .print-no-break {
+    page-break-inside: avoid !important;
+  }
+
+  .stats-chart-print-box {
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 6px !important;
+    padding: 10px !important;
+    margin: 8px 0 12px !important;
+    background: #FAFAFA !important;
+    page-break-inside: avoid !important;
+  }
+}

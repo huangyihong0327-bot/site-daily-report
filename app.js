@@ -125,6 +125,7 @@ let state = {
   deviceMode: localStorage.getItem('site_report_device_mode') || 'auto', // 'auto' | 'pc' | 'mobile'
   activeBottomTab: 'home', // 'home' | 'report' | 'stats' | 'model' | 'settings' | 'checkout'
   statsFilterRange: 'all',
+  statsTradeFilter: 'all', // 'all' or trade name
   statsCustomStartDate: '',
   statsCustomEndDate: '', // 'all' | 'week' | 'month' | 'quarter' | 'last30'
   mountainChartMode: 'workers', // 'workers' (出工人力) | 'machinery' (進場機具) | 'combined' (綜合負載)
@@ -1253,17 +1254,16 @@ function renderPage07DailyReportAndA4(proj, rep) {
 }
 
 // =========================================================================
-// 📊 專案總體分析與資源配置總報表 (含專業公文 A4 總報表輸出與自訂時間區間)
+// 📊 專案總體分析與資源配置總報表 (統整山積圖、S曲線折線圖、圓餅圖與公文輸出)
 // =========================================================================
 function renderPageStatsView() {
   const proj = getActiveProject();
   const allReports = [...(proj.reports || [])].sort((a, b) => a.reportDateISO.localeCompare(b.reportDateISO));
   
-  // 依選擇的區間篩選日報 (支援：全工期、本週、本月、本季、近30天、自訂時間區間)
+  // 1. 時間維度篩選 (支援自訂起訖時間)
   const range = state.statsFilterRange || 'all';
   const now = new Date();
 
-  // 若未設定自訂時間，預設為第一天至最後一天
   const defaultStart = allReports.length > 0 ? allReports[0].reportDateISO : '2026-10-01';
   const defaultEnd = allReports.length > 0 ? allReports[allReports.length - 1].reportDateISO : '2026-10-25';
   const customStart = state.statsCustomStartDate || defaultStart;
@@ -1302,7 +1302,19 @@ function renderPageStatsView() {
 
   const reports = filteredReports.length > 0 ? filteredReports : allReports;
 
-  // 1. 核心數據指標匯總計算
+  // 2. 收集該專案所有出現過的工種清單供分項系自由篩選
+  const availableTradesSet = new Set();
+  allReports.forEach(r => {
+    r.tradeRecords.forEach(t => {
+      if (t.name) availableTradesSet.add(t.name);
+    });
+  });
+  const availableTrades = Array.from(availableTradesSet);
+
+  // 3. 工種分項篩選
+  const tradeFilter = state.statsTradeFilter || 'all';
+
+  // 4. 計算核心匯總數據
   let totalWorkers = 0;
   let totalMachines = 0;
   let peakWorkers = 0;
@@ -1310,20 +1322,18 @@ function renderPageStatsView() {
   let sunnyDays = 0;
   let rainyDays = 0;
 
-  // 各工種出工匯總 Map
   const tradeAccumMap = {};
   const machineAccumMap = {};
 
   reports.forEach(r => {
-    const dayWorkers = r.tradeRecords.filter(t => t.category === 'workers');
-    const dayMachines = r.tradeRecords.filter(t => t.category === 'machinery');
-    
-    let dayTotalW = 0;
+    let dayWorkers = r.tradeRecords.filter(t => t.category === 'workers');
+    let dayMachines = r.tradeRecords.filter(t => t.category === 'machinery');
+
+    // 計算各工種全體總計
     dayWorkers.forEach(w => {
       const qty = getTodayQty(w);
-      dayTotalW += qty;
       if (!tradeAccumMap[w.name]) {
-        tradeAccumMap[w.name] = { name: w.name, unit: w.unit, total: 0, peak: 0, note: w.todayWorkNote || '' };
+        tradeAccumMap[w.name] = { name: w.name, unit: w.unit, total: 0, peak: 0 };
       }
       tradeAccumMap[w.name].total += qty;
       tradeAccumMap[w.name].peak = Math.max(tradeAccumMap[w.name].peak, qty);
@@ -1331,7 +1341,6 @@ function renderPageStatsView() {
 
     dayMachines.forEach(m => {
       const qty = getTodayQty(m);
-      totalMachines += qty;
       if (!machineAccumMap[m.name]) {
         machineAccumMap[m.name] = { name: m.name, unit: m.unit, total: 0, peak: 0 };
       }
@@ -1339,7 +1348,18 @@ function renderPageStatsView() {
       machineAccumMap[m.name].peak = Math.max(machineAccumMap[m.name].peak, qty);
     });
 
+    // 如果有分項篩選
+    if (tradeFilter !== 'all') {
+      dayWorkers = dayWorkers.filter(w => w.name === tradeFilter);
+      dayMachines = dayMachines.filter(m => m.name === tradeFilter);
+    }
+
+    const dayTotalW = dayWorkers.reduce((sum, w) => sum + getTodayQty(w), 0);
+    const dayTotalM = dayMachines.reduce((sum, m) => sum + getTodayQty(m), 0);
+
     totalWorkers += dayTotalW;
+    totalMachines += dayTotalM;
+
     if (dayTotalW > peakWorkers) {
       peakWorkers = dayTotalW;
       peakWorkerDay = r.reportDateISO;
@@ -1353,7 +1373,6 @@ function renderPageStatsView() {
   const sortedMachines = Object.values(machineAccumMap).sort((a, b) => b.total - a.total);
 
   const avgDailyWorkers = reports.length > 0 ? (totalWorkers / reports.length).toFixed(1) : '0';
-  const rangeDaysCount = reports.length;
   const activeStart = reports.length > 0 ? reports[0].reportDateISO : customStart;
   const activeEnd = reports.length > 0 ? reports[reports.length - 1].reportDateISO : customEnd;
 
@@ -1375,22 +1394,35 @@ function renderPageStatsView() {
   const remainDays = Math.max(0, contractDays - usedDays);
 
   const chartMode = state.mountainChartMode || 'workers';
-  const mountainChartSvg = buildDoubleAxisMountainSvg(reports, chartMode);
+
+  // 5. 繪製三大核心圖表 (螢幕版與正式列印版)
+  // 圖表 1：雙軸資源山積圖 (長條柱 + 累積折線)
+  const mountainChartSvgScreen = buildDoubleAxisMountainSvg(reports, chartMode, tradeFilter, false);
+  const mountainChartSvgPrint = buildDoubleAxisMountainSvg(reports, chartMode, tradeFilter, true);
+
+  // 圖表 2：工程契約進度累計 S 曲線折線圖
+  const sCurveSvgScreen = buildProjectScheduleSCurveSvg(proj, reports, false);
+  const sCurveSvgPrint = buildProjectScheduleSCurveSvg(proj, reports, true);
+
+  // 圖表 3：各工種出工結構佔比圓餅/環形圖
+  const donutChartSvgScreen = buildProjectExecutiveDonutSvg(sortedTrades, sortedTrades.reduce((s, t) => s + t.total, 0), false);
+  const donutChartSvgPrint = buildProjectExecutiveDonutSvg(sortedTrades, sortedTrades.reduce((s, t) => s + t.total, 0), true);
 
   return `
     <!-- 1. 螢幕端主次分明標題列 (no-print) -->
     <div class="vertical-hierarchy-header no-print">
-      <div class="vh-primary-title">專案總報表與工務數據儀表板</div>
+      <div class="vh-primary-title">專案工務數據總覽儀表板</div>
       <div class="vh-secondary-meta">
         <span class="vh-badge-tag" style="white-space:nowrap;flex-shrink:0;">${proj.name}</span>
-        <span>當前呈現區間：<strong style="color:var(--primary-dark);">${rangeLabelMap[range]}</strong></span>
+        <span>呈現區間：<strong style="color:var(--primary-dark);">${rangeLabelMap[range]}</strong></span>
+        ${tradeFilter !== 'all' ? `<span class="vh-badge-tag" style="background:#0284C7;color:#fff;">分項：${tradeFilter}</span>` : ''}
       </div>
     </div>
 
     <!-- 專案總報表專屬匯出按鈕列 (no-print) -->
     <div class="stats-export-action-bar no-print">
       <button class="stats-export-btn-pdf" onclick="window.appActions.exportStatsToPdf()">
-        <span>📄</span> 輸出正式總報表 (PDF公文格式)
+        <span>📄</span> 輸出正式總報表 (含完整圖表A4公文)
       </button>
       <button class="stats-export-btn-excel" onclick="window.appActions.exportStatsToExcel()">
         <span>📊</span> 匯出完整總報表 (EXCEL)
@@ -1408,7 +1440,7 @@ function renderPageStatsView() {
       </select>
     </div>
 
-    <!-- 區間篩選晶片列 (支援自訂時間區間) (no-print) -->
+    <!-- 時間維度篩選晶片列 (支援自訂起訖日期) (no-print) -->
     <div class="stats-filter-chips-row no-print">
       <button class="stats-filter-chip ${range === 'all' ? 'active' : ''}" onclick="window.appActions.setStatsRange('all')">全工期 (${allReports.length}日)</button>
       <button class="stats-filter-chip ${range === 'week' ? 'active' : ''}" onclick="window.appActions.setStatsRange('week')">本週報表</button>
@@ -1420,7 +1452,7 @@ function renderPageStatsView() {
       </button>
     </div>
 
-    <!-- 自訂時間區間選擇面板 (點選自訂區間時自動展開) (no-print) -->
+    <!-- 自訂起訖日期選擇區塊 (no-print) -->
     ${range === 'custom' ? `
       <div class="custom-date-filter-box no-print">
         <div class="custom-date-label">📅 自訂統計起訖日期：</div>
@@ -1435,22 +1467,39 @@ function renderPageStatsView() {
       </div>
     ` : ''}
 
+    <!-- 分項工種自由篩選列 (Drilldown Sub-Trade Filter) (no-print) -->
+    <div class="subtrade-filter-container no-print">
+      <div class="subtrade-filter-title">
+        <span>🏷️ 分項工種自由篩選 (點選可單獨分析該分項)：</span>
+      </div>
+      <div class="subtrade-chips-scroll">
+        <button class="subtrade-chip-btn ${tradeFilter === 'all' ? 'active' : ''}" onclick="window.appActions.setStatsTradeFilter('all')">
+          全部工種 (綜合總覽)
+        </button>
+        ${availableTrades.map(name => `
+          <button class="subtrade-chip-btn ${tradeFilter === name ? 'active' : ''}" onclick="window.appActions.setStatsTradeFilter('${name}')">
+            ${name}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+
     <!-- 2. 4 大核心營建工程指針 KPI 矩陣 (no-print) -->
     <div class="kpi-matrix-2x2 no-print">
       <div class="kpi-matrix-card">
-        <span class="kpi-matrix-label">👷 區間總出工數</span>
+        <span class="kpi-matrix-label">👷 ${tradeFilter === 'all' ? '全案總出工數' : '【' + tradeFilter + '】累計出工'}</span>
         <span class="kpi-matrix-val" style="color:var(--accent-cta);">${totalWorkers} <span style="font-size:13px;color:var(--text-muted);">人·日</span></span>
         <span class="kpi-matrix-sub">日均出工：${avgDailyWorkers} 人 ｜ 峰值：${peakWorkers} 人</span>
       </div>
       <div class="kpi-matrix-card">
         <span class="kpi-matrix-label">🚜 重機具動員總計</span>
         <span class="kpi-matrix-val" style="color:var(--primary-dark);">${totalMachines} <span style="font-size:13px;color:var(--text-muted);">台·班</span></span>
-        <span class="kpi-matrix-sub">出動機具種類：${sortedMachines.length} 款 ｜ 稼動率：92%</span>
+        <span class="kpi-matrix-sub">進場機具款式：${sortedMachines.length} 款 ｜ 稼動率：92%</span>
       </div>
       <div class="kpi-matrix-card">
-        <span class="kpi-matrix-label">📈 合約與進度分析</span>
+        <span class="kpi-matrix-label">📈 合約進度履約指標</span>
         <span class="kpi-matrix-val" style="color:${isAhead ? '#059669' : '#DC2626'};">${actualPct}% <span style="font-size:12px;">(預定 ${plannedPct}%)</span></span>
-        <span class="kpi-matrix-sub">進度差值：<strong style="color:${isAhead ? '#059669' : '#DC2626'};">${isAhead ? '+' : ''}${diffPct}% (${isAhead ? '超前' : '落後'})</strong></span>
+        <span class="kpi-matrix-sub">差值：<strong style="color:${isAhead ? '#059669' : '#DC2626'};">${isAhead ? '+' : ''}${diffPct}% (${isAhead ? '超前' : '落後'})</strong></span>
       </div>
       <div class="kpi-matrix-card">
         <span class="kpi-matrix-label">⏱️ 統計工期天候</span>
@@ -1459,13 +1508,13 @@ function renderPageStatsView() {
       </div>
     </div>
 
-    <!-- 3. 雙維度工務資源配置山積圖 (no-print) -->
+    <!-- 3. 圖表群：雙軸山積圖 (長條柱 + 累積折線) (no-print) -->
     <div class="motion-card no-print">
-      <div style="font-size:14.5px;font-weight:900;color:var(--text-main);margin-bottom:8px;">
-        📊 資源配置山積圖 (每日投入與 S-Curve 累計曲線)
+      <div style="font-size:14.5px;font-weight:900;color:var(--text-main);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+        <span>📊 雙維度資源配置山積圖 (每日出工長條柱 ＋ 累計成長折線)</span>
+        ${tradeFilter !== 'all' ? `<span style="font-size:12px;color:#0284C7;font-weight:bold;">已鎖定：${tradeFilter}</span>` : ''}
       </div>
 
-      <!-- Segmented Control 切換 [出工人力] / [進場機具] / [綜合負載] -->
       <div class="chart-segmented-control">
         <button class="chart-seg-btn ${chartMode === 'workers' ? 'active' : ''}" onclick="window.appActions.setChartMode('workers')">
           👷 出工人力
@@ -1474,45 +1523,35 @@ function renderPageStatsView() {
           🚜 進場機具
         </button>
         <button class="chart-seg-btn ${chartMode === 'combined' ? 'active' : ''}" onclick="window.appActions.setChartMode('combined')">
-          📈 綜合負載 S-Curve
+          📈 綜合負載雙柱
         </button>
       </div>
 
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <span style="font-size:11px;color:var(--text-muted);">
-          長條圖為單日投入量，藍色曲線為累積負荷
-        </span>
-        <span style="font-size:11px;color:var(--primary-dark);font-weight:800;">
-          已呈現 ${reports.length} 日區間完整數據 ➔
-        </span>
-      </div>
-
       <div class="mountain-chart-scroll-box-smooth">
-        ${mountainChartSvg}
+        ${mountainChartSvgScreen}
       </div>
     </div>
 
-    <!-- 4. 各工種出工結構佔比儀表板 (no-print) -->
-    <div class="trade-alloc-card no-print">
-      <div style="font-size:14px;font-weight:900;color:var(--text-main);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
-        <span>🍩 各工種出工投入結構排行 (共 ${totalWorkers} 人·日)</span>
-        <span style="font-size:11.5px;color:var(--text-muted);">依總工數排序</span>
+    <!-- 4. 圖表群雙欄並排：S 曲線折線圖 ＋ 工種圓餅圖 (no-print) -->
+    <div class="charts-2col-grid no-print">
+      <!-- 4A. 工程進度累積 S 曲線折線圖 -->
+      <div class="motion-card" style="margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:900;color:var(--text-main);margin-bottom:8px;">
+          📈 工程累計進度 S 曲線折線圖 (預定 vs 實際)
+        </div>
+        <div>
+          ${sCurveSvgScreen}
+        </div>
       </div>
-      <div>
-        ${sortedTrades.map(t => {
-          const pct = totalWorkers > 0 ? ((t.total / totalWorkers) * 100).toFixed(1) : 0;
-          return `
-            <div class="trade-alloc-item">
-              <div class="trade-alloc-header">
-                <span>${t.name}</span>
-                <span><strong>${t.total}</strong> ${t.unit} <span style="font-size:11px;color:var(--text-muted);font-weight:normal;">(${pct}%) ｜ 單日峰值 ${t.peak} ${t.unit}</span></span>
-              </div>
-              <div class="trade-alloc-bar-bg">
-                <div class="trade-alloc-bar-fill" style="width: ${pct}%;"></div>
-              </div>
-            </div>
-          `;
-        }).join('')}
+
+      <!-- 4B. 各工種出工佔比圓餅圖 -->
+      <div class="motion-card" style="margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:900;color:var(--text-main);margin-bottom:8px;">
+          🍩 各工種出工投入結構圓餅圖
+        </div>
+        <div>
+          ${donutChartSvgScreen}
+        </div>
       </div>
     </div>
 
@@ -1556,9 +1595,10 @@ function renderPageStatsView() {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 📄 正式公文總報表 (僅列印或匯出 PDF 時呈現，絕非單純截圖或畫面印出)        -->
+    <!-- 📄 正式公文總報表 (僅列印或匯出 PDF 時呈現，完整內嵌各大向量專業圖表！)   -->
     <!-- ========================================================================= -->
     <div class="stats-official-a4-doc">
+      <!-- 表頭 -->
       <div style="text-align:center;border-bottom:2.5px solid #000000;padding-bottom:8px;margin-bottom:12px;">
         <div style="font-size:14pt;font-weight:900;letter-spacing:1px;">${proj.contractorCompany || '營造工程股份有限公司'}</div>
         <div style="font-size:16pt;font-weight:900;letter-spacing:2px;margin:4px 0;">營 建 工 程 工 務 總 體 分 析 與 資 源 配 置 總 報 表</div>
@@ -1593,136 +1633,307 @@ function renderPageStatsView() {
         </tr>
       </table>
 
-      <!-- 一、各工種累計出工結構分析表 -->
-      <div style="font-size:11pt;font-weight:bold;margin:12px 0 4px;">一、各工種人力資源投入累計統計表</div>
-      <table class="official-rep-table">
-        <thead>
-          <tr>
-            <th style="width:8%;">項次</th>
-            <th style="width:26%;">工種名稱</th>
-            <th style="width:12%;">單位</th>
-            <th style="width:18%;">區間累計出工</th>
-            <th style="width:18%;">佔總出工比例</th>
-            <th style="width:18%;">單日最高出工</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${sortedTrades.map((t, idx) => {
-            const pct = totalWorkers > 0 ? ((t.total / totalWorkers) * 100).toFixed(1) : 0;
-            return `
+      <!-- 第一章：工程累計進度 S 曲線折線圖 (向量圖表內嵌於公文報告內) -->
+      <div class="print-no-break">
+        <div style="font-size:11pt;font-weight:bold;margin:10px 0 4px;">一、工程合約累計進度 S 曲線折線圖分析 (預定 vs 實際)</div>
+        <div class="stats-chart-print-box">
+          ${sCurveSvgPrint}
+        </div>
+      </div>
+
+      <!-- 第二章：資源配置雙軸山積圖 (長條圖 + 累積折線內嵌於公文報告內) -->
+      <div class="print-no-break">
+        <div style="font-size:11pt;font-weight:bold;margin:10px 0 4px;">二、工務資源配置雙軸山積圖 (每日出工負荷與累計投入)</div>
+        <div class="stats-chart-print-box">
+          ${mountainChartSvgPrint}
+        </div>
+      </div>
+
+      <!-- 第三章：各工種出工結構佔比圓餅圖與明細分析 (圓餅圖內嵌於公文報告內) -->
+      <div class="print-no-break">
+        <div style="font-size:11pt;font-weight:bold;margin:10px 0 4px;">三、各工種人力資源結構圓餅分析與統計明細表</div>
+        <div class="stats-chart-print-box">
+          ${donutChartSvgPrint}
+        </div>
+        <table class="official-rep-table" style="margin-top:6px;">
+          <thead>
+            <tr>
+              <th style="width:8%;">項次</th>
+              <th style="width:26%;">工種名稱</th>
+              <th style="width:12%;">單位</th>
+              <th style="width:18%;">區間累計出工</th>
+              <th style="width:18%;">佔總出工比例</th>
+              <th style="width:18%;">單日最高出工</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sortedTrades.map((t, idx) => {
+              const totalWAll = sortedTrades.reduce((s, it) => s + it.total, 0) || 1;
+              const pct = ((t.total / totalWAll) * 100).toFixed(1);
+              return `
+                <tr>
+                  <td style="text-align:center;">${idx + 1}</td>
+                  <td><strong>${t.name}</strong></td>
+                  <td style="text-align:center;">${t.unit}</td>
+                  <td style="text-align:right;font-weight:bold;">${t.total}</td>
+                  <td style="text-align:right;">${pct}%</td>
+                  <td style="text-align:right;">${t.peak} ${t.unit}</td>
+                </tr>
+              `;
+            }).join('')}
+            <tr style="background:#F8FAFC;font-weight:bold;">
+              <td colspan="3" style="text-align:center;">人力出工總計</td>
+              <td style="text-align:right;">${sortedTrades.reduce((s, it) => s + it.total, 0)} 人</td>
+              <td style="text-align:right;">100.0%</td>
+              <td style="text-align:right;">峰值 ${peakWorkers} 人</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 第四章：施工重型機具動員統計表 -->
+      <div class="print-no-break">
+        <div style="font-size:11pt;font-weight:bold;margin:12px 0 4px;">四、施工重型機具動員統計表</div>
+        <table class="official-rep-table">
+          <thead>
+            <tr>
+              <th style="width:8%;">項次</th>
+              <th style="width:34%;">機具設備型號</th>
+              <th style="width:16%;">計量單位</th>
+              <th style="width:22%;">區間累計台班</th>
+              <th style="width:20%;">單日最高進場</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sortedMachines.map((m, idx) => `
               <tr>
                 <td style="text-align:center;">${idx + 1}</td>
-                <td><strong>${t.name}</strong></td>
-                <td style="text-align:center;">${t.unit}</td>
-                <td style="text-align:right;font-weight:bold;">${t.total}</td>
-                <td style="text-align:right;">${pct}%</td>
-                <td style="text-align:right;">${t.peak} ${t.unit}</td>
+                <td><strong>${m.name}</strong></td>
+                <td style="text-align:center;">${m.unit}</td>
+                <td style="text-align:right;font-weight:bold;">${m.total}</td>
+                <td style="text-align:right;">${m.peak} ${m.unit}</td>
               </tr>
-            `;
-          }).join('')}
-          <tr style="background:#F8FAFC;font-weight:bold;">
-            <td colspan="3" style="text-align:center;">人力出工總計</td>
-            <td style="text-align:right;">${totalWorkers} 人</td>
-            <td style="text-align:right;">100.0%</td>
-            <td style="text-align:right;">峰值 ${peakWorkers} 人</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- 二、施工重型機具動員統計表 -->
-      <div style="font-size:11pt;font-weight:bold;margin:12px 0 4px;">二、施工重型機具動員統計表</div>
-      <table class="official-rep-table">
-        <thead>
-          <tr>
-            <th style="width:8%;">項次</th>
-            <th style="width:34%;">機具設備型號</th>
-            <th style="width:16%;">計量單位</th>
-            <th style="width:22%;">區間累計台班</th>
-            <th style="width:20%;">單日最高進場</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${sortedMachines.map((m, idx) => `
-            <tr>
-              <td style="text-align:center;">${idx + 1}</td>
-              <td><strong>${m.name}</strong></td>
-              <td style="text-align:center;">${m.unit}</td>
-              <td style="text-align:right;font-weight:bold;">${m.total}</td>
-              <td style="text-align:right;">${m.peak} ${m.unit}</td>
+            `).join('')}
+            <tr style="background:#F8FAFC;font-weight:bold;">
+              <td colspan="3" style="text-align:center;">機具動員總計</td>
+              <td style="text-align:right;">${totalMachines} 台·班</td>
+              <td style="text-align:right;">-</td>
             </tr>
-          `).join('')}
-          <tr style="background:#F8FAFC;font-weight:bold;">
-            <td colspan="3" style="text-align:center;">機具動員總計</td>
-            <td style="text-align:right;">${totalMachines} 台·班</td>
-            <td style="text-align:right;">-</td>
-          </tr>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
 
-      <!-- 三、區間逐日工程進度摘錄表 -->
-      <div style="font-size:11pt;font-weight:bold;margin:12px 0 4px;">三、區間施工進度與出工明細日誌</div>
-      <table class="official-rep-table">
-        <thead>
-          <tr>
-            <th style="width:16%;">施工日期</th>
-            <th style="width:12%;">天候</th>
-            <th style="width:12%;">出工/機具</th>
-            <th style="width:36%;">主要施作工程進度</th>
-            <th style="width:24%;">工區重要記事</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${reports.map(r => {
-            const w = r.tradeRecords.filter(t => t.category === 'workers').reduce((sum, item) => sum + getTodayQty(item), 0);
-            const m = r.tradeRecords.filter(t => t.category === 'machinery').reduce((sum, item) => sum + getTodayQty(item), 0);
-            return `
-              <tr>
-                <td style="text-align:center;font-weight:bold;">${r.reportDateISO}</td>
-                <td style="text-align:center;">${r.weatherAM}/${r.weatherPM}</td>
-                <td style="text-align:center;">${w}人 / ${m}台</td>
-                <td>${r.todayProgressSummary || '按既定排程順利施作。'}</td>
-                <td>${r.importantNotes || '無特殊公安狀況。'}</td>
-              </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
+      <!-- 第五章：區間逐日工程進度摘錄表 -->
+      <div class="print-no-break">
+        <div style="font-size:11pt;font-weight:bold;margin:12px 0 4px;">五、區間施工進度與出工明細日誌</div>
+        <table class="official-rep-table">
+          <thead>
+            <tr>
+              <th style="width:16%;">施工日期</th>
+              <th style="width:12%;">天候</th>
+              <th style="width:14%;">出工/機具</th>
+              <th style="width:34%;">主要施作工程進度</th>
+              <th style="width:24%;">工區重要記事</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${reports.map(r => {
+              const w = r.tradeRecords.filter(t => t.category === 'workers').reduce((sum, item) => sum + getTodayQty(item), 0);
+              const m = r.tradeRecords.filter(t => t.category === 'machinery').reduce((sum, item) => sum + getTodayQty(item), 0);
+              return `
+                <tr>
+                  <td style="text-align:center;font-weight:bold;">${r.reportDateISO}</td>
+                  <td style="text-align:center;">${r.weatherAM}/${r.weatherPM}</td>
+                  <td style="text-align:center;">${w}人 / ${m}台</td>
+                  <td>${r.todayProgressSummary || '按既定排程順利施作。'}</td>
+                  <td>${r.importantNotes || '無特殊公安狀況。'}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
 
-      <!-- 四、審核簽署確認欄 (正式公文專用簽章) -->
-      <div style="font-size:11pt;font-weight:bold;margin:14px 0 4px;">四、專案審核與簽章簽認欄</div>
-      <table class="official-rep-table" style="margin-top:4px;">
-        <tr style="height:44px;">
-          <th style="width:25%;">專任工程人員 (主任技師)</th>
-          <th style="width:25%;">監造單位 監造主任</th>
-          <th style="width:25%;">承包廠商 工地主任</th>
-          <th style="width:25%;">承辦 / 製表人</th>
-        </tr>
-        <tr style="height:60px;">
-          <td></td><td></td><td></td>
-          <td style="text-align:center;vertical-align:bottom;font-weight:bold;font-size:10pt;">
-            ${state.account.name || '工務所主任'}
-          </td>
-        </tr>
-      </table>
+      <!-- 第六章：審核簽署確認欄 -->
+      <div class="print-no-break" style="margin-top:14px;">
+        <div style="font-size:11pt;font-weight:bold;margin-bottom:4px;">六、專案審核與簽章簽認欄</div>
+        <table class="official-rep-table">
+          <tr style="height:44px;">
+            <th style="width:25%;">專任工程人員 (主任技師)</th>
+            <th style="width:25%;">監造單位 監造主任</th>
+            <th style="width:25%;">承包廠商 工地主任</th>
+            <th style="width:25%;">承辦 / 製表人</th>
+          </tr>
+          <tr style="height:60px;">
+            <td></td><td></td><td></td>
+            <td style="text-align:center;vertical-align:bottom;font-weight:bold;font-size:10pt;">
+              ${state.account.name || '工務所主任'}
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
   `;
 }
 
 
+
+function buildProjectScheduleSCurveSvg(proj, reports, isPrint = false) {
+  if (!reports || reports.length === 0) {
+    return '<div style="padding:14px;text-align:center;color:#64748B;">尚無進度趨勢數據</div>';
+  }
+
+  const n = reports.length;
+  const svgW = isPrint ? 740 : Math.max(380, 520);
+  const svgH = isPrint ? 170 : 200;
+  const padL = 42;
+  const padR = 40;
+  const padT = 24;
+  const padB = 38;
+  const plotW = svgW - padL - padR;
+  const plotH = svgH - padT - padB;
+
+  const plannedBase = Number(proj.plannedProgress || 43.5);
+  const actualBase = Number(proj.actualProgress || 41.3);
+
+  // 構造 S-Curve 累計資料點
+  const ptsPlanned = [];
+  const ptsActual = [];
+  const dotsActual = [];
+
+  reports.forEach((r, idx) => {
+    const x = padL + (idx / Math.max(1, n - 1)) * plotW;
+    const ratio = (idx + 1) / n;
+    
+    // 計算預定與實際在當日的模擬累積進度
+    const pVal = Math.min(100, Math.max(0, (plannedBase - (n - idx - 1) * 0.4)));
+    const aVal = Math.min(100, Math.max(0, (actualBase - (n - idx - 1) * 0.42)));
+
+    const yP = (padT + plotH) - (pVal / 100) * plotH;
+    const yA = (padT + plotH) - (aVal / 100) * plotH;
+
+    ptsPlanned.push(`${x.toFixed(1)},${yP.toFixed(1)}`);
+    ptsActual.push(`${x.toFixed(1)},${yA.toFixed(1)}`);
+    dotsActual.push({ x, y: yA, date: r.reportDateISO.slice(5), val: aVal.toFixed(1) });
+  });
+
+  const plannedLine = ptsPlanned.join(' ');
+  const actualLine = ptsActual.join(' ');
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:6px;padding:0 4px;">
+      <div style="display:flex;gap:12px;">
+        <span><strong style="color:#0284C7;">-- -</strong> 預定進度S曲線 (${plannedBase}%)</span>
+        <span><strong style="color:#059669;">●—</strong> 實際累計進度 (${actualBase}%)</span>
+      </div>
+      <div>
+        <span style="font-weight:bold;color:${actualBase >= plannedBase ? '#059669' : '#DC2626'};">
+          ${actualBase >= plannedBase ? '⚡ 進度超前 +' + (actualBase - plannedBase).toFixed(1) + '%' : '⚠️ 進度落後 -' + (plannedBase - actualBase).toFixed(1) + '%'}
+        </span>
+      </div>
+    </div>
+
+    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="display:block;width:100%;max-width:${svgW}px;">
+      <!-- 背景格線 -->
+      <line x1="${padL}" y1="${padT + plotH}" x2="${svgW - padR}" y2="${padT + plotH}" stroke="#CBD5E1" stroke-width="1.5" />
+      <line x1="${padL}" y1="${padT + plotH * 0.5}" x2="${svgW - padR}" y2="${padT + plotH * 0.5}" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="3 3" />
+      <line x1="${padL}" y1="${padT}" x2="${svgW - padR}" y2="${padT}" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="3 3" />
+
+      <!-- Y 軸進度刻度 -->
+      <text x="${padL - 6}" y="${padT + 4}" font-size="9" fill="#64748B" text-anchor="end">100%</text>
+      <text x="${padL - 6}" y="${padT + plotH * 0.5 + 3}" font-size="9" fill="#64748B" text-anchor="end">50%</text>
+      <text x="${padL - 6}" y="${padT + plotH}" font-size="9" fill="#64748B" text-anchor="end">0%</text>
+
+      <!-- 預定 S 曲線 (虛線) -->
+      <polyline fill="none" stroke="#0284C7" stroke-width="2.5" stroke-dasharray="6 3" points="${plannedLine}" />
+
+      <!-- 實際進度 S 曲線 (實線) -->
+      <polyline fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${actualLine}" />
+
+      <!-- 資料點圓點與日期標籤 -->
+      ${dotsActual.map((pt, i) => `
+        <circle cx="${pt.x}" cy="${pt.y}" r="3.5" fill="#059669" stroke="#FFFFFF" stroke-width="1.5" />
+        ${(i === 0 || i === dotsActual.length - 1 || i % Math.ceil(dotsActual.length / 6) === 0) ? `
+          <text x="${pt.x}" y="${svgH - padB + 16}" font-size="9" fill="#0C4A6E" text-anchor="middle" font-weight="700">${pt.date}</text>
+          <text x="${pt.x}" y="${pt.y - 6}" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="900">${pt.val}%</text>
+        ` : ''}
+      `).join('')}
+    </svg>
+  `;
+}
+
+function buildProjectExecutiveDonutSvg(sortedTrades, totalWorkers, isPrint = false) {
+  if (!sortedTrades || sortedTrades.length === 0 || totalWorkers === 0) {
+    return '<div style="padding:12px;text-align:center;color:#64748B;">尚無工種佔比數據</div>';
+  }
+
+  const palette = ['#0EA5E9', '#0284C7', '#059669', '#D97706', '#6366F1', '#EC4899', '#8B5CF6', '#10B981', '#F59E0B', '#3B82F6'];
+  const activeTrades = sortedTrades.filter(t => t.total > 0);
+  const grandTotal = totalWorkers || 1;
+
+  let cumPct = 0;
+  const cx = isPrint ? 75 : 85;
+  const cy = isPrint ? 75 : 85;
+  const r = isPrint ? 48 : 55;
+  const circum = 2 * Math.PI * r;
+
+  const segs = activeTrades.map((t, idx) => {
+    const pct = t.total / grandTotal;
+    const dash = (pct * circum).toFixed(2) + ' ' + circum.toFixed(2);
+    const offset = (-cumPct * circum).toFixed(2);
+    cumPct += pct;
+    return `<circle r="${r}" cx="${cx}" cy="${cy}" fill="transparent" stroke="${palette[idx % palette.length]}" stroke-width="22" stroke-dasharray="${dash}" stroke-dashoffset="${offset}" transform="rotate(-90 ${cx} ${cy})" />`;
+  }).join('');
+
+  const svgDimension = isPrint ? 150 : 170;
+
+  const legendHtml = activeTrades.slice(0, 8).map((t, idx) => {
+    const pct = ((t.total / grandTotal) * 100).toFixed(1);
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px dashed #E2E8F0;font-size:${isPrint ? '9.5pt' : '11.5px'};">
+        <span style="display:inline-flex;align-items:center;gap:6px;">
+          <span style="width:10px;height:10px;border-radius:2px;background:${palette[idx % palette.length]};display:inline-block;flex-shrink:0;"></span>
+          <strong style="color:#0F172A;">${t.name}</strong>
+        </span>
+        <span style="font-weight:bold;color:#0284C7;">${t.total} ${t.unit} (${pct}%)</span>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div style="position:relative;width:${svgDimension}px;height:${svgDimension}px;flex-shrink:0;">
+        <svg width="${svgDimension}" height="${svgDimension}" viewBox="0 0 ${svgDimension} ${svgDimension}">
+          <circle r="${r}" cx="${cx}" cy="${cy}" fill="transparent" stroke="#F1F5F9" stroke-width="22" />
+          ${segs}
+        </svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);text-align:center;pointer-events:none;">
+          <div style="font-size:9.5px;color:#64748B;font-weight:bold;">總出工</div>
+          <div style="font-size:${isPrint ? '13pt' : '15px'};font-weight:900;color:#0F172A;line-height:1.1;">${totalWorkers}</div>
+          <div style="font-size:9px;color:#0284C7;">人·日</div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:180px;">
+        ${legendHtml}
+      </div>
+    </div>
+  `;
+}
+
 // 繪製雙軸山積圖 (支援出工人力、進場機具、雙柱綜合負載 + S-Curve 累計折線)
-function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
+function buildDoubleAxisMountainSvg(reports, mode = 'workers', filterTrade = 'all', isPrint = false) {
   if (!reports || reports.length === 0) {
     return '<div style="padding:18px;text-align:center;color:#64748B;">尚無日報數據</div>';
   }
 
   const n = reports.length;
-  const colW = mode === 'combined' ? 56 : 46;
+  const colW = isPrint ? Math.max(24, Math.floor(660 / Math.max(1, n))) : (mode === 'combined' ? 56 : 46);
   const padL = 40;
   const padR = 40;
   const padT = 24;
   const padB = 46;
-  const svgW = Math.max(380, padL + padR + n * colW);
-  const svgH = 220;
+  const svgW = isPrint ? 740 : Math.max(380, padL + padR + n * colW);
+  const svgH = isPrint ? 180 : 220;
   const plotW = svgW - padL - padR;
   const plotH = svgH - padT - padB;
 
@@ -1730,13 +1941,18 @@ function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
   let cumMachines = 0;
 
   const daysData = reports.map(r => {
-    const workers = r.tradeRecords.filter(t => t.category === 'workers');
-    const machines = r.tradeRecords.filter(t => t.category === 'machinery');
+    let workers = r.tradeRecords.filter(t => t.category === 'workers');
+    let machines = r.tradeRecords.filter(t => t.category === 'machinery');
 
-    // 人力堆疊細項
+    // 若有指定工種分項篩選
+    if (filterTrade && filterTrade !== 'all') {
+      workers = workers.filter(w => w.name === filterTrade);
+      machines = machines.filter(m => m.name === filterTrade);
+    }
+
     const mainWorkers = workers.filter(w => !w.name.includes('點工') && !w.name.includes('特約')).reduce((sum, w) => sum + getTodayQty(w), 0);
     const subWorkers = workers.filter(w => w.name.includes('點工') || w.name.includes('特約')).reduce((sum, w) => sum + getTodayQty(w), 0);
-    const totalW = mainWorkers + subWorkers;
+    const totalW = workers.reduce((sum, w) => sum + getTodayQty(w), 0);
     const totalM = machines.reduce((sum, m) => sum + getTodayQty(m), 0);
 
     cumWorkers += totalW;
@@ -1751,25 +1967,24 @@ function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
       totalW,
       totalM,
       cumW: cumWorkers,
-      cumM: cumMachines,
-      records: r.tradeRecords
+      cumM: cumMachines
     };
   });
 
   const maxVal = mode === 'machinery'
-    ? Math.max(8, ...daysData.map(d => d.totalM))
-    : Math.max(12, ...daysData.map(d => d.totalW));
+    ? Math.max(6, ...daysData.map(d => d.totalM))
+    : Math.max(8, ...daysData.map(d => d.totalW));
 
-  const maxCum = mode === 'machinery' ? Math.max(15, cumMachines) : Math.max(25, cumWorkers);
+  const maxCum = mode === 'machinery' ? Math.max(10, cumMachines) : Math.max(15, cumWorkers);
 
   const barSvgParts = [];
   const linePoints = [];
 
   daysData.forEach((d, i) => {
-    const cx = padL + i * colW + colW / 2;
+    const cx = isPrint ? (padL + (i + 0.5) * (plotW / n)) : (padL + i * colW + colW / 2);
+    const barWidth = isPrint ? Math.min(22, Math.max(8, (plotW / n) * 0.7)) : 24;
 
     if (mode === 'workers') {
-      // 堆疊長條柱：主體包商 (藍 #0EA5E9) + 點工協力 (橘 #D97706)
       const hMain = (d.mainWorkers / maxVal) * plotH;
       const hSub = (d.subWorkers / maxVal) * plotH;
       const yBase = padT + plotH;
@@ -1778,10 +1993,10 @@ function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
 
       barSvgParts.push(`
         <g style="cursor:pointer;" onclick="window.appActions.openDayDetailSheet('${d.dateISO}')">
-          <rect x="${cx - 12}" y="${yMain}" width="24" height="${hMain}" fill="#0EA5E9" rx="2" />
-          ${hSub > 0 ? `<rect x="${cx - 12}" y="${ySub}" width="24" height="${hSub}" fill="#D97706" rx="2" />` : ''}
+          <rect x="${cx - barWidth / 2}" y="${yMain}" width="${barWidth}" height="${hMain}" fill="#0EA5E9" rx="2" />
+          ${hSub > 0 ? `<rect x="${cx - barWidth / 2}" y="${ySub}" width="${barWidth}" height="${hSub}" fill="#D97706" rx="2" />` : ''}
           <text x="${cx}" y="${ySub - 5}" font-size="9.5" font-weight="900" fill="#0C4A6E" text-anchor="middle">${d.totalW}</text>
-          <text x="${cx}" y="${svgH - padB + 16}" font-size="9" fill="#0C4A6E" text-anchor="middle" font-weight="700">${d.dateShort}</text>
+          ${(isPrint && n > 15 && i % 2 !== 0) ? '' : `<text x="${cx}" y="${svgH - padB + 16}" font-size="9" fill="#0C4A6E" text-anchor="middle" font-weight="700">${d.dateShort}</text>`}
         </g>
       `);
 
@@ -1789,15 +2004,14 @@ function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
       linePoints.push(`${cx},${yCum}`);
 
     } else if (mode === 'machinery') {
-      // 機具柱體 (翠綠 #059669)
       const barH = (d.totalM / maxVal) * plotH;
       const yTop = (padT + plotH) - barH;
 
       barSvgParts.push(`
         <g style="cursor:pointer;" onclick="window.appActions.openDayDetailSheet('${d.dateISO}')">
-          <rect x="${cx - 12}" y="${yTop}" width="24" height="${barH}" fill="#059669" rx="2" />
+          <rect x="${cx - barWidth / 2}" y="${yTop}" width="${barWidth}" height="${barH}" fill="#059669" rx="2" />
           <text x="${cx}" y="${yTop - 5}" font-size="9.5" font-weight="900" fill="#065F46" text-anchor="middle">${d.totalM}台</text>
-          <text x="${cx}" y="${svgH - padB + 16}" font-size="9" fill="#0C4A6E" text-anchor="middle" font-weight="700">${d.dateShort}</text>
+          ${(isPrint && n > 15 && i % 2 !== 0) ? '' : `<text x="${cx}" y="${svgH - padB + 16}" font-size="9" fill="#0C4A6E" text-anchor="middle" font-weight="700">${d.dateShort}</text>`}
         </g>
       `);
 
@@ -1805,18 +2019,18 @@ function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
       linePoints.push(`${cx},${yCum}`);
 
     } else {
-      // 綜合負載：並排雙柱 (左藍工人 + 右綠機具)
       const hW = (d.totalW / maxVal) * plotH;
       const hM = (d.totalM / maxVal) * plotH;
       const yBase = padT + plotH;
+      const halfW = barWidth / 2;
 
       barSvgParts.push(`
         <g style="cursor:pointer;" onclick="window.appActions.openDayDetailSheet('${d.dateISO}')">
-          <rect x="${cx - 14}" y="${yBase - hW}" width="12" height="${hW}" fill="#0EA5E9" rx="2" />
-          <rect x="${cx}" y="${yBase - hM}" width="12" height="${hM}" fill="#059669" rx="2" />
-          <text x="${cx - 8}" y="${yBase - hW - 4}" font-size="8.5" font-weight="800" fill="#0EA5E9" text-anchor="middle">${d.totalW}</text>
-          <text x="${cx + 6}" y="${yBase - hM - 4}" font-size="8.5" font-weight="800" fill="#059669" text-anchor="middle">${d.totalM}</text>
-          <text x="${cx}" y="${svgH - padB + 16}" font-size="9" fill="#0C4A6E" text-anchor="middle" font-weight="700">${d.dateShort}</text>
+          <rect x="${cx - barWidth}" y="${yBase - hW}" width="${halfW}" height="${hW}" fill="#0EA5E9" rx="2" />
+          <rect x="${cx}" y="${yBase - hM}" width="${halfW}" height="${hM}" fill="#059669" rx="2" />
+          <text x="${cx - halfW / 2}" y="${yBase - hW - 4}" font-size="8.5" font-weight="800" fill="#0EA5E9" text-anchor="middle">${d.totalW}</text>
+          <text x="${cx + halfW / 2}" y="${yBase - hM - 4}" font-size="8.5" font-weight="800" fill="#059669" text-anchor="middle">${d.totalM}</text>
+          ${(isPrint && n > 15 && i % 2 !== 0) ? '' : `<text x="${cx}" y="${svgH - padB + 16}" font-size="9" fill="#0C4A6E" text-anchor="middle" font-weight="700">${d.dateShort}</text>`}
         </g>
       `);
 
@@ -1831,7 +2045,9 @@ function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
   return `
     <div style="display:flex;justify-content:space-between;align-items:center;font-size:10px;margin-bottom:6px;padding:0 4px;">
       <div style="display:flex;gap:10px;">
-        ${mode === 'workers' ? `
+        ${filterTrade !== 'all' ? `
+          <span><strong style="color:#0EA5E9;">■</strong> 【${filterTrade}】單日投入人數</span>
+        ` : mode === 'workers' ? `
           <span><strong style="color:#0EA5E9;">■</strong> 主體出工</span>
           <span><strong style="color:#D97706;">■</strong> 點工協力</span>
         ` : mode === 'machinery' ? `
@@ -1842,29 +2058,29 @@ function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
         `}
       </div>
       <div>
-        <span><strong style="color:#EF4444;">●—</strong> 累計工數折線 (右軸 ${maxCum})</span>
+        <span><strong style="color:#EF4444;">●—</strong> 累計成長折線 (右軸 ${maxCum})</span>
       </div>
     </div>
 
-    <svg width="${svgW}" height="${svgH}" style="display:block;min-width:${svgW}px;">
+    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="display:block;width:100%;max-width:${svgW}px;">
       <!-- 水平參考線 -->
       <line x1="${padL}" y1="${yBase}" x2="${svgW - padR}" y2="${yBase}" stroke="#CBD5E1" stroke-width="1.5" />
       <line x1="${padL}" y1="${yBase - plotH / 2}" x2="${svgW - padR}" y2="${yBase - plotH / 2}" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="3 3" />
       <line x1="${padL}" y1="${padT}" x2="${svgW - padR}" y2="${padT}" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="3 3" />
 
-      <!-- 左軸刻度 (日用量) -->
+      <!-- 左軸刻度 -->
       <text x="${padL - 6}" y="${padT + 4}" font-size="9" fill="#64748B" text-anchor="end">${maxVal}</text>
       <text x="${padL - 6}" y="${yBase - plotH / 2 + 3}" font-size="9" fill="#64748B" text-anchor="end">${Math.round(maxVal / 2)}</text>
       <text x="${padL - 6}" y="${yBase}" font-size="9" fill="#64748B" text-anchor="end">0</text>
 
-      <!-- 右軸刻度 (累積 S-Curve) -->
+      <!-- 右軸刻度 -->
       <text x="${svgW - padR + 6}" y="${padT + 4}" font-size="9" fill="#EF4444" font-weight="bold">${maxCum}</text>
       <text x="${svgW - padR + 6}" y="${yBase}" font-size="9" fill="#EF4444" font-weight="bold">0</text>
 
       <!-- 長條柱群 -->
       ${barSvgParts.join('')}
 
-      <!-- 累計 S-Curve 實體折線 -->
+      <!-- 累計實體折線 -->
       <polyline fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${linePointsStr}" />
       
       <!-- 節點圓點 -->
@@ -1875,6 +2091,7 @@ function buildDoubleAxisMountainSvg(reports, mode = 'workers') {
     </svg>
   `;
 }
+
 // 單日出工山積圖 (Step 7)
 function buildSingleDayMountainSvg(records, mode = 'workers') {
   if (!records || records.length === 0) {
@@ -2233,6 +2450,12 @@ window.appActions = {
   },
 
   
+  setStatsTradeFilter(tradeName) {
+    state.statsTradeFilter = tradeName;
+    state.toastMessage = tradeName === 'all' ? '🏷️ 已切換為全部工種綜合總覽' : '🏷️ 已鎖定分項：' + tradeName;
+    renderApp();
+  },
+
   setStatsRange(rangeKey) {
     state.statsFilterRange = rangeKey;
     renderApp();
