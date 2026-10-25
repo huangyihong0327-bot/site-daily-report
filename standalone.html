@@ -1911,6 +1911,284 @@ table.rep-table-grid th {
   transform: scale(0.96) !important;
 }
 
+
+
+/* ========================================================================= */
+/* 🖥️ 電腦端 (PC / Desktop / iPad 橫向) 專屬自適應樣式 (RWD & PC Workstation)  */
+/* ========================================================================= */
+
+/* 1. 桌面寬螢幕全域背景與視窗 */
+@media (min-width: 900px) {
+  body {
+    background-color: #EBF3FA !important;
+    background-image: 
+      radial-gradient(circle at 15% 15%, rgba(14, 165, 233, 0.09) 0%, transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(5, 150, 105, 0.08) 0%, transparent 45%) !important;
+    padding-bottom: 20px !important;
+  }
+
+  /* 核心容器寬度擴展為現代化桌面工作站版型 (1180px) */
+  .app-shell:not(.is-mobile-preview) {
+    max-width: 1180px !important;
+    width: 92% !important;
+    margin: 24px auto 40px !important;
+    border-radius: 14px !important;
+    border: 2px solid #CBD5E1 !important;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08) !important;
+    padding: 24px 32px 90px !important;
+    background: #FFFFFF !important;
+  }
+
+  /* 頂部頁頭 Navbar 桌面版排版 */
+  .app-shell:not(.is-mobile-preview) .minimal-header-nav {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 0 16px !important;
+    border-bottom: 2px solid #E2E8F0 !important;
+    margin-bottom: 20px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-top-nav-tabs {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-nav-tab-item {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    height: 38px !important;
+    padding: 0 14px !important;
+    border-radius: 8px !important;
+    border: 1.5px solid transparent !important;
+    background: #F8FAFC !important;
+    color: var(--text-main) !important;
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-nav-tab-item:hover {
+    background: #E0F2FE !important;
+    color: var(--primary-dark) !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-nav-tab-item.active {
+    background: #0EA5E9 !important;
+    color: #FFFFFF !important;
+    border-color: #0284C7 !important;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25) !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-brand-subtitle {
+    display: block !important;
+    font-size: 11px !important;
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+  }
+
+  /* 步驟導航列 (1~7 步)：在電腦螢幕上以 7 欄並排顯示，清晰一目了然 */
+  .app-shell:not(.is-mobile-preview) .tabstrip-steps-row {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 20px !important;
+    overflow: visible !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .tabstrip-pill {
+    height: 38px !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .tabstrip-pill:hover:not(.active) {
+    background: #F0F9FF !important;
+    border-color: #0EA5E9 !important;
+    transform: translateY(-2px) !important;
+  }
+
+  /* 首頁專案卡片列表：電腦端自動轉換為 3 欄式卡片網格 */
+  .app-shell:not(.is-mobile-preview) .projects-cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .project-card-item {
+    margin-bottom: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .project-card-item:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 24px rgba(12, 74, 110, 0.15) !important;
+  }
+
+  /* 首頁頂部教學卡片與快捷按鈕：電腦端左右雙欄排列 */
+  .app-shell:not(.is-mobile-preview) .pc-home-top-row {
+    display: grid !important;
+    grid-template-columns: 1.35fr 1fr !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+    margin-bottom: 14px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-home-actions-card {
+    background: var(--card-bg) !important;
+    border: var(--border-width) solid var(--border-color) !important;
+    border-radius: var(--radius-base) !important;
+    padding: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 10px !important;
+  }
+
+  /* 步驟 2 (工期與氣候)：電腦端左右雙欄佈局 */
+  .app-shell:not(.is-mobile-preview) .pc-2col-layout {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* 總報表 KPI 卡片：在電腦端展開為 4 欄並排 */
+  .app-shell:not(.is-mobile-preview) .kpi-matrix-2x2 {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* 步驟 6 施工照片：在電腦端展開為 4 欄式相簿 */
+  .app-shell:not(.is-mobile-preview) .photo-grid-scroll-box {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  /* 步驟 7 日報表預覽：在電腦端置中擬真 A4 紙張 (860px 寬) */
+  .app-shell:not(.is-mobile-preview) .pc-a4-preview-wrapper {
+    max-width: 860px !important;
+    margin: 0 auto 24px !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.09) !important;
+    padding: 28px !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+  }
+
+  /* 底部快速導覽列在電腦端的吸附尺寸 */
+  .app-shell:not(.is-mobile-preview) .bottom-quick-tabbar {
+    max-width: 1180px !important;
+    border-radius: 14px 14px 0 0 !important;
+    border-left: 2px solid var(--border-color) !important;
+    border-right: 2px solid var(--border-color) !important;
+    height: 68px !important;
+    padding: 6px 36px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .quick-tab-item {
+    flex-direction: row !important;
+    gap: 8px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .quick-tab-icon {
+    font-size: 19px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .quick-tab-label {
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+  }
+}
+
+/* 2. 手機版與預覽模式樣式 (Mobile Preview Bezel) */
+.pc-top-nav-tabs, .pc-brand-subtitle {
+  display: none;
+}
+
+/* 介面模式切換按鈕 (電腦/手機模式) */
+.device-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-color);
+  background: #F0FDF4;
+  color: #166534;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+
+.device-toggle-btn:hover {
+  background: #DCFCE7;
+  transform: translateY(-1px);
+}
+
+.device-toggle-btn:active {
+  transform: scale(0.96);
+}
+
+.header-action-btn-pc {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.header-action-btn-pc:hover {
+  background: #E0F2FE;
+  color: var(--primary-dark);
+}
+
+/* 當使用者在 PC 上選擇「手機模擬預覽」時的外框樣式 */
+.is-mobile-preview {
+  max-width: 412px !important;
+  margin: 20px auto !important;
+  border-radius: 36px !important;
+  border: 10px solid #1E293B !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25) !important;
+  padding: 16px 14px 115px !important;
+  background-color: var(--bg-main) !important;
+}
+
+.is-mobile-preview .pc-top-nav-tabs,
+.is-mobile-preview .pc-brand-subtitle {
+  display: none !important;
+}
+
+.is-mobile-preview .bottom-quick-tabbar {
+  max-width: 392px !important;
+}
+
   </style>
 </head>
 <body data-ui-theme="motion-driven">
@@ -2040,6 +2318,7 @@ function generateSampleReportsForProject(proj, count = 20) {
 }
 
 let state = {
+  deviceMode: localStorage.getItem('site_report_device_mode') || 'auto', // 'auto' | 'pc' | 'mobile'
   activeBottomTab: 'home', // 'home' | 'report' | 'stats' | 'model' | 'settings' | 'checkout'
   statsFilterRange: 'all', // 'all' | 'week' | 'month' | 'quarter' | 'last30'
   mountainChartMode: 'workers', // 'workers' (出工人力) | 'machinery' (進場機具) | 'combined' (綜合負載)
@@ -2339,6 +2618,19 @@ function renderApp() {
   const root = document.getElementById('app-root');
   if (!root) return;
 
+  // 🖥️ PC 電腦端工作站與手機預覽模式狀態管理
+  const isPcDevice = state.deviceMode === 'pc' || (state.deviceMode !== 'mobile' && typeof window !== 'undefined' && window.innerWidth >= 900);
+  if (isPcDevice) {
+    root.classList.add('is-pc-mode');
+    root.classList.remove('is-mobile-preview');
+  } else if (state.deviceMode === 'mobile') {
+    root.classList.add('is-mobile-preview');
+    root.classList.remove('is-pc-mode');
+  } else {
+    root.classList.remove('is-pc-mode');
+    root.classList.remove('is-mobile-preview');
+  }
+
   const proj = getActiveProject();
   const rep = getActiveReport();
 
@@ -2387,16 +2679,47 @@ function renderApp() {
 function renderHeaderNav() {
   const isHome = state.activeBottomTab === 'home';
   const proj = getActiveProject();
+  const cur = state.activeBottomTab;
+  const isPcMode = state.deviceMode === 'pc' || (state.deviceMode !== 'mobile' && typeof window !== 'undefined' && window.innerWidth >= 900);
+  const toggleBtnText = isPcMode ? '🖥️ 電腦版' : '📱 手機版';
 
   return `
     <header class="minimal-header-nav no-print">
       <div class="minimal-brand-wrap" onclick="window.appActions.navigateTab('home')">
-        <span style="font-size:20px;">🏗️</span>
-        <span class="minimal-brand-title">${isHome ? '營建管理系統' : '營建日報'}</span>
-        ${!isHome ? `<span class="minimal-proj-pill">${proj.name}</span>` : ''}
+        <span style="font-size:22px;">🏗️</span>
+        <div>
+          <div class="minimal-brand-title">${isHome ? '營建工程管理系統' : '營建日報'}</div>
+          <div class="pc-brand-subtitle">工務所電腦工作站</div>
+        </div>
+        ${!isHome ? `<span class="minimal-proj-pill" title="目前案場">${proj.name}</span>` : ''}
       </div>
+
+      <!-- 電腦端專屬頂部導覽列 (PC Desktop Top Navigation) -->
+      <nav class="pc-top-nav-tabs" aria-label="電腦版導航列">
+        <button class="pc-nav-tab-item ${cur === 'home' ? 'active' : ''}" onclick="window.appActions.navigateTab('home')">
+          <span>⚡</span> 專案首頁
+        </button>
+        <button class="pc-nav-tab-item ${cur === 'stats' ? 'active' : ''}" onclick="window.appActions.navigateTab('stats')">
+          <span>📊</span> 專案總報表
+        </button>
+        <button class="pc-nav-tab-item ${cur === 'model' ? 'active' : ''}" onclick="window.appActions.navigateTab('model')">
+          <span>🏠</span> 3D模型
+        </button>
+        <button class="pc-nav-tab-item ${cur === 'settings' ? 'active' : ''}" onclick="window.appActions.navigateTab('settings')">
+          <span>⚙️</span> 系統設定
+        </button>
+      </nav>
+
       <div class="minimal-header-actions">
+        <!-- 電腦/手機版型智慧切換器 -->
+        <button class="device-toggle-btn" onclick="window.appActions.toggleDeviceMode()" title="點擊於「電腦寬版」與「手機模擬」介面切換">
+          ${toggleBtnText}
+        </button>
+
         ${!isHome ? `
+          <button class="header-action-btn-pc" onclick="window.appActions.quickPrintA4()" title="快速輸出正式 A4 報表">
+            🖨️ 列印 A4
+          </button>
           <button class="action-sheet-trigger-btn" onclick="window.appActions.openExportActionSheet()" title="更多匯出與報表操作">
             <span>⋯</span>
           </button>
@@ -2465,30 +2788,34 @@ function renderPage01ProjectManagement() {
   }).join('');
 
   return `
-    <div class="poster-tutorial-card">
-      <span class="poster-tag">STEP-BY-STEP TUTORIAL</span>
-      <div class="poster-title">營建工程日報 · 快速填寫步驟</div>
-      <p class="poster-desc">專為工務所打造的極速填報流程，數據主動累算，隨時產出 A4 正式 PDF 報表。</p>
-      
-      <div class="poster-steps-row">
-        <div class="poster-step-pill">1.選專案</div>
-        <div class="poster-step-pill">2.工期天候</div>
-        <div class="poster-step-pill">3.今日進度</div>
-        <div class="poster-step-pill">4.出工機具</div>
+    <div class="pc-home-top-row">
+      <div class="poster-tutorial-card">
+        <span class="poster-tag">STEP-BY-STEP TUTORIAL</span>
+        <div class="poster-title">營建工程日報 · 快速填寫步驟</div>
+        <p class="poster-desc">專為工務所打造的極速填報流程，數據主動累算，隨時產出 A4 正式 PDF 報表。</p>
+        
+        <div class="poster-steps-row">
+          <div class="poster-step-pill">1.選專案</div>
+          <div class="poster-step-pill">2.工期天候</div>
+          <div class="poster-step-pill">3.今日進度</div>
+          <div class="poster-step-pill">4.出工機具</div>
+        </div>
       </div>
-    </div>
 
-    <button class="btn-create-proj-locked" onclick="window.appActions.openCreateProjectModal()">
-      <span>＋</span> 建立新工程專案 (空白日報)
-    </button>
+      <div class="pc-home-actions-card">
+        <button class="btn-create-proj-locked" style="margin-bottom:8px;" onclick="window.appActions.openCreateProjectModal()">
+          <span>＋</span> 建立新工程專案 (空白日報)
+        </button>
 
-    <div class="backup-btn-row-locked">
-      <button class="btn-backup-item" onclick="window.appActions.exportBackup()">
-        <span>💾</span> 匯出專案備份檔
-      </button>
-      <button class="btn-backup-item" onclick="window.appActions.importBackup()">
-        <span>📥</span> 匯入專案備份檔
-      </button>
+        <div class="backup-btn-row-locked" style="margin-bottom:0;">
+          <button class="btn-backup-item" onclick="window.appActions.exportBackup()">
+            <span>💾</span> 匯出專案備份檔
+          </button>
+          <button class="btn-backup-item" onclick="window.appActions.importBackup()">
+            <span>📥</span> 匯入專案備份檔
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="section-divider"></div>
@@ -2600,21 +2927,7 @@ function renderPage02DateWeatherSchedule(proj, rep) {
       </div>
     </div>
 
-    <div class="field-input-card">
-      <div class="field-label-small">
-        <span>📅 本日施工日期 (西元格式)</span>
-        <span style="color:var(--primary-dark);font-weight:800;">${formatDateWestern(rep.reportDateISO, 'slash_weekday')}</span>
-      </div>
-      <div class="field-interactive-row">
-        <input type="date" class="native-input-box" value="${rep.reportDateISO}"
-               onchange="window.appActions.setReportDate(this.value)" style="flex:1;" />
-        <div style="display:flex;gap:4px;">
-          <button class="phrase-chip-item" style="padding:4px 8px;font-size:11px;" onclick="window.appActions.shiftReportDate(-1)">◀ -1天</button>
-          <button class="phrase-chip-item" style="padding:4px 8px;font-size:11px;" onclick="window.appActions.setReportDateToToday()">今天</button>
-          <button class="phrase-chip-item" style="padding:4px 8px;font-size:11px;" onclick="window.appActions.shiftReportDate(1)">+1天 ▶</button>
-        </div>
-      </div>
-    </div>
+
 
     <div class="section-divider"></div>
 
@@ -3001,7 +3314,7 @@ function renderPage07DailyReportAndA4(proj, rep) {
     </div>
 
     <!-- 正式日報表主體 (手機垂直排版 ＋ 支援左右滑動與標準 A4 列印) -->
-    <div class="motion-card a4-print-sheet" style="padding:14px;">
+    <div class="pc-a4-preview-wrapper"><div class="motion-card a4-print-sheet" style="padding:18px;margin-bottom:0;">
       <div style="text-align:center;border-bottom:2.5px solid #0C4A6E;padding-bottom:6px;margin-bottom:10px;">
         <h2 style="font-size:17px;font-weight:900;color:#0C4A6E;">${proj.contractorCompany || '營造工程股份有限公司'}</h2>
         <h3 style="font-size:15px;font-weight:800;color:#0C4A6E;letter-spacing:1px;margin-top:2px;">營 建 工 程 施 工 日 報 表</h3>
@@ -4382,6 +4695,16 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {
   initApp();
+}
+
+
+// 監聽視窗尺寸自適應
+if (typeof window !== 'undefined') {
+  window.addEventListener('resize', () => {
+    if (state.deviceMode === 'auto') {
+      renderApp();
+    }
+  });
 }
 
   </script>

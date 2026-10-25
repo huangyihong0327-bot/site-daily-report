@@ -122,6 +122,7 @@ function generateSampleReportsForProject(proj, count = 20) {
 }
 
 let state = {
+  deviceMode: localStorage.getItem('site_report_device_mode') || 'auto', // 'auto' | 'pc' | 'mobile'
   activeBottomTab: 'home', // 'home' | 'report' | 'stats' | 'model' | 'settings' | 'checkout'
   statsFilterRange: 'all', // 'all' | 'week' | 'month' | 'quarter' | 'last30'
   mountainChartMode: 'workers', // 'workers' (出工人力) | 'machinery' (進場機具) | 'combined' (綜合負載)
@@ -421,6 +422,19 @@ function renderApp() {
   const root = document.getElementById('app-root');
   if (!root) return;
 
+  // 🖥️ PC 電腦端工作站與手機預覽模式狀態管理
+  const isPcDevice = state.deviceMode === 'pc' || (state.deviceMode !== 'mobile' && typeof window !== 'undefined' && window.innerWidth >= 900);
+  if (isPcDevice) {
+    root.classList.add('is-pc-mode');
+    root.classList.remove('is-mobile-preview');
+  } else if (state.deviceMode === 'mobile') {
+    root.classList.add('is-mobile-preview');
+    root.classList.remove('is-pc-mode');
+  } else {
+    root.classList.remove('is-pc-mode');
+    root.classList.remove('is-mobile-preview');
+  }
+
   const proj = getActiveProject();
   const rep = getActiveReport();
 
@@ -469,16 +483,47 @@ function renderApp() {
 function renderHeaderNav() {
   const isHome = state.activeBottomTab === 'home';
   const proj = getActiveProject();
+  const cur = state.activeBottomTab;
+  const isPcMode = state.deviceMode === 'pc' || (state.deviceMode !== 'mobile' && typeof window !== 'undefined' && window.innerWidth >= 900);
+  const toggleBtnText = isPcMode ? '🖥️ 電腦版' : '📱 手機版';
 
   return `
     <header class="minimal-header-nav no-print">
       <div class="minimal-brand-wrap" onclick="window.appActions.navigateTab('home')">
-        <span style="font-size:20px;">🏗️</span>
-        <span class="minimal-brand-title">${isHome ? '營建管理系統' : '營建日報'}</span>
-        ${!isHome ? `<span class="minimal-proj-pill">${proj.name}</span>` : ''}
+        <span style="font-size:22px;">🏗️</span>
+        <div>
+          <div class="minimal-brand-title">${isHome ? '營建工程管理系統' : '營建日報'}</div>
+          <div class="pc-brand-subtitle">工務所電腦工作站</div>
+        </div>
+        ${!isHome ? `<span class="minimal-proj-pill" title="目前案場">${proj.name}</span>` : ''}
       </div>
+
+      <!-- 電腦端專屬頂部導覽列 (PC Desktop Top Navigation) -->
+      <nav class="pc-top-nav-tabs" aria-label="電腦版導航列">
+        <button class="pc-nav-tab-item ${cur === 'home' ? 'active' : ''}" onclick="window.appActions.navigateTab('home')">
+          <span>⚡</span> 專案首頁
+        </button>
+        <button class="pc-nav-tab-item ${cur === 'stats' ? 'active' : ''}" onclick="window.appActions.navigateTab('stats')">
+          <span>📊</span> 專案總報表
+        </button>
+        <button class="pc-nav-tab-item ${cur === 'model' ? 'active' : ''}" onclick="window.appActions.navigateTab('model')">
+          <span>🏠</span> 3D模型
+        </button>
+        <button class="pc-nav-tab-item ${cur === 'settings' ? 'active' : ''}" onclick="window.appActions.navigateTab('settings')">
+          <span>⚙️</span> 系統設定
+        </button>
+      </nav>
+
       <div class="minimal-header-actions">
+        <!-- 電腦/手機版型智慧切換器 -->
+        <button class="device-toggle-btn" onclick="window.appActions.toggleDeviceMode()" title="點擊於「電腦寬版」與「手機模擬」介面切換">
+          ${toggleBtnText}
+        </button>
+
         ${!isHome ? `
+          <button class="header-action-btn-pc" onclick="window.appActions.quickPrintA4()" title="快速輸出正式 A4 報表">
+            🖨️ 列印 A4
+          </button>
           <button class="action-sheet-trigger-btn" onclick="window.appActions.openExportActionSheet()" title="更多匯出與報表操作">
             <span>⋯</span>
           </button>
@@ -547,30 +592,34 @@ function renderPage01ProjectManagement() {
   }).join('');
 
   return `
-    <div class="poster-tutorial-card">
-      <span class="poster-tag">STEP-BY-STEP TUTORIAL</span>
-      <div class="poster-title">營建工程日報 · 快速填寫步驟</div>
-      <p class="poster-desc">專為工務所打造的極速填報流程，數據主動累算，隨時產出 A4 正式 PDF 報表。</p>
-      
-      <div class="poster-steps-row">
-        <div class="poster-step-pill">1.選專案</div>
-        <div class="poster-step-pill">2.工期天候</div>
-        <div class="poster-step-pill">3.今日進度</div>
-        <div class="poster-step-pill">4.出工機具</div>
+    <div class="pc-home-top-row">
+      <div class="poster-tutorial-card">
+        <span class="poster-tag">STEP-BY-STEP TUTORIAL</span>
+        <div class="poster-title">營建工程日報 · 快速填寫步驟</div>
+        <p class="poster-desc">專為工務所打造的極速填報流程，數據主動累算，隨時產出 A4 正式 PDF 報表。</p>
+        
+        <div class="poster-steps-row">
+          <div class="poster-step-pill">1.選專案</div>
+          <div class="poster-step-pill">2.工期天候</div>
+          <div class="poster-step-pill">3.今日進度</div>
+          <div class="poster-step-pill">4.出工機具</div>
+        </div>
       </div>
-    </div>
 
-    <button class="btn-create-proj-locked" onclick="window.appActions.openCreateProjectModal()">
-      <span>＋</span> 建立新工程專案 (空白日報)
-    </button>
+      <div class="pc-home-actions-card">
+        <button class="btn-create-proj-locked" style="margin-bottom:8px;" onclick="window.appActions.openCreateProjectModal()">
+          <span>＋</span> 建立新工程專案 (空白日報)
+        </button>
 
-    <div class="backup-btn-row-locked">
-      <button class="btn-backup-item" onclick="window.appActions.exportBackup()">
-        <span>💾</span> 匯出專案備份檔
-      </button>
-      <button class="btn-backup-item" onclick="window.appActions.importBackup()">
-        <span>📥</span> 匯入專案備份檔
-      </button>
+        <div class="backup-btn-row-locked" style="margin-bottom:0;">
+          <button class="btn-backup-item" onclick="window.appActions.exportBackup()">
+            <span>💾</span> 匯出專案備份檔
+          </button>
+          <button class="btn-backup-item" onclick="window.appActions.importBackup()">
+            <span>📥</span> 匯入專案備份檔
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="section-divider"></div>
@@ -682,21 +731,7 @@ function renderPage02DateWeatherSchedule(proj, rep) {
       </div>
     </div>
 
-    <div class="field-input-card">
-      <div class="field-label-small">
-        <span>📅 本日施工日期 (西元格式)</span>
-        <span style="color:var(--primary-dark);font-weight:800;">${formatDateWestern(rep.reportDateISO, 'slash_weekday')}</span>
-      </div>
-      <div class="field-interactive-row">
-        <input type="date" class="native-input-box" value="${rep.reportDateISO}"
-               onchange="window.appActions.setReportDate(this.value)" style="flex:1;" />
-        <div style="display:flex;gap:4px;">
-          <button class="phrase-chip-item" style="padding:4px 8px;font-size:11px;" onclick="window.appActions.shiftReportDate(-1)">◀ -1天</button>
-          <button class="phrase-chip-item" style="padding:4px 8px;font-size:11px;" onclick="window.appActions.setReportDateToToday()">今天</button>
-          <button class="phrase-chip-item" style="padding:4px 8px;font-size:11px;" onclick="window.appActions.shiftReportDate(1)">+1天 ▶</button>
-        </div>
-      </div>
-    </div>
+
 
     <div class="section-divider"></div>
 
@@ -1083,7 +1118,7 @@ function renderPage07DailyReportAndA4(proj, rep) {
     </div>
 
     <!-- 正式日報表主體 (手機垂直排版 ＋ 支援左右滑動與標準 A4 列印) -->
-    <div class="motion-card a4-print-sheet" style="padding:14px;">
+    <div class="pc-a4-preview-wrapper"><div class="motion-card a4-print-sheet" style="padding:18px;margin-bottom:0;">
       <div style="text-align:center;border-bottom:2.5px solid #0C4A6E;padding-bottom:6px;margin-bottom:10px;">
         <h2 style="font-size:17px;font-weight:900;color:#0C4A6E;">${proj.contractorCompany || '營造工程股份有限公司'}</h2>
         <h3 style="font-size:15px;font-weight:800;color:#0C4A6E;letter-spacing:1px;margin-top:2px;">營 建 工 程 施 工 日 報 表</h3>
@@ -2464,4 +2499,14 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {
   initApp();
+}
+
+
+// 監聽視窗尺寸自適應
+if (typeof window !== 'undefined') {
+  window.addEventListener('resize', () => {
+    if (state.deviceMode === 'auto') {
+      renderApp();
+    }
+  });
 }

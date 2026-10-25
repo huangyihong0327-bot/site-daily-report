@@ -1899,3 +1899,281 @@ table.rep-table-grid th {
   background: #FEE2E2 !important;
   transform: scale(0.96) !important;
 }
+
+
+
+/* ========================================================================= */
+/* 🖥️ 電腦端 (PC / Desktop / iPad 橫向) 專屬自適應樣式 (RWD & PC Workstation)  */
+/* ========================================================================= */
+
+/* 1. 桌面寬螢幕全域背景與視窗 */
+@media (min-width: 900px) {
+  body {
+    background-color: #EBF3FA !important;
+    background-image: 
+      radial-gradient(circle at 15% 15%, rgba(14, 165, 233, 0.09) 0%, transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(5, 150, 105, 0.08) 0%, transparent 45%) !important;
+    padding-bottom: 20px !important;
+  }
+
+  /* 核心容器寬度擴展為現代化桌面工作站版型 (1180px) */
+  .app-shell:not(.is-mobile-preview) {
+    max-width: 1180px !important;
+    width: 92% !important;
+    margin: 24px auto 40px !important;
+    border-radius: 14px !important;
+    border: 2px solid #CBD5E1 !important;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08) !important;
+    padding: 24px 32px 90px !important;
+    background: #FFFFFF !important;
+  }
+
+  /* 頂部頁頭 Navbar 桌面版排版 */
+  .app-shell:not(.is-mobile-preview) .minimal-header-nav {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 0 16px !important;
+    border-bottom: 2px solid #E2E8F0 !important;
+    margin-bottom: 20px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-top-nav-tabs {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-nav-tab-item {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    height: 38px !important;
+    padding: 0 14px !important;
+    border-radius: 8px !important;
+    border: 1.5px solid transparent !important;
+    background: #F8FAFC !important;
+    color: var(--text-main) !important;
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-nav-tab-item:hover {
+    background: #E0F2FE !important;
+    color: var(--primary-dark) !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-nav-tab-item.active {
+    background: #0EA5E9 !important;
+    color: #FFFFFF !important;
+    border-color: #0284C7 !important;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25) !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-brand-subtitle {
+    display: block !important;
+    font-size: 11px !important;
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+  }
+
+  /* 步驟導航列 (1~7 步)：在電腦螢幕上以 7 欄並排顯示，清晰一目了然 */
+  .app-shell:not(.is-mobile-preview) .tabstrip-steps-row {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 20px !important;
+    overflow: visible !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .tabstrip-pill {
+    height: 38px !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .tabstrip-pill:hover:not(.active) {
+    background: #F0F9FF !important;
+    border-color: #0EA5E9 !important;
+    transform: translateY(-2px) !important;
+  }
+
+  /* 首頁專案卡片列表：電腦端自動轉換為 3 欄式卡片網格 */
+  .app-shell:not(.is-mobile-preview) .projects-cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .project-card-item {
+    margin-bottom: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .project-card-item:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 24px rgba(12, 74, 110, 0.15) !important;
+  }
+
+  /* 首頁頂部教學卡片與快捷按鈕：電腦端左右雙欄排列 */
+  .app-shell:not(.is-mobile-preview) .pc-home-top-row {
+    display: grid !important;
+    grid-template-columns: 1.35fr 1fr !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+    margin-bottom: 14px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .pc-home-actions-card {
+    background: var(--card-bg) !important;
+    border: var(--border-width) solid var(--border-color) !important;
+    border-radius: var(--radius-base) !important;
+    padding: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 10px !important;
+  }
+
+  /* 步驟 2 (工期與氣候)：電腦端左右雙欄佈局 */
+  .app-shell:not(.is-mobile-preview) .pc-2col-layout {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* 總報表 KPI 卡片：在電腦端展開為 4 欄並排 */
+  .app-shell:not(.is-mobile-preview) .kpi-matrix-2x2 {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* 步驟 6 施工照片：在電腦端展開為 4 欄式相簿 */
+  .app-shell:not(.is-mobile-preview) .photo-grid-scroll-box {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  /* 步驟 7 日報表預覽：在電腦端置中擬真 A4 紙張 (860px 寬) */
+  .app-shell:not(.is-mobile-preview) .pc-a4-preview-wrapper {
+    max-width: 860px !important;
+    margin: 0 auto 24px !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.09) !important;
+    padding: 28px !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+  }
+
+  /* 底部快速導覽列在電腦端的吸附尺寸 */
+  .app-shell:not(.is-mobile-preview) .bottom-quick-tabbar {
+    max-width: 1180px !important;
+    border-radius: 14px 14px 0 0 !important;
+    border-left: 2px solid var(--border-color) !important;
+    border-right: 2px solid var(--border-color) !important;
+    height: 68px !important;
+    padding: 6px 36px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .quick-tab-item {
+    flex-direction: row !important;
+    gap: 8px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .quick-tab-icon {
+    font-size: 19px !important;
+  }
+
+  .app-shell:not(.is-mobile-preview) .quick-tab-label {
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+  }
+}
+
+/* 2. 手機版與預覽模式樣式 (Mobile Preview Bezel) */
+.pc-top-nav-tabs, .pc-brand-subtitle {
+  display: none;
+}
+
+/* 介面模式切換按鈕 (電腦/手機模式) */
+.device-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-color);
+  background: #F0FDF4;
+  color: #166534;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+
+.device-toggle-btn:hover {
+  background: #DCFCE7;
+  transform: translateY(-1px);
+}
+
+.device-toggle-btn:active {
+  transform: scale(0.96);
+}
+
+.header-action-btn-pc {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.header-action-btn-pc:hover {
+  background: #E0F2FE;
+  color: var(--primary-dark);
+}
+
+/* 當使用者在 PC 上選擇「手機模擬預覽」時的外框樣式 */
+.is-mobile-preview {
+  max-width: 412px !important;
+  margin: 20px auto !important;
+  border-radius: 36px !important;
+  border: 10px solid #1E293B !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25) !important;
+  padding: 16px 14px 115px !important;
+  background-color: var(--bg-main) !important;
+}
+
+.is-mobile-preview .pc-top-nav-tabs,
+.is-mobile-preview .pc-brand-subtitle {
+  display: none !important;
+}
+
+.is-mobile-preview .bottom-quick-tabbar {
+  max-width: 392px !important;
+}
