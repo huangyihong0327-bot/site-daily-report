@@ -2928,7 +2928,283 @@ table.rep-table-grid th {
   }
 }
 
-  </style>
+
+
+/* ========================================================================= */
+/* 營建工程日報 2.0 全域強固導航與新模組樣式 (Universal System 2.0)            */
+/* ========================================================================= */
+
+.universal-header-bar {
+  display: block !important;
+  width: 100% !important;
+  background: #FFFFFF !important;
+  border-bottom: 2px solid #E2E8F0 !important;
+  padding: 10px 14px 8px !important;
+  margin-bottom: 16px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+.header-main-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  padding-bottom: 8px !important;
+}
+
+.brand-clickable-area {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.brand-title-text {
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+
+.brand-subtitle-text {
+  font-size: 11px !important;
+  color: #64748B !important;
+}
+
+.active-proj-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 3px 10px !important;
+  border-radius: 12px !important;
+  background: #E0F2FE !important;
+  color: #0284C7 !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  border: 1px solid #BAE6FD !important;
+  max-width: 200px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.header-controls-area {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.role-pill-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+  border-radius: 16px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+.badge-admin {
+  background: #FEF3C7 !important;
+  color: #92400E !important;
+  border: 1px solid #FCD34D !important;
+}
+.badge-worker {
+  background: #F1F5F9 !important;
+  color: #475569 !important;
+  border: 1px solid #CBD5E1 !important;
+}
+.role-pill-badge:hover {
+  transform: translateY(-1px) !important;
+}
+
+.universal-subnav-rail {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: #F8FAFC !important;
+  padding: 6px 8px !important;
+  border-radius: 10px !important;
+  border: 1px solid #E2E8F0 !important;
+  margin-top: 4px !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell:not(.is-mobile-preview) .universal-subnav-rail,
+.is-pc-mode .universal-subnav-rail {
+  flex-wrap: wrap !important;
+  overflow: visible !important;
+}
+
+.is-mobile-preview .universal-subnav-rail {
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+}
+.is-mobile-preview .universal-subnav-rail::-webkit-scrollbar {
+  display: none !important;
+}
+
+.subnav-pill-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  height: 36px !important;
+  padding: 0 13px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid #CBD5E1 !important;
+  background: #FFFFFF !important;
+  color: #334155 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.subnav-pill-btn:hover {
+  background: #F1F5F9 !important;
+  border-color: #94A3B8 !important;
+  color: #0F172A !important;
+}
+
+.subnav-pill-btn.active {
+  background: #0284C7 !important;
+  border-color: #0284C7 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35) !important;
+}
+
+.lock-indicator {
+  font-size: 11px !important;
+  margin-left: 2px !important;
+}
+
+.advanced-modules-dashboard-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+  gap: 12px !important;
+  margin-bottom: 20px !important;
+}
+
+.adv-module-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+}
+.adv-module-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: #0284C7 !important;
+  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.12) !important;
+}
+
+.adv-card-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 8px !important;
+}
+.adv-card-icon {
+  font-size: 22px !important;
+}
+.adv-card-badge {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 2px 8px !important;
+  border-radius: 10px !important;
+  background: #E0F2FE !important;
+  color: #0284C7 !important;
+}
+.adv-card-title {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  margin-bottom: 4px !important;
+}
+.adv-card-desc {
+  font-size: 12px !important;
+  color: #64748B !important;
+  line-height: 1.4 !important;
+}
+
+.module-title-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 12px !important;
+  padding: 18px 22px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
+}
+.custom-card-panel {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
+}
+
+/* 手機底部導覽列樣式：5 欄格柵，絕不擁擠 */
+.bottom-quick-tabbar {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  max-width: 480px !important;
+  height: 64px !important;
+  padding: 4px 6px 8px !important;
+}
+
+.bottom-quick-tabbar .quick-tab-item {
+  padding: 2px !important;
+  gap: 2px !important;
+}
+
+.bottom-quick-tabbar .quick-tab-icon {
+  font-size: 18px !important;
+}
+
+.bottom-quick-tabbar .quick-tab-label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+/* 電腦版 (>=900px 或 is-pc-mode) 隱藏底欄，由頂部 universal-subnav-rail 完全接管 */
+@media (min-width: 900px) {
+  .bottom-quick-tabbar {
+    display: none !important;
+  }
+}
+.is-pc-mode .bottom-quick-tabbar {
+  display: none !important;
+}
+
+@media print {
+  .universal-header-bar,
+  .universal-subnav-rail,
+  .bottom-quick-tabbar,
+  .advanced-modules-dashboard-grid,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #FFFFFF !important;
+  }
+  .formal-log-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+}
+
+</style>
 </head>
 <body data-ui-theme="motion-driven">
   <div id="app-root" class="app-shell"></div>
@@ -3096,7 +3372,67 @@ let state = {
     lineSupportUrl: '@site_support'
   },
 
-  toastMessage: ''
+  toastMessage: '',
+
+  // ===== 2.0 依需求書 DOC 1 擴充之狀態 =====
+  currentUserRole: localStorage.getItem('site_report_user_role') || 'admin', // 'admin' (工務所主任) | 'worker' (現場工程師)
+  
+  // DOC 1 第二節：設定中的專案功能開關 (可由管理者於設定中啟用/停用)
+  featureFlags: {
+    materials: true,   // 材料管理與用量計算
+    cost: true,        // 成本管理與預算控制
+    claims: true,      // 請款階段與款項追蹤
+    formalLog: true    // 建築物施工日誌轉換
+  },
+
+  // DOC 1 第五節：材料主檔清單
+  materialsMaster: [
+    { id: 'm1', code: 'C210', name: '預拌混凝土 210kgf/cm²', spec: '普通混凝土 (水灰比<0.5)', unit: 'm³', initQty: 100, inQty: 30, todayUsed: 25, unitPrice: 2450 },
+    { id: 'm2', code: 'R_SD420', name: '竹節鋼筋 SD420', spec: '#4 (D13) 高張力', unit: 't', initQty: 50, inQty: 10, todayUsed: 4.5, unitPrice: 22000 },
+    { id: 'm3', code: 'SAND_M', name: '特級天然中砂', spec: '洗選天然砂', unit: 'm³', initQty: 80, inQty: 0, todayUsed: 12, unitPrice: 650 },
+    { id: 'm4', code: 'BRICK_R', name: '一級紅磚', spec: '200x95x53mm 實心', unit: '千塊', initQty: 30, inQty: 5, todayUsed: 3, unitPrice: 3200 }
+  ],
+
+  // DOC 1 第七節：成本計算與 EVM 控制
+  costMetrics: {
+    BAC: 18500000, // 總預算 (契約總額)
+    AC: 6480000,   // 實際成本
+    EV: 7200000,   // 實得值
+    ETC: 12020000, // 完工尚需估計
+    EAC: 18500000, // 完工預估成本
+    VAC: 0         // 預算變異
+  },
+
+  // DOC 1 第八、九節與用戶附圖 4：工程契約請款雙軌看板
+  claimsData: {
+    contractTotal: 18500000,
+    milestones: [
+      { id: 1, title: '基礎擋土與地盤改良', weight: 20, amount: 3700000, progress: 100, status: 'settled', statusText: '已結清' },
+      { id: 2, title: '地下室及 1F 結構體', weight: 35, amount: 6480000, progress: 85, status: 'claiming', statusText: '已核定請款中' },
+      { id: 3, title: '地上層主體結構工程', weight: 25, amount: 4630000, progress: 20, status: 'unreached', statusText: '尚未達標' },
+      { id: 4, title: '外牆帷幕與泥水裝修', weight: 12, amount: 2220000, progress: 0, status: 'unstarted', statusText: '未開始' },
+      { id: 5, title: '機電配管與竣工驗收', weight: 8, amount: 1480000, progress: 0, status: 'unstarted', statusText: '未開始' }
+    ],
+    currentPeriod: {
+      periodNo: '04',
+      title: '第 04 期計價估驗款 (地下結構與1F樑版)',
+      statusText: '業主已核定 · 待撥尾款',
+      approvedAmount: 75000,  // (+) 本期核定工程款
+      taxRate: 0.05,          // (+) 營業稅 (5%) = 3750
+      retentionRate: 0.05,    // (-) 契約保留款 (5%) = 3750
+      prepayDeduction: 10000, // (-) 預付款扣回 = 10000
+      safetyPenalty: 1000     // (-) 現場安衛罰款扣減 = 1000
+    }
+  },
+
+  // DOC 1 第十節與用戶附圖 1：建築物施工日誌法定數據
+  formalLogSchedule: {
+    contractDays: 480,
+    usedDays: 160,
+    extendedDays: 18,
+    excludedDays: 67,
+    remainingDays: 338 // 480 + 18 - 160 = 338
+  }
 };
 
 function formatDateWestern(isoStr, mode = 'slash_weekday') {
@@ -3421,6 +3757,14 @@ function renderApp() {
 
   if (state.activeBottomTab === 'home') {
     bodyContent = renderPage01ProjectManagement();
+  } else if (state.activeBottomTab === 'materials') {
+    bodyContent = renderPageMaterialsView(proj, rep);
+  } else if (state.activeBottomTab === 'cost') {
+    bodyContent = renderPageCostView(proj);
+  } else if (state.activeBottomTab === 'claims') {
+    bodyContent = renderPageClaimsView(proj);
+  } else if (state.activeBottomTab === 'formalLog') {
+    bodyContent = renderPageFormalLogView(proj, rep);
   } else if (state.activeBottomTab === 'stats') {
     bodyContent = renderPageStatsView();
   } else if (state.activeBottomTab === 'model') {
@@ -3471,54 +3815,78 @@ function renderHeaderNav() {
   const isHome = state.activeBottomTab === 'home';
   const proj = getActiveProject();
   const cur = state.activeBottomTab;
-  const isPcMode = state.deviceMode === 'pc' || (state.deviceMode !== 'mobile' && typeof window !== 'undefined' && window.innerWidth >= 900);
-  const toggleBtnText = isPcMode ? '🖥️ 電腦版' : '📱 手機版';
+  const isPcDevice = state.deviceMode === 'pc' || (state.deviceMode !== 'mobile' && typeof window !== 'undefined' && window.innerWidth >= 900);
+  const toggleBtnText = isPcDevice ? '🖥️ 電腦版' : '📱 手機版';
+  const isAdmin = state.currentUserRole === 'admin';
+
+  // 核心模組清單 (依據設定中開關動態顯示)
+  const navTabs = [
+    { id: 'home', icon: '⚡', label: '專案首頁', enabled: true },
+    { id: 'materials', icon: '🧱', label: '材料台帳', enabled: state.featureFlags.materials },
+    { id: 'cost', icon: '💰', label: '成本預算', enabled: state.featureFlags.cost, lock: !isAdmin },
+    { id: 'claims', icon: '📑', label: '計價請款', enabled: state.featureFlags.claims },
+    { id: 'formalLog', icon: '🏛️', label: '施工日誌', enabled: state.featureFlags.formalLog },
+    { id: 'stats', icon: '📊', label: '總報表', enabled: true },
+    { id: 'model', icon: '🏢', label: '3D模型', enabled: true },
+    { id: 'settings', icon: '⚙️', label: '系統設定', enabled: true }
+  ].filter(t => t.enabled);
 
   return `
-    <header class="minimal-header-nav no-print">
-      <div class="minimal-brand-wrap" onclick="window.appActions.navigateTab('home')">
-        <span style="font-size:22px;">🏗️</span>
-        <div>
-          <div class="minimal-brand-title">${isHome ? '營建工程管理系統' : '營建日報'}</div>
-          <div class="pc-brand-subtitle">工務所電腦工作站</div>
+    <header class="universal-header-bar no-print">
+      <!-- 頂部品牌列與全域控制鈕 -->
+      <div class="header-main-row">
+        <div class="brand-clickable-area" onclick="window.appActions.navigateTab('home')" style="cursor:pointer;" title="點擊返回專案首頁">
+          <span style="font-size:24px;">🏗️</span>
+          <div>
+            <div class="brand-title-text">${isHome ? '營建工程管理系統 2.0' : '營建日報 2.0'}</div>
+            <div class="brand-subtitle-text">工務所電腦工作站</div>
+          </div>
+          ${!isHome ? `<span class="active-proj-pill" title="目前案場">${proj.name}</span>` : ''}
         </div>
-        ${!isHome ? `<span class="minimal-proj-pill" title="目前案場">${proj.name}</span>` : ''}
+
+        <div class="header-controls-area">
+          <!-- DOC 1: 角色守衛切換膠囊 -->
+          <button class="role-pill-badge ${isAdmin ? 'badge-admin' : 'badge-worker'}" 
+                  onclick="window.appActions.toggleUserRole()" 
+                  title="點擊切換權限角色：工務所主任(全權限) / 現場工程師(遮蔽預算)">
+            ${isAdmin ? '👑 主任 (全解鎖)' : '👷 工程師 (遮蔽)'}
+          </button>
+
+          <!-- 電腦/手機版型智慧切換器 -->
+          <button class="device-toggle-btn" onclick="window.appActions.toggleDeviceMode()" title="點擊切換「電腦寬螢幕」與「手機模擬」視圖">
+            ${toggleBtnText}
+          </button>
+
+          ${!isHome ? `
+            <button class="header-action-btn-pc" onclick="window.appActions.quickPrintA4()" title="快速輸出正式 A4 建築物施工日誌">
+              🖨️ 列印 A4
+            </button>
+            <button class="action-sheet-trigger-btn" onclick="window.appActions.openExportActionSheet()" title="匯出 Excel / 備份">
+              <span>⋯</span>
+            </button>
+          ` : `
+            <button class="header-action-btn-pc" onclick="window.appActions.navigateTab('formalLog')" title="查看建築物施工日誌">
+              🏛️ 施工日誌
+            </button>
+          `}
+          <button class="action-sheet-trigger-btn" style="background:#0EA5E9;color:#fff;border-color:#0284C7;" onclick="window.appActions.navigateTab('settings')" title="帳號與設定">
+            <span>⚙️</span>
+          </button>
+        </div>
       </div>
 
-      <!-- 電腦端專屬頂部導覽列 (PC Desktop Top Navigation) -->
-      <nav class="pc-top-nav-tabs" aria-label="電腦版導航列">
-        <button class="pc-nav-tab-item ${cur === 'home' ? 'active' : ''}" onclick="window.appActions.navigateTab('home')">
-          <span>⚡</span> 專案首頁
-        </button>
-        <button class="pc-nav-tab-item ${cur === 'stats' ? 'active' : ''}" onclick="window.appActions.navigateTab('stats')">
-          <span>📊</span> 專案總報表
-        </button>
-        <button class="pc-nav-tab-item ${cur === 'model' ? 'active' : ''}" onclick="window.appActions.navigateTab('model')">
-          <span>🏠</span> 3D模型
-        </button>
-        <button class="pc-nav-tab-item ${cur === 'settings' ? 'active' : ''}" onclick="window.appActions.navigateTab('settings')">
-          <span>⚙️</span> 系統設定
-        </button>
+      <!-- 全功能模組次導覽列 (電腦版一覽無遺、手機版流暢滑動，保證隨時皆可切換，解決「電腦沒得切」問題) -->
+      <nav class="universal-subnav-rail" aria-label="核心模組切換導覽列">
+        ${navTabs.map(t => `
+          <button class="subnav-pill-btn ${cur === t.id ? 'active' : ''}" 
+                  onclick="window.appActions.navigateTab('${t.id}')"
+                  title="${t.label}${t.lock ? ' (主任權限解鎖)' : ''}">
+            <span class="subnav-icon">${t.icon}</span>
+            <span class="subnav-label">${t.label}</span>
+            ${t.lock ? '<span class="lock-indicator" title="工程師權限保護">🔒</span>' : ''}
+          </button>
+        `).join('')}
       </nav>
-
-      <div class="minimal-header-actions">
-        <!-- 電腦/手機版型智慧切換器 -->
-        <button class="device-toggle-btn" onclick="window.appActions.toggleDeviceMode()" title="點擊於「電腦寬版」與「手機模擬」介面切換">
-          ${toggleBtnText}
-        </button>
-
-        ${!isHome ? `
-          <button class="header-action-btn-pc" onclick="window.appActions.quickPrintA4()" title="快速輸出正式 A4 報表">
-            🖨️ 列印 A4
-          </button>
-          <button class="action-sheet-trigger-btn" onclick="window.appActions.openExportActionSheet()" title="更多匯出與報表操作">
-            <span>⋯</span>
-          </button>
-        ` : ''}
-        <button class="action-sheet-trigger-btn" style="background:#0EA5E9;color:#fff;border-color:#0284C7;" onclick="window.appActions.navigateTab('settings')" title="帳號與設定">
-          <span>👤</span>
-        </button>
-      </div>
     </header>
   `;
 }
@@ -3526,22 +3894,26 @@ function renderHeaderNav() {
 function renderBottomQuickTabBar() {
   const cur = state.activeBottomTab;
   return `
-    <nav class="bottom-quick-tabbar no-print" aria-label="主要快速導覽">
+    <nav class="bottom-quick-tabbar no-print" aria-label="手機端主要快速導覽">
       <button class="quick-tab-item ${cur === 'home' ? 'active' : ''}" onclick="window.appActions.navigateTab('home')">
         <span class="quick-tab-icon">⚡</span>
-        <span class="quick-tab-label">快速首頁</span>
+        <span class="quick-tab-label">專案首頁</span>
+      </button>
+      <button class="quick-tab-item ${cur === 'materials' ? 'active' : ''}" onclick="window.appActions.navigateTab('materials')">
+        <span class="quick-tab-icon">🧱</span>
+        <span class="quick-tab-label">材料台帳</span>
+      </button>
+      <button class="quick-tab-item ${cur === 'formalLog' ? 'active' : ''}" onclick="window.appActions.navigateTab('formalLog')">
+        <span class="quick-tab-icon">🏛️</span>
+        <span class="quick-tab-label">施工日誌</span>
       </button>
       <button class="quick-tab-item ${cur === 'stats' ? 'active' : ''}" onclick="window.appActions.navigateTab('stats')">
         <span class="quick-tab-icon">📊</span>
-        <span class="quick-tab-label">專案總報表</span>
-      </button>
-      <button class="quick-tab-item ${cur === 'model' ? 'active' : ''}" onclick="window.appActions.navigateTab('model')">
-        <span class="quick-tab-icon">🏠</span>
-        <span class="quick-tab-label">模型</span>
+        <span class="quick-tab-label">總報表</span>
       </button>
       <button class="quick-tab-item ${cur === 'settings' ? 'active' : ''}" onclick="window.appActions.navigateTab('settings')">
         <span class="quick-tab-icon">⚙️</span>
-        <span class="quick-tab-label">設定</span>
+        <span class="quick-tab-label">系統設定</span>
       </button>
     </nav>
   `;
@@ -3579,6 +3951,45 @@ function renderPage01ProjectManagement() {
   }).join('');
 
   return `
+    <!-- 2.0 依需求書 DOC 1：進階專案管理模組快捷看板 -->
+    <section class="advanced-modules-dashboard-grid no-print">
+      <div class="adv-module-card adv-card-materials" onclick="window.appActions.navigateTab('materials')">
+        <div class="adv-card-header">
+          <span class="adv-card-icon">🧱</span>
+          <span class="adv-card-badge">材料台帳</span>
+        </div>
+        <div class="adv-card-title">材料用量與庫存</div>
+        <div class="adv-card-desc">預拌混凝土/鋼筋進退料台帳、BOM 耗用與方數計算</div>
+      </div>
+
+      <div class="adv-module-card adv-card-cost" onclick="window.appActions.navigateTab('cost')">
+        <div class="adv-card-header">
+          <span class="adv-card-icon">💰</span>
+          <span class="adv-card-badge">${state.currentUserRole === 'admin' ? '預算監控' : '🔒 權限保護'}</span>
+        </div>
+        <div class="adv-card-title">成本預算與 EVM</div>
+        <div class="adv-card-desc">${state.currentUserRole === 'admin' ? '契約總額 NT$ 1850 萬 · AC 累計 NT$ 648 萬' : '主任授權解鎖詳細敏感財務成本資訊'}</div>
+      </div>
+
+      <div class="adv-module-card adv-card-claims" onclick="window.appActions.navigateTab('claims')">
+        <div class="adv-card-header">
+          <span class="adv-card-icon">📑</span>
+          <span class="adv-card-badge">請款看板</span>
+        </div>
+        <div class="adv-card-title">契約請款與估驗</div>
+        <div class="adv-card-desc">5大履約里程碑追蹤 · 第04期估驗款扣減公式</div>
+      </div>
+
+      <div class="adv-module-card adv-card-formallog" onclick="window.appActions.navigateTab('formalLog')">
+        <div class="adv-card-header">
+          <span class="adv-card-icon">🏛️</span>
+          <span class="adv-card-badge">法定 A4</span>
+        </div>
+        <div class="adv-card-title">建築物施工日誌</div>
+        <div class="adv-card-desc">依附圖標準格式 · 契約工期480天 · 九大法定欄位</div>
+      </div>
+    </section>
+
     <div class="pc-home-top-row">
       <div class="poster-tutorial-card">
         <span class="poster-tag">STEP-BY-STEP TUTORIAL</span>
@@ -4240,6 +4651,401 @@ function renderPage07DailyReportAndA4(proj, rep) {
 // =========================================================================
 // 📊 專案總體分析與資源配置總報表 (統整山積圖、S曲線折線圖、圓餅圖與公文輸出)
 // =========================================================================
+
+// =========================================================================
+// 🧱 2.0 模組一：材料台帳與用量計算 (DOC 1 第五、六節)
+// =========================================================================
+function renderPageMaterialsView(proj, rep) {
+  const mats = state.materialsMaster || [];
+  return `
+    <div class="page-container" style="max-width:1180px;margin:0 auto;padding-bottom:90px;">
+      <div class="module-title-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <h2 style="font-size:20px;font-weight:800;color:#0F172A;margin:0;">🧱 專案主要材料進退料與用量台帳</h2>
+            <p style="font-size:13px;color:#64748B;margin:4px 0 0;">依工程日報標準規範登錄材料規格、期初數量、今日使用與庫存推算</p>
+          </div>
+          <button class="primary-btn-pill" onclick="window.appActions.navigateTab('home')" style="height:36px;padding:0 14px;border-radius:8px;background:#0284C7;color:#fff;border:none;font-weight:700;cursor:pointer;">
+            ⬅️ 返回專案首頁
+          </button>
+        </div>
+      </div>
+
+      <!-- 材料主檔台帳表格 -->
+      <div class="custom-card-panel" style="margin-top:16px;">
+        <h3 style="font-size:16px;font-weight:700;color:#1E293B;margin-bottom:12px;">📊 本日材料使用明細與庫存現況</h3>
+        <div style="overflow-x:auto;">
+          <table class="standard-ledger-table" style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+              <tr style="background:#F1F5F9;color:#334155;border-bottom:2px solid #CBD5E1;text-align:left;">
+                <th style="padding:10px;">編碼</th>
+                <th style="padding:10px;">材料名稱與規格</th>
+                <th style="padding:10px;">單位</th>
+                <th style="padding:10px;">期初庫存</th>
+                <th style="padding:10px;">今日進料</th>
+                <th style="padding:10px;">今日使用量</th>
+                <th style="padding:10px;">結存數量</th>
+                <th style="padding:10px;">材料單價</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${mats.map(m => {
+                const stock = m.initQty + m.inQty - m.todayUsed;
+                return `
+                  <tr style="border-bottom:1px solid #E2E8F0;">
+                    <td style="padding:10px;font-weight:700;color:#0284C7;">${m.code}</td>
+                    <td style="padding:10px;"><strong>${m.name}</strong><br><span style="font-size:11px;color:#64748B;">${m.spec}</span></td>
+                    <td style="padding:10px;">${m.unit}</td>
+                    <td style="padding:10px;">${m.initQty}</td>
+                    <td style="padding:10px;color:#16A34A;font-weight:600;">+${m.inQty}</td>
+                    <td style="padding:10px;">
+                      <input type="number" min="0" step="0.5" value="${m.todayUsed}" 
+                             style="width:80px;height:32px;padding:2px 8px;border:1.5px solid #CBD5E1;border-radius:6px;font-weight:700;"
+                             onchange="window.appActions.updateDailyMaterial('${m.id}', this.value)" />
+                    </td>
+                    <td style="padding:10px;font-weight:800;color:${stock < 10 ? '#DC2626' : '#0F172A'};">${stock.toFixed(1)}</td>
+                    <td style="padding:10px;color:#475569;">${state.currentUserRole === 'admin' ? `NT$ ${m.unitPrice.toLocaleString()}` : '🔒 遮蔽'}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 混凝土方數試算輔助工具 (DOC 1 第五節) -->
+      <div class="custom-card-panel" style="margin-top:16px;">
+        <h3 style="font-size:16px;font-weight:700;color:#1E293B;margin-bottom:8px;">📐 預拌混凝土理論用量試算機 (BOM 計算)</h3>
+        <p style="font-size:12px;color:#64748B;margin-bottom:12px;">依據工程經驗公式：澆置面積 (m²) × 標準版厚 (0.15m) + 3% 施工耗損率</p>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <label style="font-size:13px;font-weight:600;color:#334155;">施作澆置面積 (m²)：</label>
+          <input type="number" id="calc-concrete-area" placeholder="例: 120" style="width:120px;height:34px;padding:4px 8px;border:1.5px solid #CBD5E1;border-radius:6px;" oninput="window.appActions.calcTheoreticalConcrete(this.value)" />
+          <span id="calc-result-hint" style="font-size:14px;font-weight:700;color:#0284C7;">➔ 理論量：0.0 m³ (加計3%損耗：0.0 m³)</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// =========================================================================
+// 💰 2.0 模組二：成本計算與 EVM 預算控制 (DOC 1 第七節)
+// =========================================================================
+function renderPageCostView(proj) {
+  const cb = state.costMetrics;
+  const isAdmin = state.currentUserRole === 'admin';
+
+  return `
+    <div class="page-container" style="max-width:1180px;margin:0 auto;padding-bottom:90px;">
+      <div class="module-title-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <h2 style="font-size:20px;font-weight:800;color:#0F172A;margin:0;">💰 專案財務成本與 EVM 掙值管理看板</h2>
+            <p style="font-size:13px;color:#64748B;margin:4px 0 0;">整合合約總預算 BAC、實際成本 AC、完工尚需 ETC 與預算變異 VAC</p>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="role-pill-badge ${isAdmin ? 'badge-admin' : 'badge-worker'}" onclick="window.appActions.toggleUserRole()">
+              ${isAdmin ? '👑 主任 (全解鎖)' : '👷 工程師 (遮蔽)'}
+            </button>
+            <button class="primary-btn-pill" onclick="window.appActions.navigateTab('home')" style="height:36px;padding:0 14px;border-radius:8px;background:#0284C7;color:#fff;border:none;font-weight:700;cursor:pointer;">
+              ⬅️ 返回專案
+            </button>
+          </div>
+        </div>
+      </div>
+
+      ${!isAdmin ? `
+        <div class="custom-card-panel" style="margin-top:16px;background:#FEF2F2;border:1.5px solid #FCA5A5;text-align:center;padding:32px 20px;">
+          <span style="font-size:36px;">🔒</span>
+          <h3 style="font-size:17px;font-weight:800;color:#991B1B;margin:8px 0;">財務機密成本受主任權限保護</h3>
+          <p style="font-size:13px;color:#7F1D1D;max-width:500px;margin:0 auto 16px;">
+            依據 DOC 1 第四節「成員邀請與兩類權限」規範，一般使用者 (現場工程師) 預設遮蔽契約單價、累計成本與利潤等敏感數額。
+          </p>
+          <button onclick="window.appActions.toggleUserRole()" style="height:38px;padding:0 16px;border-radius:8px;background:#DC2626;color:#fff;border:none;font-weight:700;cursor:pointer;">
+            切換為【工務所主任】身分即時檢視
+          </button>
+        </div>
+      ` : `
+        <!-- 5 大 EVM 核心指標卡片 -->
+        <div class="metrics-kpi-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-top:16px;">
+          <div class="metric-summary-card" style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:10px;padding:16px;">
+            <div style="font-size:12px;color:#64748B;font-weight:600;">契約完工總預算 (BAC)</div>
+            <div style="font-size:22px;font-weight:800;color:#0284C7;margin:6px 0;">NT$ ${(cb.BAC/10000).toFixed(0)} 萬</div>
+            <div style="font-size:11px;color:#94A3B8;">合約承造總金額 (1,850萬)</div>
+          </div>
+
+          <div class="metric-summary-card" style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:10px;padding:16px;">
+            <div style="font-size:12px;color:#64748B;font-weight:600;">實際累計發生成本 (AC)</div>
+            <div style="font-size:22px;font-weight:800;color:#DC2626;margin:6px 0;">NT$ ${(cb.AC/10000).toFixed(0)} 萬</div>
+            <div style="font-size:11px;color:#16A34A;">成本執行率 35.0%</div>
+          </div>
+
+          <div class="metric-summary-card" style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:10px;padding:16px;">
+            <div style="font-size:12px;color:#64748B;font-weight:600;">完工尚需估計成本 (ETC)</div>
+            <div style="font-size:22px;font-weight:800;color:#D97706;margin:6px 0;">NT$ ${(cb.ETC/10000).toFixed(0)} 萬</div>
+            <div style="font-size:11px;color:#64748B;">剩餘工程發包預估</div>
+          </div>
+
+          <div class="metric-summary-card" style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:10px;padding:16px;">
+            <div style="font-size:12px;color:#64748B;font-weight:600;">完工預估總成本 (EAC)</div>
+            <div style="font-size:22px;font-weight:800;color:#0F172A;margin:6px 0;">NT$ ${(cb.EAC/10000).toFixed(0)} 萬</div>
+            <div style="font-size:11px;color:#0284C7;">EAC = AC + ETC</div>
+          </div>
+
+          <div class="metric-summary-card" style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:10px;padding:16px;">
+            <div style="font-size:12px;color:#64748B;font-weight:600;">完工預算變異 (VAC)</div>
+            <div style="font-size:22px;font-weight:800;color:#16A34A;margin:6px 0;">NT$ ${(cb.VAC/10000).toFixed(0)} 萬</div>
+            <div style="font-size:11px;color:#16A34A;">預算內履約，無超支</div>
+          </div>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+// =========================================================================
+// 📑 2.0 模組三：工程契約請款雙軌看板 (100% 依據用戶附圖 4 media_1793133054240_96d2c67b.png)
+// =========================================================================
+function renderPageClaimsView(proj) {
+  const c = state.claimsData;
+  const p = c.currentPeriod;
+  const netAmount = p.approvedAmount + (p.approvedAmount * p.taxRate) - (p.approvedAmount * p.retentionRate) - p.prepayDeduction - p.safetyPenalty;
+
+  return `
+    <div class="page-container" style="max-width:1180px;margin:0 auto;padding-bottom:90px;">
+      <!-- 上半部卡片：施工加權履約里程碑看板 -->
+      <div class="claims-master-card" style="background:#FFFFFF;border:1.5px solid #BAE6FD;border-radius:14px;box-shadow:0 8px 24px rgba(14,165,233,0.06);padding:24px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-bottom:16px;border-bottom:1.5px solid #F1F5F9;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">📑</span>
+            <h2 style="font-size:19px;font-weight:800;color:#0F172A;margin:0;">工程契約請款階段與款項追蹤雙軌看板</h2>
+            <span style="font-size:13px;font-weight:700;color:#0284C7;margin-left:8px;">契約總額：NT$ ${(c.contractTotal/10000).toFixed(0)} 萬元</span>
+          </div>
+          <button class="claims-export-btn" onclick="window.appActions.exportClaimsPdf()" style="height:36px;padding:0 16px;border-radius:20px;background:#0284C7;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+            📥 匯出請款期別報表
+          </button>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div style="font-size:13px;font-weight:700;color:#475569;margin-bottom:14px;">※ 施工加權履約里程碑 (合約總和 100%)</div>
+          <div class="milestones-list" style="display:flex;flex-direction:column;gap:12px;">
+            ${c.milestones.map(m => {
+              let badgeBg = '#F1F5F9';
+              let badgeColor = '#64748B';
+              if (m.status === 'settled') {
+                badgeBg = '#DCFCE7';
+                badgeColor = '#15803D';
+              } else if (m.status === 'claiming') {
+                badgeBg = '#E0F2FE';
+                badgeColor = '#0369A1';
+              } else if (m.status === 'unstarted') {
+                badgeBg = '#F8FAFC';
+                badgeColor = '#94A3B8';
+              }
+
+              return `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#FAFCFF;border:1px solid #E2E8F0;border-radius:10px;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:28px;height:28px;border-radius:50%;background:#0284C7;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">
+                      ${m.id}
+                    </div>
+                    <div>
+                      <div style="font-size:14px;font-weight:700;color:#0F172A;">${m.title} (合約權重 ${m.weight}%)</div>
+                      <div style="font-size:12px;color:#64748B;margin-top:2px;">
+                        階段契約額：NT$ ${(m.amount/10000).toFixed(0)} 萬元 · 現場施工進度 ${m.progress}%
+                      </div>
+                    </div>
+                  </div>
+                  <span style="display:inline-block;padding:4px 12px;border-radius:14px;font-size:12px;font-weight:700;background:${badgeBg};color:${badgeColor};">
+                    ${m.statusText}
+                  </span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- 下半部卡片：當期計價估驗款明細 (100% 還原用戶附圖 4) -->
+      <div class="claims-period-card" style="background:#FFFFFF;border:1.5px solid #38BDF8;border-radius:14px;padding:24px;box-shadow:0 8px 24px rgba(56,189,248,0.08);">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-bottom:16px;border-bottom:1px solid #E2E8F0;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">📑</span>
+            <h3 style="font-size:16px;font-weight:800;color:#0F172A;margin:0;">${p.title}</h3>
+          </div>
+          <span style="display:inline-block;padding:4px 14px;border-radius:14px;background:#FEF3C7;color:#B45309;font-size:12.5px;font-weight:700;">
+            ${p.statusText}
+          </span>
+        </div>
+
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#334155;">
+            <span>(+) 本期核定工程款：</span>
+            <span style="font-weight:700;color:#0F172A;">NT$ ${p.approvedAmount.toLocaleString()}</span>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#334155;">
+            <span>(+) 營業稅 (5%)：</span>
+            <span style="font-weight:700;color:#0F172A;">NT$ ${(p.approvedAmount * p.taxRate).toLocaleString()}</span>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#DC2626;">
+            <span>(-) 契約保留款 (5%)：</span>
+            <span style="font-weight:700;">- NT$ ${(p.approvedAmount * p.retentionRate).toLocaleString()}</span>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#DC2626;">
+            <span>(-) 預付款扣回：</span>
+            <span style="font-weight:700;">- NT$ ${p.prepayDeduction.toLocaleString()}</span>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#DC2626;">
+            <span>(-) 現場安衛罰款扣減：</span>
+            <span style="font-weight:700;">- NT$ ${p.safetyPenalty.toLocaleString()}</span>
+          </div>
+
+          <div style="margin-top:12px;padding-top:12px;border-top:2px dashed #CBD5E1;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:15px;font-weight:800;color:#0F172A;">➔ 本期實付 / 應收估驗款淨額：</span>
+            <span style="font-size:20px;font-weight:900;color:#0284C7;">NT$ ${netAmount.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// =========================================================================
+// 🏛️ 2.0 模組四：建築物施工日誌法定 A4 報表 (100% 依據用戶附圖 1 media_1793119798288_ec3af1b3.png)
+// =========================================================================
+function renderPageFormalLogView(proj, rep) {
+  const sch = state.formalLogSchedule;
+  const workers = (rep && rep.workers) || [];
+  const machines = (rep && rep.machines) || [];
+
+  return `
+    <div class="page-container formal-log-container" style="max-width:1100px;margin:0 auto;padding-bottom:90px;">
+      <div class="no-print" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h2 style="font-size:18px;font-weight:800;color:#0F172A;margin:0;">🏛️ 建築物施工日誌 (法定專用 A4 格式)</h2>
+          <span style="font-size:12px;color:#64748B;">依據營造業法第 32 條與內政部國土管理署標準表單製作</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="primary-btn-pill" onclick="window.print()" style="height:36px;padding:0 16px;border-radius:8px;background:#0284C7;color:#fff;border:none;font-weight:700;cursor:pointer;">
+            🖨️ 直接列印 A4
+          </button>
+          <button class="primary-btn-pill" onclick="window.appActions.navigateTab('home')" style="height:36px;padding:0 14px;border-radius:8px;background:#E2E8F0;color:#334155;border:none;font-weight:700;cursor:pointer;">
+            ⬅️ 返回首頁
+          </button>
+        </div>
+      </div>
+
+      <!-- A4 模擬紙張 (列印時佔滿整頁) -->
+      <div class="formal-log-sheet" style="background:#FFFFFF;border:2px solid #000000;padding:24px;color:#000000;font-family:'Times New Roman', '標楷體', serif;">
+        <div style="text-align:center;margin-bottom:16px;">
+          <h1 style="font-size:22px;font-weight:900;letter-spacing:4px;margin:0 0 6px;">建築物施工日誌</h1>
+          <div style="font-size:12px;color:#333;">工程編號：${proj.id || 'PRJ-2026-001'}</div>
+        </div>
+
+        <!-- 基本資料表頭 -->
+        <table style="width:100%;border-collapse:collapse;border:1px solid #000;font-size:12px;margin-bottom:12px;">
+          <tr>
+            <td style="border:1px solid #000;padding:6px;font-weight:700;width:12%;background:#F8F8F8;">工程名稱</td>
+            <td style="border:1px solid #000;padding:6px;width:38%;">${proj.name}</td>
+            <td style="border:1px solid #000;padding:6px;font-weight:700;width:12%;background:#F8F8F8;">填報日期</td>
+            <td style="border:1px solid #000;padding:6px;width:38%;">${(rep && rep.date) || '2026-10-27'} (晴)</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #000;padding:6px;font-weight:700;background:#F8F8F8;">承造人</td>
+            <td style="border:1px solid #000;padding:6px;">大陸營造股份有限公司</td>
+            <td style="border:1px solid #000;padding:6px;font-weight:700;background:#F8F8F8;">專任工程人員</td>
+            <td style="border:1px solid #000;padding:6px;">張簡技師 (主任技師)</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #000;padding:6px;font-weight:700;background:#F8F8F8;">工地主任</td>
+            <td style="border:1px solid #000;padding:6px;">黃主任 (證號: 110-BIM-0088)</td>
+            <td style="border:1px solid #000;padding:6px;font-weight:700;background:#F8F8F8;">工期核算</td>
+            <td style="border:1px solid #000;padding:6px;font-size:11px;">
+              核定工期: <strong>${sch.contractDays}</strong> 天 | 累計已用: <strong>${sch.usedDays}</strong> 天 | 展延: <strong>${sch.extendedDays}</strong> 天 | 免計: <strong>${sch.excludedDays}</strong> 天 | 剩餘工期: <strong style="color:#0284C7;">${sch.remainingDays}</strong> 天
+            </td>
+          </tr>
+        </table>
+
+        <!-- 九大法定欄位內容 -->
+        <div style="font-size:12px;font-weight:700;margin:8px 0 4px;">一、施工項目與契約數量：</div>
+        <table style="width:100%;border-collapse:collapse;border:1px solid #000;font-size:11px;margin-bottom:8px;">
+          <tr style="background:#F8F8F8;text-align:center;">
+            <th style="border:1px solid #000;padding:4px;width:40%;">工項名稱與部位</th>
+            <th style="border:1px solid #000;padding:4px;width:15%;">單位</th>
+            <th style="border:1px solid #000;padding:4px;width:15%;">契約數量</th>
+            <th style="border:1px solid #000;padding:4px;width:15%;">本日完成</th>
+            <th style="border:1px solid #000;padding:4px;width:15%;">累計完成</th>
+          </tr>
+          <tr>
+            <td style="border:1px solid #000;padding:4px;">1. 地下室 B1 擋土排樁與支撐</td>
+            <td style="border:1px solid #000;padding:4px;text-align:center;">支</td>
+            <td style="border:1px solid #000;padding:4px;text-align:right;">120.0</td>
+            <td style="border:1px solid #000;padding:4px;text-align:right;">4.0</td>
+            <td style="border:1px solid #000;padding:4px;text-align:right;">98.0</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #000;padding:4px;">2. 1F 樓板結構鋼筋綁紮與預埋管</td>
+            <td style="border:1px solid #000;padding:4px;text-align:center;">m²</td>
+            <td style="border:1px solid #000;padding:4px;text-align:right;">450.0</td>
+            <td style="border:1px solid #000;padding:4px;text-align:right;">45.0</td>
+            <td style="border:1px solid #000;padding:4px;text-align:right;">320.0</td>
+          </tr>
+        </table>
+
+        <div style="font-size:12px;font-weight:700;margin:8px 0 4px;">二、工地人員與機具管理概況：</div>
+        <table style="width:100%;border-collapse:collapse;border:1px solid #000;font-size:11px;margin-bottom:8px;">
+          <tr style="background:#F8F8F8;">
+            <td style="border:1px solid #000;padding:6px;width:50%;vertical-align:top;">
+              <strong>【工作人員進場 (人日)】</strong><br>
+              ${workers.map(w => `${w.tradeName}: ${w.count} 人`).join('、') || '鋼筋工: 6人、模板工: 8人、泥水工: 4人、水電工: 2人'}
+            </td>
+            <td style="border:1px solid #000;padding:6px;width:50%;vertical-align:top;">
+              <strong>【機具設備進場 (台班)】</strong><br>
+              ${machines.map(m => `${m.machineName}: ${m.count} 台`).join('、') || '挖掘機 (0.7m³): 1台、混凝土泵車: 1台、全吊吊車 (25T): 1台'}
+            </td>
+          </tr>
+        </table>
+
+        <div style="font-size:12px;font-weight:700;margin:8px 0 4px;">三、查核、安衛與重要記事：</div>
+        <table style="width:100%;border-collapse:collapse;border:1px solid #000;font-size:11px;margin-bottom:16px;">
+          <tr>
+            <td style="border:1px solid #000;padding:6px;font-weight:700;width:25%;background:#F8F8F8;">查核及依圖施工事項</td>
+            <td style="border:1px solid #000;padding:6px;">1F樑版鋼筋綁紮間距抽檢合格；模板支撐高度核符結構施工圖。</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #000;padding:6px;font-weight:700;background:#F8F8F8;">職業安全衛生及行政事務</td>
+            <td style="border:1px solid #000;padding:6px;">實施開工前勤前教育與酒測（全員合格）；周邊防墜安全網巡檢無破損。</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #000;padding:6px;font-weight:700;background:#F8F8F8;">施工取樣試驗紀錄</td>
+            <td style="border:1px solid #000;padding:6px;">預拌混凝土 210kgf/cm² 抽樣試體 5 組 (7天、28天抗壓試驗)。</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #000;padding:6px;font-weight:700;background:#F8F8F8;">重要事項與備註</td>
+            <td style="border:1px solid #000;padding:6px;">明日預定進行 B1 地坪混凝土澆置作業，已協調泵車於上午 08:00 進場。</td>
+          </tr>
+        </table>
+
+        <!-- 簽章區 -->
+        <table style="width:100%;border-collapse:collapse;border:1px solid #000;font-size:12px;">
+          <tr style="height:60px;">
+            <td style="border:1px solid #000;padding:8px;width:50%;vertical-align:bottom;">
+              承造人專任工程人員簽章：<span style="font-family:'標楷體';font-size:15px;color:#1E3A8A;margin-left:12px;">張簡 (已核章)</span>
+            </td>
+            <td style="border:1px solid #000;padding:8px;width:50%;vertical-align:bottom;">
+              工地主任簽章：<span style="font-family:'標楷體';font-size:15px;color:#1E3A8A;margin-left:12px;">黃主任 (已核章)</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+
 function renderPageStatsView() {
   const proj = getActiveProject();
   const allReports = [...(proj.reports || [])].sort((a, b) => a.reportDateISO.localeCompare(b.reportDateISO));
@@ -7070,7 +7876,54 @@ const bim3DManager = {
 // ⚙️ 設定 (加入累計數量開關)
 function renderPageSettingsView() {
   const acc = state.account;
+  const isAdmin = state.currentUserRole === 'admin';
   return `
+    <!-- 2.0 依需求書 DOC 1 第二節：專案進階功能開關面板 -->
+    <div class="motion-card" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;border-bottom:2px solid var(--border-light);padding-bottom:8px;">
+        <div>
+          <h3 style="font-size:16px;font-weight:800;color:var(--text-main);margin:0;">⚙️ 專案進階模組功能開關 (DOC 1 第二節)</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin:3px 0 0;">可由訂閱管理者/工務所主任依據各專案合約階段自主啟用，一般人員唯讀</p>
+        </div>
+        <button class="role-pill-badge ${isAdmin ? 'badge-admin' : 'badge-worker'}" onclick="window.appActions.toggleUserRole()">
+          ${isAdmin ? '👑 主任 (可編輯開關)' : '👷 工程師 (唯讀狀態)'}
+        </button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;">
+        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:700;font-size:14px;color:#1E293B;">🧱 材料管理與計算</span>
+            <input type="checkbox" ${state.featureFlags.materials ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''} onchange="window.appActions.toggleFeatureFlag('materials')" />
+          </div>
+          <div style="font-size:11.5px;color:#64748B;margin-top:4px;">材料主檔、BOM 耗用與庫存推算</div>
+        </div>
+
+        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:700;font-size:14px;color:#1E293B;">💰 成本管理與預算</span>
+            <input type="checkbox" ${state.featureFlags.cost ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''} onchange="window.appActions.toggleFeatureFlag('cost')" />
+          </div>
+          <div style="font-size:11.5px;color:#64748B;margin-top:4px;">BAC/AC/EVM 指標與敏感財務遮蔽</div>
+        </div>
+
+        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:700;font-size:14px;color:#1E293B;">📑 請款階段管理</span>
+            <input type="checkbox" ${state.featureFlags.claims ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''} onchange="window.appActions.toggleFeatureFlag('claims')" />
+          </div>
+          <div style="font-size:11.5px;color:#64748B;margin-top:4px;">5大履約里程碑與估驗扣減公式</div>
+        </div>
+
+        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:700;font-size:14px;color:#1E293B;">🏛️ 正式施工日誌轉換</span>
+            <input type="checkbox" ${state.featureFlags.formalLog ? 'checked' : ''} ${!isAdmin ? 'disabled' : ''} onchange="window.appActions.toggleFeatureFlag('formalLog')" />
+          </div>
+          <div style="font-size:11.5px;color:#64748B;margin-top:4px;">內政部法定 A4 建築物施工日誌</div>
+        </div>
+      </div>
+    </div>
     <div class="section-title-box">
       <span class="section-title-text">系統設定與帳號訂閱</span>
     </div>
@@ -7204,6 +8057,89 @@ function renderToastNotice() {
 // 全域動作控制器 (window.appActions)
 // =========================================================================
 window.appActions = {
+  // ===== 2.0 依需求書 DOC 1 & 2 擴充之互動動作 =====
+  toggleUserRole() {
+    state.currentUserRole = state.currentUserRole === 'admin' ? 'worker' : 'admin';
+    localStorage.setItem('site_report_user_role', state.currentUserRole);
+    showToast(state.currentUserRole === 'admin' ? '👑 已切換為【工務所主任】(解鎖預算與成本敏感數據)' : '👷 已切換為【現場工程師】(敏感金額自動遮蔽)');
+    renderApp();
+  },
+
+  toggleDeviceMode() {
+    const root = document.getElementById('app-root');
+    const isCurrentlyPc = root && root.classList.contains('is-pc-mode');
+    if (isCurrentlyPc) {
+      state.deviceMode = 'mobile';
+      localStorage.setItem('site_report_device_mode', 'mobile');
+      showToast('📱 已切換為【手機端模擬視圖】');
+    } else {
+      state.deviceMode = 'pc';
+      localStorage.setItem('site_report_device_mode', 'pc');
+      showToast('🖥️ 已切換為【電腦工務所寬螢幕模式】');
+    }
+    renderApp();
+  },
+
+  quickPrintA4() {
+    if (state.activeBottomTab !== 'formalLog') {
+      state.activeBottomTab = 'formalLog';
+      renderApp();
+      setTimeout(() => {
+        window.print();
+      }, 350);
+    } else {
+      window.print();
+    }
+  },
+
+  toggleFeatureFlag(key) {
+    if (state.currentUserRole !== 'admin') {
+      showToast('⚠️ 一般人員僅具唯讀權限，無法變更功能開關');
+      return;
+    }
+    state.featureFlags[key] = !state.featureFlags[key];
+    showToast(`已${state.featureFlags[key] ? '啟用' : '停用'}：${key} 模組`);
+    renderApp();
+  },
+
+  updateDailyMaterial(matId, val) {
+    const mat = state.materialsMaster.find(m => m.id === matId);
+    if (mat) {
+      mat.todayUsed = parseFloat(val) || 0;
+      saveState();
+      showToast(`已更新 ${mat.name} 本日使用量: ${mat.todayUsed} ${mat.unit}`);
+    }
+  },
+
+  calcTheoreticalConcrete(areaVal) {
+    const area = parseFloat(areaVal) || 0;
+    const thickness = 0.15; // 15cm 標準版厚
+    const theoretical = (area * thickness).toFixed(1);
+    const withLoss = (area * thickness * 1.03).toFixed(1);
+    const el = document.getElementById('calc-result-hint');
+    if (el) {
+      el.innerHTML = `➔ 理論量：<strong>${theoretical}</strong> m³ (加計3%施工耗損：<strong>${withLoss}</strong> m³)預拌車約 ${Math.ceil(withLoss/6)} 車`;
+    }
+  },
+
+  exportClaimsPdf() {
+    showToast('📑 正在產出工程契約請款期別估驗報表 (PDF)...');
+    setTimeout(() => {
+      window.print();
+    }, 300);
+  },
+
+  // DOC 2: F10 bug 修復 - 數量輸入採 DOM 原生操作，不重新觸發全頁 render
+  updateTradeQtyDirect(category, index, val) {
+    const rep = getActiveReport();
+    if (!rep) return;
+    const list = category === 'workers' ? rep.workers : rep.machines;
+    if (list && list[index]) {
+      list[index].count = Math.max(0, parseInt(val, 10) || 0);
+      saveState();
+    }
+  },
+
   // 🏢 3D BIM 輕量化檢視器動作 (業界標準無損局部 DOM 更新，絕不中斷 WebGL 與全螢幕)
   initBim3DViewer() {
     const container = document.getElementById('bim-canvas-wrap');
@@ -8024,6 +8960,6 @@ if (typeof window !== 'undefined') {
   });
 }
 
-  </script>
+</script>
 </body>
 </html>
